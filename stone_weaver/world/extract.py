@@ -178,6 +178,17 @@ def extract_relationships_from_text(
     return parse_json_list(raw)
 
 
+def _find_character(db: Session, name: str) -> Character | None:
+    """按标准名或别名精确匹配人物（Python 侧，规避 SQLite JSON contains 语义问题）。"""
+    c = db.query(Character).filter(Character.name == name).first()
+    if c:
+        return c
+    for cc in db.query(Character).all():
+        if name in (cc.aliases or []):
+            return cc
+    return None
+
+
 def save_relationships(db: Session, rels: list[dict], chapter: int) -> int:
     """按 (source, target, type) 去重 upsert，记录出处回目。返回新增数。"""
     from ..models import Relationship
@@ -189,14 +200,8 @@ def save_relationships(db: Session, rels: list[dict], chapter: int) -> int:
         rtype = (r.get("type") or "").strip()
         if not s_name or not t_name or not rtype or s_name == t_name:
             continue
-        s = (
-            db.query(Character).filter(Character.name == s_name).first()
-            or db.query(Character).filter(Character.aliases.contains(s_name)).first()
-        )
-        t = (
-            db.query(Character).filter(Character.name == t_name).first()
-            or db.query(Character).filter(Character.aliases.contains(t_name)).first()
-        )
+        s = _find_character(db, s_name)
+        t = _find_character(db, t_name)
         if s is None or t is None:
             continue  # 人物未入库则跳过（等人物全量后再跑）
         exists = (
