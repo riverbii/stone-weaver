@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>癸酉本石头记 · 目录</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="index-body">
+<header>
+  <h1>癸酉本石头记</h1>
+  <p class="subtitle">一百零八回全本</p>
+</header>
+<main class="toc">
+  <ol>
+    {% for c in chapters %}
+    <li><a href="/chapter/{{ c.num }}"><span class="num">第{{ c.num }}回</span>{{ c.title }}</a></li>
+    {% endfor %}
+  </ol>
+</main>
+<footer><p>stone-weaver · 甲辰秋</p></footer>
+</body>
+</html>

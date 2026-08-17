@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ddd5c0">
+<title>世界模型 · 石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="cover-body">
+<section class="cover portal" aria-label="世界模型">
+  <div class="cover-inner">
+    <p class="cover-kicker">世界模型 · 知识图谱</p>
+    <h1 class="cover-title">人物图谱</h1>
+    <p class="cover-sub">底本：脂评汇校（gongban_rb）· <span class="draft-badge">草稿版</span> 统一版就绪后重建</p>
+
+    <div class="world-stats">
+      <span class="stat"><b>{{ n_chars }}</b>人物</span>
+      <span class="stat"><b>{{ n_rels }}</b>关系</span>
+      <span class="stat"><b>{{ n_locs }}</b>地点</span>
+      <span class="stat"><b>{{ n_events }}</b>事件</span>
+      <span class="stat"><b>{{ n_ref }}</b>典故引用</span>
+    </div>
+
+    <div class="world-nav">
+      <a href="/world/chapter/1">按回看出场人物 →</a>
+      {% if kind == "story" %}
+      <a href="/world?kind=reference">查看典故引用人物 →</a>
+      {% else %}
+      <a href="/world">查看故事人物 →</a>
+      {% endif %}
+    </div>
+
+    <div class="world-table-wrap">
+      <table class="world-table">
+        <thead>
+          <tr><th>姓名</th><th>别名</th><th>性别</th><th>氏族</th><th>归属</th><th>首次出场</th></tr>
+        </thead>
+        <tbody>
+          {% for c in characters %}
+          <tr>
+            <td class="w-name"><a href="/world/character/{{ c.id }}">{{ c.name }}</a></td>
+            <td class="w-aliases">{{ c.aliases | join('、') }}</td>
+            <td>{{ c.gender or '—' }}</td>
+            <td>{{ c.clan or '—' }}</td>
+            <td>{{ c.house or '—' }}</td>
+            <td><a href="/world/chapter/{{ c.first_chapter }}">第{{ c.first_chapter }}回</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p class="world-foot"><a href="/">← 返回石头记</a></p>
+  </div>
+</section>
+</body>
+</html>

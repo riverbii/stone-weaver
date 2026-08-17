@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第{{ chapter.num }}回　{{ chapter.title }} · 癸酉本石头记</title>
+<script>
+try {
+  const saved = JSON.parse(localStorage.getItem("stone-weaver-preferences") || "{}");
+  if (["zhu", "bamboo", "begonia", "night"].includes(saved.theme)) document.documentElement.dataset.theme = saved.theme;
+  if (Number.isFinite(saved.fontSize)) document.documentElement.style.setProperty("--reader-size", saved.fontSize + "px");
+} catch (_) {}
+</script>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body data-view="reader" data-current="{{ chapter.num }}" data-total="{{ total }}">
+
+<div class="reader-shell">
+
+  <aside class="toc-panel" aria-label="回目">
+    <header class="toc-head">
+      <span class="toc-word">回 目</span>
+      <button class="control-button toc-close" id="toc-close" type="button" aria-label="收起回目">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <ol class="toc-list">
+      {% for c in all_chapters %}
+      <li>
+        <a class="toc-link {% if c.num == chapter.num %}is-active{% endif %}" href="/chapter/{{ c.num }}" {% if c.num == chapter.num %}aria-current="true"{% endif %}>
+          <span class="toc-number">{{ "%03d" | format(c.num) }}</span>
+          <span class="toc-title">{{ c.title }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+    <footer class="toc-foot">
+      {% if prev %}
+      <a class="control-button toc-prev" href="/chapter/{{ prev[0] }}" aria-label="上一回">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </a>
+      {% else %}
+      <span class="control-button toc-prev" aria-disabled="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></span>
+      {% endif %}
+      <span class="toc-current">第{{ chapter.num }}回</span>
+      {% if next %}
+      <a class="control-button toc-next" href="/chapter/{{ next[0] }}" aria-label="下一回">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </a>
+      {% else %}
+      <span class="control-button toc-next" aria-disabled="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+      {% endif %}
+    </footer>
+  </aside>
+
+  <main class="reader-main">
+    <header class="reader-toolbar" id="reader-toolbar">
+      <div class="reading-progress"><span id="progress-bar"></span></div>
+      <div class="reader-toolbar-inner">
+        <div class="toolbar-left">
+          <button class="control-button" id="toc-toggle" type="button" aria-label="回目">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          </button>
+          <a class="control-button" href="/" aria-label="封面">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V4l12-2v18M4 20l12-2M4 4l12-2M16 18V2"/></svg>
+          </a>
+        </div>
+        <button class="chapter-jump" id="chapter-jump" type="button" title="打开回目">
+          <span class="cj-num">第{{ chapter.num }}回</span>
+          <span class="cj-title">{{ chapter.title }}</span>
+        </button>
+        <div class="toolbar-right">
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <button class="control-button font-smaller" id="font-smaller" type="button" aria-label="减小字号">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20l6-16M11 20l6-16M8 12h6M3 20h4M17 20h4"/></svg>
+          </button>
+          <span class="font-value" id="font-size-value" aria-live="polite">21</span>
+          <button class="control-button font-larger" id="font-larger" type="button" aria-label="增大字号">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l6-16M10 20l6-16M7 12h6"/></svg>
+          </button>
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <button class="control-button theme-toggle" id="theme-toggle" type="button" aria-label="主题" aria-expanded="false">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-14 3 3 0 0 0 0-4z"/></svg>
+          </button>
+          <div class="theme-popover" id="theme-popover" role="radiogroup" aria-label="主题选择">
+            <button class="theme-option" type="button" role="radio" data-theme-value="zhu" aria-checked="true"><span class="theme-swatch swatch-zhu"></span><span>朱砂笺</span></button>
+            <button class="theme-option" type="button" role="radio" data-theme-value="bamboo" aria-checked="false"><span class="theme-swatch swatch-bamboo"></span><span>潇湘竹</span></button>
+            <button class="theme-option" type="button" role="radio" data-theme-value="begonia" aria-checked="false"><span class="theme-swatch swatch-begonia"></span><span>海棠春</span></button>
+            <button class="theme-option" type="button" role="radio" data-theme-value="night" aria-checked="false"><span class="theme-swatch swatch-night"></span><span>松烟夜</span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <article class="article-stage">
+      <header class="chapter-header">
+        <h2 class="chapter-title">第{{ chapter.num }}回</h2>
+        <p class="chapter-subtitle">{{ chapter.title }}</p>
+        <div class="chapter-rule" aria-hidden="true"><span></span></div>
+      </header>
+      <div class="prose">
+        {% for nodes in annotated %}
+        <p>
+          {% for n in nodes %}
+            {% if n.type == 'text' %}{{ n.text }}
+            {% elif n.type == 'annot' %}<span class="ann-inline ann-{{ n.source }}" title="{{ n.source_label }}">{{ n.text }}</span>
+            {% endif %}
+          {% endfor %}
+        </p>
+        {% endfor %}
+      </div>
+    </article>
+
+    <nav class="chapter-footer" aria-label="回目翻页">
+      {% if prev %}
+      <a class="turn-button footer-prev" href="/chapter/{{ prev[0] }}" aria-keyshortcuts="ArrowLeft">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        <span><span class="turn-label">上一回 · ←</span><span class="turn-title">第{{ prev[0] }}回　{{ prev[1] }}</span></span>
+      </a>
+      {% else %}
+      <span class="turn-button footer-prev is-disabled">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        <span><span class="turn-label">上一回 · ←</span><span class="turn-title">已是第一回</span></span>
+      </span>
+      {% endif %}
+      {% if next %}
+      <a class="turn-button footer-next" href="/chapter/{{ next[0] }}" aria-keyshortcuts="ArrowRight">
+        <span><span class="turn-label">下一回 · →</span><span class="turn-title">第{{ next[0] }}回　{{ next[1] }}</span></span>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </a>
+      {% else %}
+      <span class="turn-button footer-next is-disabled">
+        <span><span class="turn-label">下一回 · →</span><span class="turn-title">已是末回</span></span>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </span>
+      {% endif %}
+    </nav>
+
+    <footer class="colophon"><p>stone-weaver · 癸酉本石头记</p></footer>
+  </main>
+</div>
+
+<div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+
+<nav class="mobile-chapter-nav" aria-label="回目翻页">
+  {% if prev %}
+  <a class="control-button mobile-prev" href="/chapter/{{ prev[0] }}" aria-label="上一回">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+  </a>
+  {% else %}
+  <span class="control-button mobile-prev is-disabled"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></span>
+  {% endif %}
+  <button class="chapter-jump mobile-current" id="mobile-current" type="button">第{{ chapter.num }}回</button>
+  {% if next %}
+  <a class="control-button mobile-next" href="/chapter/{{ next[0] }}" aria-label="下一回">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+  </a>
+  {% else %}
+  <span class="control-button mobile-next is-disabled"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+  {% endif %}
+</nav>
+
+<script src="/static/reader.js"></script>
+</body>
+</html>

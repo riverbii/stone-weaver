@@ -1,0 +1,163 @@
+"""叙事引擎 · 主循环。
+
+架构定位（docs/architecture.md §5）：
+  simulate_one_beat 是阶段2 的最小闭环（先单 beat 验证质量，再扩展整回）。
+
+流程：
+  plan → generate → extract → validate_rules → 落库(events/event_edges/character_states)
+  规则校验失败 → 带反馈重生成（最多 max_retries 次）
+"""
+
+from __future__ import annotations
+
+import json
+import time
+
+from sqlalchemy.orm import Session
+
+from ..llm import LLMClient
+from ..models import Character, Event, EventEdge, GeneratedChapter
+from ..style.anchors import StyleAnchor
+from ..world.state import WorldState, apply_event
+from .generate import generate_and_extract
+from .validate import Violation, feedback_prompt, validate_personality, validate_rules
+
+
+def _name_to_id(db: Session, name: str) -> int | None:
+    c = db.query(Character).filter(Character.name == name).first()
+    if c:
+        return c.id
+    c = db.query(Character).filter(Character.kind == "story").all()
+    for cc in c:
+        if name in (cc.aliases or []):
+            return cc.id
+    return None
+
+
+def simulate_one_beat(
+    db: Session,
+    client: LLMClient,
+    beat: dict,
+    state: WorldState,
+    anchors: list[StyleAnchor],
+    *,
+    chapter_num: int,
+    title: str = "",
+    max_retries: int = 3,
+    persist: bool = True,
+) -> dict:
+    """执行一个 beat 的完整循环。返回结果 dict（供调用方检查）。"""
+    result: dict = {
+        "ok": False,
+        "text": "",
+        "events": [],
+        "violations": [],
+        "retries": 0,
+    }
+    for attempt in range(max_retries):
+        try:
+            text, evs = generate_and_extract(client, beat, state, anchors)
+        except Exception as e:  # noqa: BLE001
+            result["retries"] = attempt + 1
+            print(f"    生成异常（{type(e).__name__}），重试 {attempt+1}/{max_retries}", flush=True)
+            continue
+        if not text:
+            result["retries"] = attempt + 1
+            continue
+        v_rule = validate_rules(state, evs)
+        if v_rule:
+            # 带反馈重生成
+            fb = feedback_prompt(v_rule)
+            beat_w_fb = dict(beat)
+            beat_w_fb["_feedback"] = fb
+            result["violations"] = v_rule
+            result["retries"] = attempt + 1
+            continue
+        # 规则通过 → 落库
+        result["ok"] = True
+        result["text"] = text
+        result["events"] = evs
+        result["retries"] = attempt
+
+        if persist:
+            _persist(db, evs, state, chapter_num, text, title, beat)
+        # LLM 性格校验（warn 级，不影响落库，返回供参考）
+        v_person = validate_personality(client, text, state)
+        result["violations"] = v_rule + v_person
+        return result
+    return result
+
+
+def _persist(
+    db: Session,
+    evs: list[dict],
+    state: WorldState,
+    chapter_num: int,
+    text: str,
+    title: str,
+    beat: dict,
+) -> None:
+    """事件 + 因果边 + 状态变更 + 生成回目 落库。"""
+    from ..models import Chapter
+
+    ch = (
+        db.query(Chapter)
+        .filter(Chapter.version == "gongban_rb", Chapter.num == chapter_num)
+        .first()
+    )
+    if ch is None:
+        # 引擎生成回无公版对应（后28回），挂到 guihui_v3 同回下
+        ch = (
+            db.query(Chapter)
+            .filter(Chapter.version == "guihui_v3", Chapter.num == chapter_num)
+            .first()
+        )
+    event_rows = []
+    for i, ev in enumerate(evs, 1):
+        pids = [
+            _name_to_id(db, n)
+            for n in (ev.get("participants") or [])
+            if _name_to_id(db, n) is not None
+        ]
+        e = Event(
+            chapter_id=ch.id if ch else None,
+            seq=i,
+            summary=ev.get("summary", ""),
+            participants=pids,
+            location=ev.get("location"),
+        )
+        db.add(e)
+        db.flush()
+        event_rows.append((e, ev))
+    # 因果/时序边：cause_of 指向本数组序号 → 因果边；否则默认前驱时序边
+    for e, ev in event_rows:
+        idx = event_rows.index((e, ev))
+        cause = ev.get("cause_of") or 0
+        if isinstance(cause, int) and 1 <= cause <= len(event_rows) and cause != idx + 1:
+            db.add(
+                EventEdge(
+                    from_event_id=event_rows[cause - 1][0].id,
+                    to_event_id=e.id,
+                    kind="causal",
+                    note=ev.get("summary", "")[:80],
+                )
+            )
+        elif idx > 0:
+            db.add(
+                EventEdge(
+                    from_event_id=event_rows[idx - 1][0].id,
+                    to_event_id=e.id,
+                    kind="temporal",
+                )
+            )
+    db.add(
+        GeneratedChapter(
+            arc_id=None,
+            num=chapter_num,
+            title=title or f"第{chapter_num}回",
+            content=text,
+            status="draft",
+        )
+    )
+    db.commit()
+    state.chapter = chapter_num
