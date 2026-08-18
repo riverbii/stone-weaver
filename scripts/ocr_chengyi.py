@@ -1,0 +1,195 @@
+#!/usr/bin/env python3
+"""程乙本校注本：定位120回起始页 + 逐回OCR入库。
+
+流程：
+  1. 扫描全书找"第X回"标题页（跳过前63页目录区）
+  2. 每回从起始页到下一回前，逐页 OCR，拼接正文
+  3. 入库 version=chengyi_ocr
+
+用法: .venv/bin/python scripts/ocr_chengyi.py
+"""
+
+from __future__ import annotations
+
+import glob
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from sqlalchemy.orm import Session
+
+from stone_weaver.models import Chapter
+from stone_weaver.ingest.text import make_session, clean_text
+
+PDF = ROOT / "data" / "红楼梦" / "红楼梦（程乙本）欧阳健等校注，贵州人民出版社.pdf"
+DB = ROOT / "data" / "db" / "stone.db"
+
+CN = {
+    "一": 1,
+    "二": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+    "十": 10,
+    "〇": 0,
+    "零": 0,
+}
+
+
+def cn2int(s: str) -> int:
+    if s.isdigit():
+        return int(s)
+    total, section = 0, 0
+    for ch in s:
+        if ch == "十":
+            section = section * 10 if section else 10
+            total += section
+            section = 0
+        elif ch in CN and CN[ch] == 0:
+            section = 0
+        elif ch in CN:
+            section = CN[ch]
+    return total + section
+
+
+def page_png(pdf: str, page: int, dpi: int = 150) -> str:
+    prefix = tempfile.mktemp(prefix="ocr_", suffix="")
+    subprocess.run(
+        [
+            "pdftoppm",
+            "-f",
+            str(page),
+            "-l",
+            str(page),
+            "-r",
+            str(dpi),
+            "-png",
+            pdf,
+            prefix,
+        ],
+        check=True,
+        capture_output=True,
+    )
+    files = glob.glob(prefix + "*.png")
+    return files[0] if files else ""
+
+
+def locate_chapters(ocr, pdf: str, pages: int, start_page: int = 64) -> dict[int, int]:
+    """扫描找每回起始页。返回 {回数: 页码}。"""
+    title_re = re.compile(r"第([一二三四五六七八九十百零〇\d]+)回")
+    found: dict[int, int] = {}
+    # 先扫 start_page 附近的前几回建立格式，再全量
+    for page in range(start_page, pages + 1):
+        png = page_png(pdf, page)
+        if not png:
+            continue
+        result, _ = ocr(png)
+        texts = [item[1] for item in (result or [])]
+        head = " ".join(texts[:4])
+        m = title_re.search(head)
+        if m:
+            n = cn2int(m.group(1))
+            if n not in found:
+                found[n] = page
+                print(f"  第{n}回 -> 第{page}页")
+        os.unlink(png)
+        if page % 50 == 0:
+            print(f"  已扫 {page}/{pages} 页, 定位 {len(found)} 回")
+    return found
+
+
+def ocr_page_lines(ocr, png: str) -> list[str]:
+    """OCR 一页，按行重组。"""
+    result, _ = ocr(png)
+    if not result:
+        return []
+    rows: dict[int, list[tuple[int, str]]] = {}
+    for item in result:
+        box, text, _ = item
+        y = box[0][1] // 25 * 25
+        rows.setdefault(y, []).append((box[0][0], text))
+    lines = []
+    for y in sorted(rows):
+        line = " ".join(t for _, t in sorted(rows[y]))
+        lines.append(line)
+    return lines
+
+
+def main() -> int:
+    info = subprocess.run(["pdfinfo", str(PDF)], capture_output=True, text=True)
+    pages = 0
+    for line in info.stdout.splitlines():
+        if line.startswith("Pages:"):
+            pages = int(line.split(":")[1].strip())
+    print(f"程乙本校注本 总页数: {pages}")
+
+    from rapidocr_onnxruntime import RapidOCR
+
+    ocr = RapidOCR()
+
+    found = locate_chapters(ocr, str(PDF), pages)
+    missing = [n for n in range(1, 121) if n not in found]
+    print(f"定位 {len(found)} 回, 缺失 {missing}")
+
+    # 补齐缺失回（用前后回插值）
+    sorted_pages = sorted(found.items())
+    if not sorted_pages:
+        print("无定位结果，退出")
+        return 1
+
+    # 逐回 OCR
+    session: Session = make_session(str(DB))
+    try:
+        session.query(Chapter).filter(Chapter.version == "chengyi_ocr").delete()
+        session.commit()
+        for idx, (num, start) in enumerate(sorted_pages):
+            end = sorted_pages[idx + 1][1] - 1 if idx + 1 < len(sorted_pages) else pages
+            paras: list[str] = []
+            for page in range(start, end + 1):
+                png = page_png(str(PDF), page)
+                if not png:
+                    continue
+                lines = ocr_page_lines(ocr, png)
+                # 去书眉（第X回/回目行）和页眉
+                for line in lines:
+                    s = line.strip()
+                    if not s:
+                        continue
+                    if re.match(
+                        r"^第[一二三四五六七八九十百零〇\d]+回", s
+                    ) or s.startswith("中国古典文学名著"):
+                        continue
+                    paras.append(s)
+                os.unlink(png)
+            body = clean_text("\n".join(paras))
+            title = ""
+            # 标题从第一段提取
+            if paras:
+                tm = re.search(
+                    r"([\u4e00-\u9fff]{2,12}[\u3000　 ][\u4e00-\u9fff]{2,12})", paras[0]
+                )
+                if tm:
+                    title = tm.group(1).strip()
+            session.add(
+                Chapter(num=num, title=title, version="chengyi_ocr", content=body)
+            )
+            session.commit()
+            print(f"  第{num}回 入库 ({len(body)}字) 页{start}-{end}")
+    finally:
+        session.close()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
