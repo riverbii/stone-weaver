@@ -86,14 +86,37 @@ def chapter_mentions(db: Session, chapter_text: str) -> dict[int, int]:
     """计算一段文本里各人物的提及次数（规则匹配，别名展开）。
 
     返回 {character_id: count}。用于"谁在第几回出场"的快速索引。
+
+    计数策略：对每个字符位置做"最长词优先"匹配（同位置不重复计数），
+    避免子串重叠（如"贾雨村"里的"雨村"被二次计数）。
     """
     chars = db.query(Character).all()
     variants = names_variants(chars)
-    counts: dict[int, int] = {}
+    # 所有人物的匹配词 -> (人物id, 词长)，按词长降序（最长优先）
+    word_map: dict[str, int] = {}  # word -> character_id
     for cid, words in variants.items():
-        n = sum(chapter_text.count(w) for w in words)
-        if n:
-            counts[cid] = n
+        for w in words:
+            # 同一词归属多人时保留（由调用方决定），这里取最先的
+            word_map.setdefault(w, cid)
+    sorted_words = sorted(word_map.items(), key=lambda kv: -len(kv[0]))
+
+    text = chapter_text
+    n = len(text)
+    used = [False] * n  # 已匹配的字符位置
+    counts: dict[int, int] = {}
+    for word, cid in sorted_words:
+        wlen = len(word)
+        i = 0
+        while True:
+            pos = text.find(word, i)
+            if pos == -1:
+                break
+            # 该位置区间内若有字符已被更长词占用，跳过
+            if not any(used[pos : pos + wlen]):
+                counts[cid] = counts.get(cid, 0) + 1
+                for j in range(pos, pos + wlen):
+                    used[j] = True
+            i = pos + 1
     return counts
 
 
