@@ -8,9 +8,18 @@
 
 from __future__ import annotations
 
+import re
+
 from ..llm import LLMClient
 from ..world.state import WorldState
 from .anchors import StyleAnchor, format_anchors
+
+# 模型输出残留标记（如 <｜end▁of▁sentence｜> / <end_of_turn> 等）
+_JUNK_RE = re.compile(r"<\|?end▁of▁sentence\|?>|<end_of_turn>|<\|?im_end\|?>", re.I)
+
+
+def _clean_output(text: str) -> str:
+    return _JUNK_RE.sub("", text).strip()
 
 SCENE_PROMPT = """你是一位深谙《红楼梦》文风的续写专家。请根据给定的"世界状态"与"场景目标"，用曹雪芹的笔法写一段小说正文。
 
@@ -50,15 +59,16 @@ def generate_scene(
     state: WorldState,
     anchors: list[StyleAnchor],
 ) -> str:
-    """生成一个场景段落（带一次失败重试）。"""
+    """生成一个场景段落（带一次失败重试），清洗输出残留标记。"""
     prompt = build_scene_prompt(goal, state, anchors)
     for attempt in range(2):
         try:
-            return client.chat(
+            raw = client.chat(
                 [{"role": "system", "content": prompt}],
                 temperature=0.7,
                 max_tokens=1000,
             )
+            return _clean_output(raw)
         except Exception as e:  # noqa: BLE001
             if attempt == 0:
                 continue

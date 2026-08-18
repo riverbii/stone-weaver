@@ -122,3 +122,10 @@
 - 数据层已加 `characters.source_version` 列，现有 342 人标记 `gongban_rb`；提取脚本 save_characters 已支持写入。
 - 迁移：统一版入库为 version=unified → 4 个提取脚本 --version unified 全量重跑（source_version 区分草稿/正式）。
 - 网关限流已恢复，提取重启跑 ch23-80（bash-17），修复后不再空回（ch23 +8 / ch24 +23）。
+
+## [2026-08-17 阶段2试点] 文风生成首次成功 ✅
+- **最小试点通过**（沁芳桥畔·宝玉黛玉闲谈场景）：自动评估 **0.62 分（文风达标）**。
+- 生成质量：章回体腔调自然（"话说这一日""款款走来"）、葬花情节无缝衔接原著、人物口吻区分（宝玉痴语/黛玉尖刻）、结尾化用《葬花吟》诗句收束。
+- 修复：生成输出清洗残留标记（`<｜end▁of▁sentence｜>`）→ style.py `_clean_output`。
+- 验证链路：anchors 抽取 → style prompt 组装 → generate_scene → assess 自动评估，全通。
+- 注意：试点与提取并发会加剧网关限流；**大批量任务严格串行**。
