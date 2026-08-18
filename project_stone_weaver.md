@@ -129,3 +129,10 @@
 - 修复：生成输出清洗残留标记（`<｜end▁of▁sentence｜>`）→ style.py `_clean_output`。
 - 验证链路：anchors 抽取 → style prompt 组装 → generate_scene → assess 自动评估，全通。
 - 注意：试点与提取并发会加剧网关限流；**大批量任务严格串行**。
+
+## [2026-08-18 归并事故与修复] 别名归并 canonical 选择 bug
+- **事故**：merge_aliases.py 初版 canonical 选"名字最长者"→ 黛玉组 canonical 变成"潇湘妃子"，林黛玉等标准名记录被删（897→778 但核心人物丢失）。
+- **处理**：清空 characters + 重置进度 + DeepSeek 重跑全量 80 回（约 40 分钟）。
+- **修复**：canonical 优先"带姓氏标准全名"（林黛玉>黛玉>潇湘妃子）；单向别名指向即可入组（比双向互认全面）；排除 ≤1 字别名（"玉"会串起所有含玉人物）、泛称（太太/老爷/二姑娘…）、硬分离名（甄宝玉≠宝玉，薛二姑娘≠迎春）、亲属称谓（X之母/X之妻）。
+- **教训**：归并类破坏性操作先跑模拟数据测试（tests/ 应有 test_merge_aliases.py）；先备份 DB（sqlite .backup）再 apply。
+- **当前**：DeepSeek 官方 API 快且稳（每回 25-40s，80 回约 40 分钟）——已替换耗尽的 opencode Zen。
