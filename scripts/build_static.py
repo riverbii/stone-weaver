@@ -82,6 +82,10 @@ def main() -> int:
             ("/engine/%d" % n, PUBLIC / "engine" / str(n) / "index.html")
             for n in _all_engine_nums()
         ],
+        *[
+            ("/self/%d" % n, PUBLIC / "self" / str(n) / "index.html")
+            for n in range(81, 109)
+        ],
     ]:
         r = client.get(path)
         if r.status_code != 200:

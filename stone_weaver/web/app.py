@@ -480,6 +480,81 @@ def world_character(request: Request, cid: int, version: str = "gongban_rb"):
     )
 
 
+@app.get("/self/{num}", response_class=HTMLResponse)
+def self_chapter(request: Request, num: int):
+    """自家版本阅读页：文笔≥6 的回用癸酉本原文，其余用引擎重建。
+
+    判定依据：data/guihui_judge_report.json（LLM 纯文笔裁判 ≥6 = 直接用原文）。
+    """
+    import json
+
+    db = get_db()
+    try:
+        from ..models import Chapter, GeneratedChapter
+
+        # 文笔≥6 名单
+        report_path = ROOT / "data" / "guihui_judge_report.json"
+        use_original = set()
+        if report_path.exists():
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            use_original = {
+                int(k) for k, v in report.items()
+                if isinstance(v, dict) and v.get("score") is not None and v["score"] >= 6
+            }
+
+        if num in use_original:
+            # 用癸酉本原文
+            ch = (
+                db.query(Chapter)
+                .filter(Chapter.version == "guihui_clean", Chapter.num == num)
+                .first()
+            )
+            source_label = "癸酉本原文 · 文笔达标"
+        else:
+            # 用引擎重建（若无则 404）
+            ch = (
+                db.query(GeneratedChapter)
+                .filter(GeneratedChapter.num == num)
+                .first()
+            )
+            source_label = "引擎重建"
+        all_chs = (
+            db.query(Chapter.num, Chapter.title)
+            .filter(Chapter.version == "guihui_clean", Chapter.num.between(81, 108))
+            .order_by(Chapter.num)
+            .all()
+        )
+    finally:
+        db.close()
+    if ch is None:
+        return templates.TemplateResponse(
+            request=request,
+            name="not_found.html",
+            context={"num": num},
+            status_code=404,
+        )
+    prev = next_ = None
+    for n, t in all_chs:
+        if n == num - 1:
+            prev = (n, t)
+        elif n == num + 1:
+            next_ = (n, t)
+    paragraphs = [p for p in ch.content.split("\n") if p.strip()]
+    return templates.TemplateResponse(
+        request=request,
+        name="engine_chapter.html",
+        context={
+            "chapter": ch,
+            "paragraphs": paragraphs,
+            "all_chapters": all_chs,
+            "prev": prev,
+            "next": next_,
+            "total": len(all_chs),
+            "source_label": source_label,
+        },
+    )
+
+
 @app.get("/engine/{num}", response_class=HTMLResponse)
 def engine_chapter(request: Request, num: int):
     """自家版本（引擎重建）阅读页。"""
@@ -523,6 +598,7 @@ def engine_chapter(request: Request, num: int):
             "prev": prev,
             "next": next_,
             "total": len(all_chs),
+            "source_label": "引擎重建",
         },
     )
 

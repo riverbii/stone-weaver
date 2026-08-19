@@ -97,7 +97,7 @@ try {
       <header class="chapter-header">
         <h2 class="chapter-title">第{{ chapter.num }}回</h2>
         <p class="chapter-subtitle">{{ chapter.title }}</p>
-        <p class="engine-badge">⚙️ 引擎重建 · draft</p>
+        <p class="engine-badge">{{ source_label if source_label else '引擎重建' }}{% if source_label == '引擎重建' %} · draft{% endif %}</p>
         <div class="chapter-rule" aria-hidden="true"><span></span></div>
       </header>
       <div class="prose">
