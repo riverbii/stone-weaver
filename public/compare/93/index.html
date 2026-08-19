@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第93回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="93">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/92" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" >第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" >第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" >第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" >第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" >第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" >第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" >第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" selected>第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" >第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" >第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/94" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi_ocr" data-label="程乙本OCR" checked>
+          程乙本OCR
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/93">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第93回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</h3>
+        
+        
+        <p class="col-para">
+          
+            卻說馮紫英去後，賈政叫門上人來吩咐道：“今兒臨安伯那里來請吃酒，知道是什麼事？”門上的人道：“奴才曾問過，并沒有什麼喜慶事。不過南安王府里到了一班小戲子，都說是個名班。伯爺高興，唱兩天戲請相好的老爺們瞧瞧，熱鬧熱鬧。大約不用送禮的。”說著，賈赦過來問道：“明兒二老爺去不去？”賈政道：“承他親熱，怎麼好不去的。”說著，門上進來回道：“衙門里書辦來請老爺明日上衙門，有堂派的事，必得早些去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賈政道：“知道了。”說著，只見兩個管屯里地租子的家人走來，請了安，磕了頭，旁邊站著。賈政道：“你們是郝家庄的？”兩個答應了一聲。賈政也不往下問，竟與賈赦各自說了一回話兒散了。家人等秉著手燈送過賈赦去。這里賈璉便叫那管租的人道：“說你的。”那人說道：“十月里的租子奴才已經赶上來了，原是明兒可到。誰知京外拿車，把車上的東西不由分說都掀在地下。奴才告訴他說是府里收租子的車，不是買賣車。他更不管這些。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            奴才叫車夫只管拉著走，幾個衙役就把車夫混打了一頓，硬扯了兩輛車去了。奴才所以先來回報，求爺打發個人到衙門里去要了來才好。再者，也整治整治這些無法無天的差役才好。爺還不知道呢，更可怜的是那買賣車，客商的東西全不顧，掀下來赶著就走。那些赶車的但說句話，打的頭破血出的。”賈璉聽了，罵道：“這個還了得！”立刻寫了一個帖兒，叫家人：“拿去向拿車的衙門里要車去，并車上東西。若少了一件，是不依的。快叫周瑞。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”周瑞不在家。又叫旺兒，旺兒晌午出去了，還沒有回來。賈璉道：“這些忘八羔子，一個都不在家！他們終年家吃糧不管事。”因吩咐小廝們：“快給我找去。”說著，也回到自己屋里睡下。不提。且說臨安伯第二天又打發人來請。賈政告訴賈赦道：“我是衙門里有事，璉兒要在家等候拿車的事情，也不能去，倒是大老爺帶寶玉應酬一天也罷了。”賈赦點頭道：“也使得。”賈政遣人去叫寶玉，說”今兒跟大爺到臨安伯那里聽戲去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”寶玉喜歡的了不得，便換上衣服，帶了焙茗，掃紅，鋤藥三個小子出來，見了賈赦，請了安，上了車，來到臨安伯府里。門上人回進去，一會子出來說：“老爺請。”于是賈赦帶著寶玉走入院內，只見賓客喧闐。賈赦寶玉見了臨安伯，又與眾賓客都見過了禮。大家坐著說笑了一回。只見一個掌班的拿著一本戲單，一個牙笏，向上打了一個千兒，說道：“求各位老爺賞戲。”先從尊位點起，挨至賈赦，也點了一出。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那人回頭見了寶玉，便不向別處去，竟搶步上來打個千兒道：“求二爺賞兩出。”寶玉一見那人，面如傅粉，唇若涂朱，鮮潤如出水芙蕖，飄揚似臨風玉樹。原來不是別人，就是蔣玉菡。前日聽得他帶了小戲兒進京，也沒有到自己那里。此時見了，又不好站起來，只得笑道：“你多早晚來的？”蔣玉菡把手在自己身子上一指，笑道：“怎麼二爺不知道么？”寶玉因眾人在坐，也難說話，只得胡亂點了一出。蔣玉菡去了，便有幾個議論道：“此人是誰？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”有的說：“他向來是唱小旦的，如今不肯唱小旦，年紀也大了，就在府里掌班。頭里也改過小生。他也攢了好幾個錢，家里已經有兩三個舖子，只是不肯放下本業，原舊領班。”有的說：“想必成了家了。”有的說：“親還沒有定。他倒拿定一個主意，說是人生配偶關系一生一世的事，不是混鬧得的，不論尊卑貴賤，總要配的上他的才能。所以到如今還并沒娶親。”寶玉暗忖度道：“不知日後誰家的女孩兒嫁他。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要嫁著這樣的人材兒，也算是不辜負了。”那時開了戲，也有昆腔，也有高腔，也有弋腔梆子腔，做得熱鬧。過了晌午，便擺開桌子吃酒。又看了一回，賈赦便欲起身。臨安伯過來留道：“天色尚早，聽見說蔣玉菡還有一出《占花魁》，他們頂好的首戲。”寶玉聽了，巴不得賈赦不走。于是賈赦又坐了一會。果然蔣玉菡扮著秦小官伏侍花魁醉後神情，把這一种怜香惜玉的意思，做得极情盡致。以後對飲對唱，纏綿繾綣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉這時不看花魁，只把兩只眼睛獨射在秦小官身上。更加蔣玉菡聲音響亮，口齒清楚，按腔落板，寶玉的神魂都唱了進去了。直等這出戲進場後，更知蔣玉菡极是情种，非尋常戲子可比。因想著《樂記》上說的是”情動于中，故形于聲。聲成文謂之音。”所以知聲，知音，知樂，有許多講究。聲音之原，不可不察。詩詞一道，但能傳情，不能入骨，自後想要講究講究音律。寶玉想出了神，忽見賈赦起身，主人不及相留。寶玉沒法，只得跟了回來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到了家中，賈赦自回那邊去了，寶玉來見賈政。賈政才下衙門，正向賈璉問起拿車之事。賈璉道：“今兒門人拿帖兒去，知縣不在家。他的門上說了：這是本官不知道的，并無牌票出去拿車，都是那些混帳東西在外頭撒野擠訛頭。既是老爺府里的，我便立刻叫人去追辦，包管明兒連車連東西一并送來，如有半點差遲，再行稟過本官，重重處治。此刻本官不在家，求這里老爺看破些，可以不用本官知道更好。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賈政道：“既無官票，到底是何等樣人在那里作怪？”賈璉道：“老爺不知，外頭都是這樣。想來明兒必定送來的。”賈璉說完下來，寶玉上去見了。賈政問了幾句，便叫他往老太太那里去。賈璉因為昨夜叫空了家人，出來傳喚，那起人多已伺候齊全。賈璉罵了一頓，叫大管家賴升：“將各行檔的花名冊子拿來，你去查點查點。寫一張諭帖，叫那些人知道：若有并未告假，私自出去，傳喚不到，貽誤公事的，立刻給我打了攆出去！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賴升連忙答應了幾個”是”，出來吩咐了一回。家人各自留意。過不幾時，忽見有一個人頭上載著氈帽，身上穿著一身青布衣裳，腳下穿著一雙撒鞋，走到門上向眾人作了個揖。眾人拿眼上上下下打諒了他一番，便問他是那里來的。那人道：“我自南邊甄府中來的。并有家老爺手書一封，求這里的爺們呈上尊老爺。”眾人聽見他是甄府來的，才站起來讓他坐下道：“你乏了，且坐坐，我們給你回就是了。”門上一面進來回明賈政，呈上來書。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈政拆書看時，上寫著：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            世交夙好，氣誼素敦。遙仰襜帷，不胜依切。弟因菲材獲譴，自分萬死難償，幸邀寬宥，待罪邊隅，迄今門戶凋零，家人星散。所有奴子包勇，向曾使用，雖無奇技，人尚愨實。倘使得備奔走，糊口有資，屋烏之愛，感佩無涯矣。專此奉達，餘容再敘。不宣。賈政看完，笑道：“這里正因人多，甄家倒荐人來，又不好卻的。”吩咐門上：“叫他見我。且留他住下，因材使用便了。”門上出去，帶進人來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            見賈政便磕了三個頭，起來道：“家老爺請老爺安。”自己又打個千兒說：“包勇請老爺安。”賈政回問了甄老爺的好，便把他上下一瞧。但見包勇身長五尺有零，肩背寬肥，濃眉爆眼，磕額長髯，氣色粗黑，垂著手站著。便問道：“你是向來在甄家的，還是住過幾年的？”包勇道：“小的向在甄家的。”賈政道：“你如今為什麼要出來呢？”包勇道：“小的原不肯出來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只是家爺再四叫小的出來，說是別處你不肯去，這里老爺家里只當原在自己家里一樣的，所以小的來的。”賈政道：“你們老爺不該有這事情，弄到這樣的田地。”包勇道：“小的本不敢說，我們老爺只是太好了，一味的真心待人，反倒招出事來。”賈政道：“真心是最好的了。”包勇道：“因為太真了，人人都不喜歡，討人厭煩是有的。”賈政笑了一笑道：“既這樣，皇天自然不負他的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”包勇還要說時，賈政又問道：“我聽見說你們家的哥兒不是也叫寶玉么？”包勇道：“是。”賈政道：“他還肯向上巴結么？”包勇道：“老爺若問我們哥兒，倒是一段奇事。哥兒的脾氣也和我家老爺一個樣子，也是一味的誠實。從小兒只管和那些姐妹們在一處頑，老爺太太也狠打過幾次，他只是不改。那一年太太進京的時候兒，哥兒大病了一場，已經死了半日，把老爺幾乎急死，裝裹都預備了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幸喜後來好了，嘴里說道，走到一座牌樓那里，見了一個姑娘領著他到了一座廟里，見了好些柜子，里頭見了好些冊子。又到屋里，見了無數女子，說是多變了鬼怪似的，也有變做骷髏兒的。他嚇急了，便哭喊起來。老爺知他醒過來了，連忙調治，漸漸的好了。老爺仍叫他在姐妹們一處頑去，他竟改了脾氣了，好著時候的頑意兒一概都不要了，惟有念書為事。就有什麼人來引誘他，他也全不動心。如今漸漸的能夠幫著老爺料理些家務了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賈政默然想了一回，道：“你去歇歇去罷。等這里用著你時，自然派你一個行次兒。”包勇答應著退下來，跟著這里人出去歇息。不提。一日賈政早起剛要上衙門，看見門上那些人在那里交頭接耳，好象要使賈政知道的似的，又不好明回，只管咕咕唧唧的說話。賈政叫上來問道：“你們有什麼事，這麼鬼鬼祟祟的？”門上的人回道：“奴才們不敢說。”賈政道：“有什麼事不敢說的？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”門上的人道：“奴才今兒起來開門出去，見門上貼著一張白紙，上寫著許多不成事体的字。”賈政道：“那里有這樣的事，寫的是什麼？”門上的人道：“是水月庵里的腌髒話。”賈政道：“拿給我瞧。”門上的人道：“奴才本要揭下來，誰知他貼得結實，揭不下來，只得一面抄一面洗。剛才李德揭了一張給奴才瞧，就是那門上貼的話。奴才們不敢隱瞞。”說著呈上那帖兒。賈政接來看時，上面寫著：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            西貝草斤年紀輕，水月庵里管尼僧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一個男人多少女，窩娼聚賭是陶情。不肖子弟來辦事，榮國府內出新聞。賈政看了，氣得頭昏目暈，赶著叫門上的人不許聲張，悄悄叫人往宁榮兩府靠近的夾道子牆壁上再去找尋。隨即叫人去喚賈璉出來。賈璉即忙赶至。賈政忙問道：“水月庵中寄居的那些女尼女道，向來你也查考查考過沒有？”賈璉道：“沒有。一向都是芹兒在那裡照管。”賈政道：“你知道芹兒照管得來照管不來？”賈璉道：“老爺既這麼說，想來芹兒必有不妥當的地方兒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賈政歎道：“你瞧瞧這個帖兒寫的是什麼。”賈璉一看，道：“有這樣事麼。”正說著，只見賈蓉走來，拿著一封書子，寫著“二老爺密啟”。打開看時，也是無頭榜一張，與門上所貼的話相同。賈政道：“快叫賴大帶了三四輛車子到水月庵里去，把那些女尼女道士一齊拉回來。不許泄漏，只說里頭傳喚。”賴大領命去了。且說水月庵中小女尼女道士等初到庵中，沙彌與道士原系老尼收管，日間教他些經忏。以後元妃不用，也便習學得懶怠了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那些女孩子們年紀漸漸的大了，都也有個知覺了。更兼賈芹也是風流人物，打量芳官等出家只是小孩子性兒，便去招惹他們。那知芳官竟是真心，不能上手，便把這心腸移到女尼女道士身上。因那小沙彌中有個名叫沁香的和女道士中有個叫做鶴仙的，長得都甚妖嬈，賈芹便和這兩個人勾搭上了。閒時便學些絲弦，唱個曲兒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那時正當十月中旬，賈芹給庵中那些人領了月例銀子，便想起法兒來，告訴眾人道：“我為你們領月錢不能進城，又只得在這里歇著。怪冷的，怎麼樣？我今兒帶些果子酒，大家吃著樂一夜好不好？”那些女孩子都高興，便擺起桌子，連本庵的女尼也叫了來，惟有芳官不來。賈芹喝了幾杯，便說道要行令。沁香等道：“我們都不會，到不如搳拳罷。誰輸了喝一杯，豈不爽快。”本庵的女尼道：“這天剛過晌午，混嚷混喝的不象。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且先喝幾盅，愛散的先散去，誰愛陪芹大爺的，回來晚上盡子喝去，我也不管。”正說著，只見道婆急忙進來說：“快散了罷，府里賴大爺來了。”眾女尼忙亂收拾，便叫賈芹躲開。賈芹因多喝了幾杯，便道：“我是送月錢來的，怕什麼！”話猶未完，已見賴大進來，見這般樣子，心里大怒。為的是賈政吩咐不許聲張，只得含糊裝笑道：“芹大爺也在這里呢么。”賈芹連忙站起來道：“賴大爺，你來作什麼？”賴大說：“大爺在這里更好。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            快快叫沙彌道士收拾上車進城，宮里傳呢。”賈芹等不知原故，還要細問。賴大說：“天已不早了，快快的好赶進城。”眾女孩子只得一齊上車，賴大騎著大走騾押著赶進城。不題。卻說賈政知道這事，氣得衙門也不能上了，獨坐在內書房歎氣。賈璉也不敢走開。忽見門上的進來稟道：“衙門里今夜該班是張老爺，因張老爺病了，有知會來請老爺補一班。”賈政正等賴大回來要辦賈芹，此時又要該班，心里納悶，也不言語。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈璉走上去說道：“賴大是飯後出去的，水月庵離城二十來里，就赶進城也得二更天。今日又是老爺的幫班，請老爺只管去。賴大來了，叫他押著，也別聲張，等明兒老爺回來再發落。倘或芹兒來了，也不用說明，看他明兒見了老爺怎麼樣說。”賈政聽來有理，只得上班去了。賈璉抽空才要回到自己房中，一面走著，心里抱怨鳳姐出的主意，欲要埋怨，因他病著，只得隱忍，慢慢的走著。且說那些下人一人傳十傳到里頭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            先是平兒知道，即忙告訴鳳姐。鳳姐因那一夜不好，懨懨的總沒精神，正是惦記鐵檻寺的事情。聽說外頭貼了匿名揭帖的一句話，嚇了一跳，忙問貼的是什麼。平兒隨口答應，不留神就錯說了道：“沒要緊，是饅頭庵里的事情。”鳳姐本是心虛，聽見饅頭庵的事情，這一唬直唬怔了，一句話沒說出來，急火上攻，眼前發暈，咳嗽了一陣，哇的一聲，吐出一口血來。平兒慌了，說道：“水月庵里不過是女沙彌女道士的事，奶奶著什麼急。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”鳳姐聽是水月庵，才定了定神，說道：“呸，糊涂東西，到底是水月庵呢，是饅頭庵？”平兒笑道：“是我頭里錯聽了是饅頭庵，後來聽見不是饅頭庵，是水月庵。我剛才也就說溜了嘴，說成饅頭庵了。”鳳姐道：“我就知道是水月庵，那饅頭庵與我什麼相干。原是這水月庵是我叫芹兒管的，大約克扣了月錢。”平兒道：“我聽著不象月錢的事，還有些腌髒話呢。”鳳姐道：“我更不管那個。你二爺那里去了？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”平兒說：“聽見老爺生氣，他不敢走開。我聽見事情不好，我吩咐這些人不許吵嚷，不知太太們知道了么。但聽見說老爺叫賴大拿這些女孩子去了。且叫個人前頭打聽打聽。奶奶現在病著，依我竟先別管他們的閒事。”正說著，只見賈璉進來。鳳姐欲待問他，見賈璉一臉的怒氣，暫且裝作不知。賈璉飯沒吃完，旺兒來說：“外頭請爺呢，賴大回來了。”賈璉道：“芹兒來了沒有？”旺兒道：“也來了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賈璉便道：“你去告訴賴大，說老爺上班兒去了。把這些個女孩子暫且收在園里，明日等老爺回來送進宮去。只叫芹兒在內書房等著我。”旺兒去了。賈芹走進書房，只見那些下人指指點點，不知說什麼。看起這個樣兒來，不象宮里要人。想著問人，又問不出來。正在心里疑惑，只見賈璉走出來。賈芹便請了安，垂手侍立，說道：“不知道娘娘宮里即刻傳那些孩子們做什麼，叫侄兒好赶。幸喜侄兒今兒送月錢去還沒有走，便同著賴大來了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二叔想來是知道的。”賈璉道：“我知道什麼！你才是明白的呢。”賈芹摸不著頭腦兒，也不敢再問。賈璉道：“你幹得好事，把老爺都氣坏了。”賈芹道：“侄兒沒有幹什麼。庵里月錢是月月給的，孩子們經忏是不忘記的。”賈璉見他不知，又是平素常在一處頑笑的，便歎口氣道：“打嘴的東西，你各自去瞧瞧罷！”便從靴掖兒里頭拿出那個揭帖來，扔與他瞧。賈芹拾來一看，嚇的面如土色，說道：“這是誰幹的！我并沒得罪人，為什麼這麼坑我！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我一月送錢去，只走一趟，并沒有這些事。若是老爺回來打著問我，侄兒便死了。我母親知道，更要打死。”說著，見沒人在旁邊，便跪下去說道：“好叔叔，救我一救兒罷！”說著，只管磕頭，滿眼淚流。賈璉想道：“老爺最惱這些，要是問准了有這些事，這場氣也不小。鬧出去也不好聽，又長那個貼帖兒的人的志氣了。將來咱們的事多著呢。倒不如趁著老爺上班兒，和賴大商量著，若混過去，就可以沒事了。現在沒有對證。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”想定主意，便說：“你別瞞我，你幹的鬼鬼祟祟的事，你打諒我都不知道呢。若要完事，就是老爺打著問你，你一口咬定沒有才好。沒臉的，起去罷！”叫人去喚賴大。不多時，賴大來了。賈璉便與他商量。賴大說：“這芹大爺本來鬧的不象了。奴才今兒到庵里的時候，他們正在那里喝酒呢。帖兒上的話是一定有的。”賈璉道：“芹兒你聽，賴大還賴你不成。”賈芹此時紅漲了臉，一句也不敢言語。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            還是賈璉拉著賴大，央他：“護庇護庇罷，只說是芹哥兒在家里找來的。你帶了他去，只說沒有見我。明日你求老爺也不用問那些女孩子了，竟是叫了媒人來，領了去一賣完事。果然娘娘再要的時候兒咱們再買。”賴大想來，鬧也無益，且名聲不好，就應了。賈璉叫賈芹：“跟了賴大爺去罷，聽著他教你。你就跟著他。”說罷，賈芹又磕了一個頭，跟著賴大出去。到了沒人的地方兒，又給賴大磕頭。賴大說：“我的小爺，你太鬧的不象了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不知得罪了誰，鬧出這個亂兒。你想想誰和你不對罷。”賈芹想了一想，忽然想起一個人來。未知是誰，下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi_ocr">
+      <div class="compare-col-head">
+        <span class="badge">程乙本OCR</span>
+        <span class="col-desc">程乙本OCR（欧阳健校注本PDF本地识别）</span>
+        <span>第93回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</h3>
+        
+        
+        <p class="col-para">
+          
+            却说冯紫英去后，贾政叫门上的人来盼道：“今儿临安伯那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里来请吃酒，知道是什么事？”门上的人道：“奴才曾问过，并没有仟
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            么喜庆事，不过南安王府里到了一班小戏子，都说是个名班，伯爷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            高兴，唱两天戏，请相好的老爷们瞧瞧，热闹热闹。大约不用送礼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的。”说着，贾赦过来问道：“明儿二老爷去不去？”贾政道：“承他亲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            热，怎么好不去的？&#34;说着，门上进来回道：“衙门里书办来请老爷明
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日上衙门，有堂派①的事，必得早些去。&#34;贾政道：“知道了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着，只见两个管屯里地租子的家人走来，请了安，磕了头，旁
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            边站着。贾政道：“你们是郝家庄的？”两个答应了一声。贾政也不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            往下问，竟与贾赦各自说了一回话儿散了。家人等秉着手灯，送过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾赦去。这里贾琏便叫那管租的人道：“说你的。那人说道：“十月
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里的租子，奴才已经赶上来了，原是明儿可到。谁知京外拿车，把
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            车上的东西，不由分说都拆在地下。奴才告诉他说是府里收租子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的车，不是买卖车②，他更不管这些。奴才叫车夫只管拉着走，几
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个衙役就把车夫混打了一顿，硬扯了两辆车去了。奴才所以先来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回报。求爷打发个人到衙门里去，要了来才好。再者，也整治整治
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这些无法无天的差役才好。爷还不知道呢，更可怜的是那买卖车，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            客商的东西全不顾，掀下来赶着就走。那些赶车的但说句话，打的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            头破血出的。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②买卖车一一供人雇用的车。 ①堂派一一本长官交派。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中国吉典文学名著
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾班听了，骂道：“这个还了得！”立刻写了一个帖儿，叫家人：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “拿去向拿车的衙门里要车去，并车上东西。若少了一件，是不依
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的。快叫周瑞！”周瑞不在家，又叫旺儿。旺儿响午出去了，还没有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回来。贾琏道：“这些忘八日的，一个都不在家！他们成年家吃粮
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不管事！”因盼时小断们：“快给我找去！”说着，也回到自己屋里睡
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            下,不提。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且说临安伯第二天又打发人来请，贾政告诉贾赦道：“我是衙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            门里有事，琏儿要在家等候拿车的事情，也不能去。倒是大老爷带
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉应酬一天也罢了。&#34;贾赦点头道：“也使得。&#34;贾政遣人去叫宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉，说：“今儿跟大老爷到临安伯那里听戏去。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉喜欢的了不得，便换上衣服，带了焙茗、扫红、锄药三个小
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子，出来见了贾赦，请了安，上了车来到临安伯府里。门上人回进
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去，一会子出来说：“老爷请。”于是贾赦带着宝玉走人院内，只见宾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            客喧阈。贾赦、宝玉见了临安伯，又与众宾客都见过了礼，大家坐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着说笑了一回。只见一个掌班拿着一本戏单，一个牙贫，向上打了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一个千儿，说道：“求各位老爷赏戏。先从尊位点起。挨至贾赦，也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            点了一出。那人回头见了宝玉，便不向别处去，竟抢步上来，打个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            千儿道：“求二爷赏两出。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉一见那人，面如傅粉，唇若涂朱，鲜润如出水芙渠，飘扬似
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            临风玉树：原来不是别人，就是蒋玉函。前日听得他带了小戏儿进
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            京，也没有到自已那里。此时见了，又不好站起来，只得笑道：“你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            多早晚来的？&#34;蒋玉函把眼往左右一溜，俏俏的笑道：“怎么二爷不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            知道么？”宝玉因众人在座，也难说话，只胡乱点了一出。蒋玉函去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，便有几个议论道：“此人是谁？”有的说：“他向来是唱小旦的，如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今不肯唱小旦，年纪也大了，就在府里掌班，头里也改过小生。他 PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也了好几个钱，家里已经有两三个铺子，只是不肯放下本业，原
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            旧领班。&#34;有的说：“想必成了家了。&#34;有的说：“亲还没有定。他倒拿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            定一个主意，说是人生婚配，关系一生一世的事，不是混闹得的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不论尊卑贵贱，总要配的上他的才能。所以到如今还并没娶亲。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉暗付度道：“不知日后谁家的女孩儿嫁他？要嫁着这样的人才
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿，也算是不辜负了！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那时开了戏，也有昆腔，也有高腔，也有代腔、平腔，热闹非常。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到了响午，便摆开桌子吃酒。又看了一回，贾赦便欲起身。临安伯
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过来留道：“天色尚早。听见说琪官儿还有一出《占花魁》，他们顶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好的首戏。”宝玉听了，巴不得贾赦不走。于是贾赦又坐了一会。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            果然蒋玉函扮了秦小官，伏侍花魁醉后神情，把那一种怜香惜玉的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            意思，做得极情尽致。以后对饮对唱，缠绵缝继。宝玉这时不看花
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            魁，只把两只眼睛独射在秦小官身上。更加蒋玉函声音响亮，口齿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清楚，按腔落板，宝玉的神魂都唱的飘荡了。直等这出戏煞场后，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            更知蒋玉函极是情种，非寻常脚色可比。因想着：“《乐记》上说的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是：“情动于中，故形于声；声成文，谓之音。所以知声，知音，知乐，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有许多讲究。声音之原，不可不察。诗词一道，但能传情，不能入
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            骨，自后想要讲究讲究音律。”宝玉想出了神，忽见贾赦起身，主人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不及相留。宝玉没法，只得跟了回来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到了家中，贾赦自回那边去了。宝玉来见贾政。贾政才下衙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            门，正向贾琏问起拿车之事。贾琏道：“今儿叫人拿帖儿去，知县不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            在家。他的门上说了：“这是本官不知道的，并无牌票出去拿车，都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是那些混帐东西在外头撒野挤讹头①。既是老爷府里的，我便立
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刻叫人去追办，包管明儿连车连东西一并送来。如有半点差迟，再
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            行票过本官，重重处治。此刻本官不在家，求这里老爷看破些，可
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            以不用本官知道更好。”贾政道：“既无官票，到底是何等样人在那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里作怪？”贾道：“老爷不知，外头都是这样。想来明儿必定送来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的。”贾琏说完下来。宝玉上去见了。贾政问了几句，便叫他往老
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①挤头诊 诈钱财。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中国古共文学名港
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            太太那里去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾因为咋夜叫空了家人，出来传唤，那起人都已伺候齐全。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾琏骂了顿，叫大管家赖大：“将各行档的花名册子拿来，你去查
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            点查点，写一张谕贴叫那些人知道：若有并未告假私自出去，传唤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不到贻误公事的，立刻给我打了摔出去！”赖大连忙答应了几个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “是”，出来盼时了一回，家人各自留意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过不几时，忽见有一个人，买上戴着毡帽，身上穿着一身青布
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            衣裳，脚下穿着一双撒鞋，走到门上，向众人作了个揖。众人拿眼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上上下下打量了他一番，便问他是那里来的。那人道：“我自南边
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            甄府中来的，并有家老爷手书一封，求这里的爷们呈上尊老爷。&#34;众
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人听见他是甄府来的，才站起来让他坐下，道：“你乏了，且坐坐。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我们给你回就是了。”门上一面进来回明贾政，呈上来书。贾政拆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书看时，上写着：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            世交风好，气谊素敦，遥仰谚，不胜依切。弟因菲材获
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            遣，自分万死难偿，幸邀宽有，待罪边隅。迄今门户凋零，家人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            星散。所有奴子包勇，向曾使用，虽无奇技，人尚惑实。倘使
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得备奔走，糊口有资，屋乌之爱，感佩无涯！专此奉达，余容
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            再叙不宣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            年家卷弟甄应嘉顿首。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾政看完，笑道：“这里正因人多，甄家倒荐人来，又不好却
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的。&#34;盼时门上：“叫他见我，且留他住下，因材使用便了。”门上出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去，带进人来。见贾政，便磕了三个头，起来道：“家老爷请老爷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            安。”自已又打个千儿，说：“包勇请老爷安。”贾政回问了甄老爷的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好，使把他上下一瞧。但见包勇身长五尺有零，肩背宽肥，浓眉暴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眼，阔额长髯，气色粗黑，垂着手站着。便问道：“你是向来在甄家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的，还是住过几年的？”包勇道：“小的向在甄家的。”贾政道：“你如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今为什么要出来呢？”包勇道：“小的原不肯出来，只是家老爷再四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            叫小的出来，说别处你不肯去，这里老爷家里和在咱们自已家里一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            样的，所以小的来的。”贾政道：“你们老爷不该有这样事情，弄到这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个田地。”包勇道：“小的本不敢说，我们老爷只是太好了，味的真
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心待人，反倒招出事来。”贾政道：“真心是最好的了。”包勇道：“因
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            为太真了，人人都不喜欢，讨人厌烦是有的。&#34;贾政笑了一笑道：“既
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这样，皇天自然不负他的。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            包勇还要说时，贾政又问道：“我听见说，你们家的哥儿不是也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            叫宝玉么？&#34;包勇道：“是。”贾政道：“他还肯向上巴结么？&#34;包勇道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “老爷若问我们哥儿，倒是一段奇事。哥儿的脾气也和我家老爷一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个样子，也是一味的诚实，从小儿只爱和那些姐妹们在一处顽，老
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            爷、太太也狠打过几次，他只是不改。那一年太太进京的时候儿，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            哥儿大病了一场，已经死了半日，把老爷几乎急死，装裹都预备了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幸喜后来好了，嘴里说道：走到一座牌楼那里，见了一个姑娘，领着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他到了一座庙里，见了好些柜子，里头见了好些册子；又到屋里，见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了无数女子，说是都变了鬼怪似的，也有变做麟儿的。他吓急
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，就哭喊起来。老爷知他醒过来了，连忙调治，渐渐的好了。老
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            爷仍叫他在姐妹们一处顽去，他竟改了脾气了：好着时候的顽意儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一概都不要了，惟有念书为事。就有什么人来引诱他，他也全不动
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心。如今渐渐的能够帮着老爷料理些家务了。”贾政默然想了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回，道：“你去歇歇去罢。等这里用着你时，自然派你个行次
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿①。”包勇答应着退下来，跟着这里人出去歇息，不提。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一日贾政早起，刚要上衙门，看见门上那些人在那里交头接
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            耳，好像要使贾政知道的似的，又不好明回，只管咕咕唧唧的说话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾政叫上来问道：“你们有什么事，这么鬼鬼票票的？&#34;门上的人回
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“奴才们不敢说。贾政道：“有什么事不敢说的？&#34;门上的人道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①行次儿一一差事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “奴才今儿起来，开门出去，见门上贴着张白纸，上写着许多不成
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            事体的字。”贾政道：“那里有这样的事！写的是什么？”门上的人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“是水月庵里的腌话。&#34;贾政道：“拿给我瞧。”门上的人道：“奴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才本要揭下来，谁知他贴的结实，揭不下来，只得一面抄，面洗。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刚才李德揭了一张给奴才瞧，就是那门上贴的话。奴才们不敢隐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            購。”说着，呈上那帖儿。贾政接来看时，上面写着：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            西贝草斤年纪轻，水月庵里管尼僧。一个男人多少女，窝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            聚赌是陶情。不肖子弟来办事，荣国府内好声名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾政看了，气的头昏目晕，赶着叫门上的人不许声张，悄悄叫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人往宁、荣两府靠近的夹道子墙壁上再去找寻。随即叫人去唤贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            琏出来。贾琏即忙赶至。贾政忙问道：“水月庵中寄居的那些女尼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            女道，向来你也查考查考过没有？&#34;贾琏道：“没有。一向都是芹儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            在那里照管。”贾政道：“你知道芹儿照管得来照管不来？&#34;贾琏道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “老爷既这么说，想来芹儿必有不妥当的地方儿。”贾政叹道：“你瞧
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瞧这个帖儿写的是什么！”贾班一看，道：“有这样事么！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正说着，只见贾蓉走来，拿着一封书子，写着“二老爷密启”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            打开看时，也是无头榜①一张，与门上所贴的话相同。贾政道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “快叫赖大带了三四辆车到水月庵里去，把那些女尼姑女道士一齐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            拉回来。不许泄漏，只说里头传唤。”赖大领命去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且说水月庵中小女尼女道士等初到庵中，沙弥与道士原系老
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            尼收管，日间教他些经杆②；以后元妃不用，也便习学得懒情了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那些女孩子们年纪渐渐的大了，都也有些知觉了。更兼贾芹也是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            风流人物，打量芳官等出家，只是小孩子性儿，便去招惹他们。那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            知芳官竟是真心，不能上手，便把这心肠移到女尼女道士身上。因
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那小沙弥中有个名叫沁香的，和女道土中有个叫做鹤仙的，长的都 PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①无头榜不署名的揭帖、榜文。 经杆一一佛经和杆文。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            甚妖娆，贾芹便和这两个人勾搭上了，闲时便学些丝弦，唱个曲儿。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那时正当十月中旬，贾芹给庵中那些人领了月例银子，便想起
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            法儿来，告诉众人道：“我为你们领月钱，不能进城，又只得在这里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            歇着，怪冷的。怎么样？我今儿带些果子酒，大家吃着乐一夜，好
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不好？&#34;那些女孩子都高兴，便摆起桌子，连本庵的女尼也叫了来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            惟有芳官不来。贾芹喝了几杯，便说道要行令。沁香等道：“我们
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            都不会，倒不如携拳罢。谁输了喝一钟，岂不爽快？”本庵的女尼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“这天刚过响午，混曦混喝的，不像①。且先喝几钟，爱散的先
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            散去，谁爱陪芹大爷的，回来晚上尽子②喝去，我也不管。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正说着，只见道婆急忙进来说：“快散了罢！府里赖大爷来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。”众女尼忙乱收拾，便叫贾芹躲开。贾芹因多喝了几杯，便道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “我是送月钱来的，怕什么！”话犹未完，已见赖大进来。见这般样
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子，心里大怒，为的是贾政吩时不许声张，只得含糊装笑道：“芹大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            爷也在这里呢么？&#34;贾芹连忙站起来道：“赖大爷，你来作什么？&#34;赖
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大说：“大爷在这里更好。快快叫沙弥道士收拾上车进城，宫里传
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            呢。&#34;贾芹等不知原故，还要细问，赖大说：“天已不早了，快快的好
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赶进城。”众女孩子只得一齐上车。赖大骑着大走骤，押着赶进城，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不提。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说贾政知道这事，气的衙门也不能上了，独坐在内书房叹
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            气。贾琏也不敢走开。忽见门上的进来票道：“衙门里今夜该班是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            张老爷。因张老爷病了，有知会来请老爷补班。”贾政正等赖大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回来要办贾芹，此时又要该班，心里纳闷，也不言语。贾琏走上去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说道：“赖大是饭后出去的，水月庵离城二十来里，就赶进城也得二
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            更天。今日又是老爷的帮班，请老爷只管去。赖大来了，叫他押
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着，也别声张，等明儿老爷回来再发落。倘或芹儿来了，也不用说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ?不像一 一不像样，不成体统。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②尽孚一一尽量，尽兴。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            明，看他明儿见了老爷怎么样说。”贾政听来有理，只得上班去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾抽空才要回到自已房中，一面走着，心里抱怨凤姐出的主意，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欲要埋怨；因他病着，只得隐忍，慢慢的走着。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且说那些下人，一人传十，传到里头，先是平儿知道，即忙告诉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐。凤姐因那一夜不好，恢恢的总没精神，正是记铁槛寺的事
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            情。听见“外头贴了匿名揭帖”的一句话，吓了一大跳，忙问：“贴的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是什么？”平儿随口答应，不留神，就错说了，道：“没要紧，是馒头庵
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里的事情。”风姐本是心虚，听见馒头庵的事情，这一晓直吓证了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            句话没说出来，急火上攻，眼前发晕，咳嗽了一阵，便歪倒了，两
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只眼却只是发证。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            平儿慌了，说道：“水月庵里，不过是女沙弥女道士的事，奶奶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着什么急呢？”凤姐听是水月庵，才定了定神，道：“暖！糊涂东西！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到底是水月庵呢，是馒头庵呢？平儿道：“是我头里错听了馒头庵。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后来听见不是馒头庵，是水月庵。我刚才也就说溜了嘴，说成馒头
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            庵了。”凤姐道：“我就知道是水月庵。那馒头庵与我什么相干？原
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是这水月庵是我叫芹儿管的，大约克扣了月钱。”平儿道：“我听着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不像月钱的事，还有些腌话呢。”凤姐道：“我更不管那个。你二
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            爷那重去了？”平儿说：“听见老爷生气，他不敢走开。我听见事情
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不好，我盼这些人不许吵曬，不知太太们知道了没有。就听见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说，老爷叫赖大拿这些女孩子去了。且叫人前头打听打听。奶奶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            现在病着，依我竟先别管他们的闲事。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正说着，只见贾琏进来。凤姐欲待问他，见贾班一脸怒气，暂
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且装作不知。贾没吃完饭，旺儿来说：“外头请爷呢，赖大回来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。”贾琏道：“芹儿来了没有？”旺儿道：“也来了。”贾琏便道：“你去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            告诉赖天，说老爷上班儿去了，把这些个女孩子暂且收在园重，明 PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日老爷回来送进宫去。只叫芹儿在内书房等着我。”旺儿去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾芹走进书房，只见那些下人指指戳截，不知说什么。看起这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个样儿来，不像宫里要人；想着问人，又问不出来。正在心里疑感，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只见贾琏走出来，贾芹便请了安，垂手侍立，说道：“不知道娘娘宫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            重即刻传那些孩子们做什么？叫侄儿好赶！幸喜侄儿今儿送月钱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去，还没有走，便同着赖大来了。二叔想来是知道的。”贾琏道：“我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            知道什么？你才是明白的呢！”贾芹摸不着头脑儿，也不敢再问。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾班道：“你干的好事啊！把老爷都气坏了。贾芹道：“侄儿没有于
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            什么。庵里月钱是月月给的，孩子们经杆是不忘记的。”贾链见他
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不知，又是平素常在一处顽笑的，便叹口气道：“打嘴的东西，你各
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自去瞧瞧罢！&#34;便从靴掖儿里头拿出那个揭帖儿来，扔与他瞧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾芹拾来一看，吓得面如土色，说道：“这是谁干的？我并没得
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            罪人，为什么这么坑我？我一月送钱去，只走一趟，并没有这些事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            若是老爷回来打着问我，侄儿就屈死了！我母亲知道，更要打死。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着，见没人在旁边，便跪下央及道：“好叔叔，救我一救儿罢！”说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着，只管磕头，满眼流泪。贾想道：“老爷最恼这些，要是问准了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有这些事，这场气也不小，闹出去不好听，又长那个贴帖儿的人的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            志气了。将来咱们的事多着呢。倒不如趁着老爷上班儿，和赖大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            商量着，要混过去就可以没事了。现在没有对证。”想定主意，便
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说：“你别購我。你干的鬼儿，你打量我都不知道呢。若要完事，除
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            非是老爷打着问你，你只一口咬定没有才好。没脸的东西！起去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            罢！”叫人去叫赖大。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不多时，赖大来了，贾琏便和他商量。赖大说：“这芹大爷本来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            闹的不像了。奴才今儿到庵里的时候，他们正在那里喝酒呢。帖
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿上的话，一定是有的。”贾道：“芹儿你听赖大还赖你不成？”贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芹此时红涨了脸，一句也不敢言语。还是贾琏拉着赖大，央他：“护
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            底护底罢，只说芹哥儿是在家里找了来的。你带了他去，只说没有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见我。明日你求老爷，也不用问那些女孩子了，竟是叫了媒人来，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            领了去，一卖完事。果然娘娘再要的时候儿，咱们再买。”赖大想
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，闹也无益，且名声不好，也就应了。贾琏叫贾芹：“跟了赖大爷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中国古典文学名花
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去罢！听着他教你，你就跟着他说罢。&#34;贾芹又磕了一个头，跟着赖
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大出去。到了没人的地方儿，又给赖大磕头。赖大说：“我的小爷，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你太闹的不像了！不知得罪了谁，闹出这个乱儿来。你想想，谁和
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你不对罢？”贾芹想了一会子，并无不对的人，只得无精打采，跟着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赖大走回。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未知如何抵赖，且听下回分解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            107(
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

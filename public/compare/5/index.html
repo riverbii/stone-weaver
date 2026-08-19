@@ -1,0 +1,8147 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第5回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="5">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/4" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" >第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" >第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" selected>第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" >第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" >第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" >第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" >第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" >第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" >第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" >第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/6" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="gong" data-label="脂评汇校" checked>
+          脂评汇校
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengjia" data-label="程甲本" checked>
+          程甲本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi" data-label="程乙本" checked>
+          程乙本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi_ocr" data-label="程乙本OCR" checked>
+          程乙本OCR
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="fax_chengyi" data-label="程乙本影印" checked>
+          程乙本影印
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/5">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="gong">
+      <div class="compare-col-head">
+        <span class="badge">脂评汇校</span>
+        <span class="col-desc">脂评汇校本（庚辰本系为主，参校诸脂本，含脂批）</span>
+        <span>第5回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">开生面梦演红楼梦 立新场情传幻境情</h3>
+        
+        
+        <p class="col-para">
+          
+            万种豪华原是幻，何尝造孽，何是风流？曲终人散有谁留，为甚营求？只爱蝇头！一番遭遇几多愁，点水根由，泉涌难酬！题曰：春困葳蕤拥绣衾，恍随仙子别红尘。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            问谁幻入华胥境？千古风流造孽人。却说薛家母子在荣府中寄居等事略已表明，此回则暂不能写矣。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此等处实又非别部小说之熟套起法。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如今且说林黛玉
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">不叙宝钗，反仍叙黛玉。</span>
+            
+          
+            盖前回只不过欲出宝钗，非实写之文耳，此回若仍续写，则将二玉高搁矣，故急转笔仍归至黛玉，使荣府正文方不至于冷落也。今写黛玉，神妙之至，何也？因写黛玉实是写宝钗，非真有意去写黛玉，几乎又被作者瞒过。自在荣府以来，贾母万般怜爱，寝食起居，一如宝玉，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">妙极！</span>
+            
+          
+            所谓一击两鸣法，宝玉身份可知。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            迎春、探春、惜春三个亲孙女倒且靠后。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此句写贾母。</span>
+            
+          
+            便是宝玉和黛玉二人之亲密友爱，亦自较别个不同，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此句妙，细思有多少文章。</span>
+            
+          
+            日则同行同坐，夜则同息同止，真是言和意顺，略无参商。不想如今忽然来了一个薛宝钗，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">总是奇峻之笔，写来健拔，似新出之一人耳。</span>
+            
+          
+            年岁虽大不多，然品格端方，容貌丰美，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">此处如此写宝钗，前回中略不一写，可知前回迥非十二钗之正文也。</span>
+            
+          
+            欲出宝钗，便不肯从宝钗身上写来，却先款款叙出二玉，陡然转出宝钗，三人方可鼎立。行文之法又一变体。人多谓黛玉所不及。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此句定评，想世人目中各有所取也。</span>
+            
+          
+            按黛玉宝钗二人，一如姣花，一如纤柳，各极其妙者，然世人性分甘苦不同之故耳。而且宝钗行为豁达，随分从时，不比黛玉孤高自许，目无下尘。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-甲" title="甲侧">将两个行止摄总一写，实是难写，亦实系千部小说中未敢说写者。</span>
+            
+          
+            故比黛玉大得下人之心。便是那些小丫头子们，亦多喜与宝钗去顽笑。因此黛玉心中便有些悒郁不忿之意，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此一句是今古才人通病，如人人皆如我黛玉之为人，方许他妒。</span>
+            
+          
+            此是黛玉缺处。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝钗却浑然不觉。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这还是天性，后文中则是又加学力了。</span>
+            
+          
+            那宝玉亦在孩提之间，况自天性所禀来的一片愚拙偏僻，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">四字是极不好，却是极妙。</span>
+            
+          
+            只不要被作者瞒过。视姊妹弟兄皆出一意，并无亲疏远近之别。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">如此反谓“愚痴”，正从世人意中写也。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            其中因与黛玉同随贾母一处坐卧，故略比别个姊妹熟惯些。既熟惯，则更觉亲密，既亲密，则不免一时有求全之毁，不虞之隙。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">八字定评，有趣。</span>
+            
+          
+            不独黛玉、宝玉二人，亦可为古今天下亲密人当头一喝。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">八字为二玉一生文字之纲。</span>
+            
+          
+            这日不知为何，他二人言语有些不合起来，黛玉又
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“又”字妙极！</span>
+            
+          
+            补出近日无限垂泪之事矣，此仍淡淡写来，使后文来得不突然。气的独在房中垂泪，宝玉又
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“又”字妙极！</span>
+            
+          
+            凡用二“又”字，如双峰对峙，总补二玉正文。自悔言语冒撞，前去俯就，那黛玉方渐渐的回转来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因东边宁府中花园内梅花盛开，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">元春消息动矣。</span>
+            
+          
+            贾珍之妻尤氏乃治酒请贾母、邢夫人、王夫人等赏花。是日，先携了贾蓉之妻二人来面请。贾母等于早饭后过来，就在会芳园
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">随笔带出，妙！</span>
+            
+          
+            字义可思。游玩。先茶后酒，不过皆是宁荣二府女眷家宴小集，并无别样新文趣事可记。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这是第一家宴，偏如此草草写。</span>
+            
+          
+            此如晋人倒食甘蔗，渐入佳境一样。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一时宝玉倦怠，欲睡中觉，贾母命人好生哄着，歇息一回再来。贾蓉之妻秦第 33 页氏便忙笑回道：“我们这里有给宝叔收拾下的屋子，老祖宗放心，只管交与我就是了。”又向宝玉的奶娘丫鬟等道：“嬷嬷姐姐们，请宝叔随我这里来。”贾母素知秦氏是个极妥当的人，生的袅娜纤巧，行事又温柔和平，乃重孙媳中第一个得意之人，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">借贾母心中定评，又夹写出秦氏来。</span>
+            
+          
+            见他去安置宝玉，自是安稳的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当下秦氏引了一簇人来至上房内间。宝玉抬头看见一幅画贴在上面，画的人物固好，其故事乃是《燃藜图》，也不看系何人所画，心中便有些不快。又有一幅对联，写的是：世事洞明皆学问，人情练达即文章。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">看此联极俗，用于此则极妙。</span>
+            
+          
+            盖作者正为古今王孙公子，劈头先下金针。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">如此画联，焉能入梦？</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            及看了这两句，纵然室宇精美，铺陈华丽，亦断断不肯在这里了，忙说：“快出去！快出去！”秦氏听了笑道：“这里还不好，可往那里去呢？不然往我屋里去吧。”宝玉点头微笑。有一个嬷嬷说道：“那里有个叔叔往侄儿的房里睡觉的理？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">当头一喝，故用反笔提醒。</span>
+            
+          
+            秦氏笑道：“嗳哟哟！不怕他恼。他能多大了，就忌讳这些个！上月你没看见我那个兄弟来了，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">伏下秦钟，妙！</span>
+            
+          
+            虽然与宝叔同年，两个人若站在一处，只怕那一个还高些呢。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">又伏下一人，随笔便出，得隙便入，精细之极。</span>
+            
+          
+            宝玉道：“我怎么没见过？你带他来我瞧瞧。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">侯门少年纨绔活跳下来。</span>
+            
+          
+            众人笑道：“隔着二三十里，往那里带去？见的日子有呢。”说着，大家来至秦氏房中。刚至房门，便有一股细细的甜香
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此香名“引梦香”。</span>
+            
+          
+            袭了人来。宝玉便愈觉得眼饧骨软，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">刻骨吸髓之情景，如何想得来，又如何写得来？</span>
+            
+          
+            连说：“好香！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">实实写得出来。</span>
+            
+          
+            辰夹：进房如梦境。入房向壁上看时，有唐伯虎画的《海棠春睡图》，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">妙图。</span>
+            
+          
+            两边有宋学士秦太虚写的一副对联，其联云：嫩寒锁梦因春冷，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">艳极，淫极！</span>
+            
+          
+            芳气笼人是酒香。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">已入梦境矣。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            案上设着武则天当日镜室中设的宝镜，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">设譬调侃耳，若真以为然，则又被作者瞒过。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一边摆着飞燕立着舞过的金盘，盘内盛着安禄山掷过伤了太真乳的木瓜。上面设着寿阳公主于含章殿下卧的榻，悬的是同昌公主制的联珠帐。宝玉含笑连说：“这里好！”辰夹：摆设就合着他的意。秦氏笑道：“我这屋子大约神仙也可以住得了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着，亲自展开了西子浣过的纱衾，移了红娘抱过的鸳枕，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一路设譬之文，迥非《石头记》大笔所屑，别有他属，余所不知。</span>
+            
+          
+            于是众奶母伏侍宝玉卧好，款款散了，只留下袭人、
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一个再见。</span>
+            
+          
+            媚人、
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">二新出。</span>
+            
+          
+            晴雯、
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">三新出，名妙而文。</span>
+            
+          
+            麝月
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">四新出，尤妙。</span>
+            
+          
+            看此四婢之名，则知历来小说难与并肩。四个丫鬟为伴。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">文至此不知从何处想来。</span>
+            
+          
+            秦氏便分咐小丫鬟们，好生在廊檐下看着猫儿狗儿打架。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">细极。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那宝玉刚合上眼，便惚惚的睡去，犹似秦氏在前，遂悠悠荡荡，随了秦氏，至一所在。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此梦文情固佳，然必用秦氏引梦，又用秦氏出梦，竟不知立意何属？</span>
+            
+          
+            惟批书人知之。但见朱栏白石，绿树清溪，真是人迹希逢，飞尘不到。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一篇《蓬莱赋》。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉在梦中欢喜，想道：“这个去处有趣！我就在这里过一生，纵然失了家也愿意，强如天天被父母、师傅打去。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一句忙里点出小儿心性。</span>
+            
+          
+            正胡思之间，忽听山后有人作歌曰：春梦随云散，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">开口拿“春”字，最紧要！</span>
+            
+          
+            飞花逐水流。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">二句比也。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寄言众儿女，何必觅闲愁。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">将通部人一喝。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 34 页宝玉听了，是女子的声音。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写出终日与女儿厮混最熟。</span>
+            
+          
+            歌声未息，早见那边走出一个人来，蹁跹袅娜，端的与人不同。有赋为证：方离柳坞，乍出花房。但行处，鸟惊庭树；将到时，影度回廊。仙袂乍飘兮，闻麝兰之馥郁；荷衣欲动兮，听环佩之铿锵。靥笑春桃兮，云堆翠髻；唇绽樱颗兮，榴齿含香。纤腰之楚楚兮，回风舞雪；珠翠之辉辉兮，满额鹅黄。出没花间兮，宜嗔宜喜；徘徊池上兮，若飞若扬。蛾眉颦笑兮，将言而未语；莲步乍移兮，待止而欲行。羡彼之良质兮，冰清玉润；羡彼之华服兮，闪灼文章；爱彼之貌容兮，香培玉琢；美彼之态度兮，凤翥龙翔。其素若何？春梅绽雪。其洁若何？秋菊被霜。其静若何？松生空谷。其艳若何？霞映澄塘。其文若何？龙游曲沼。其神若何？月射寒江。应惭西子，实愧王嫱。吁！奇矣哉，生于孰地，来自何方？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            信矣乎，瑶池不二，紫府无双。果何人哉？如斯之美也！
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">按此书凡例，本无赞赋闲文，前有宝玉二词，今复见此一赋，何也？</span>
+            
+          
+            盖此二人乃通部大纲，不得不用此套。前词却是作者别有深意，故见其妙。此赋则不见长，然亦不可无者也。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉见是一个仙姑，喜的忙上来作揖问道：“神仙姐姐，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">千古未闻之奇称，写来竟成千古未闻之奇语。</span>
+            
+          
+            故是千古未有之奇文。不知从那里来，如今要往那里去？我也不知这里是何处，望乞携带携带。”那仙姑笑道：“吾居离恨天之上，灌愁海之中，乃放春山遣香洞太虚幻境警幻仙姑是也。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">与首回中甄士隐梦境一照。</span>
+            
+          
+            司人间之风情月债，掌尘世之女怨男痴。因近来风流冤孽，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">四字可畏。</span>
+            
+          
+            缠绵于此处，是以前来访察机会，布散相思。今忽与尔相逢，亦非偶然。此离吾境不远，别无他物，仅有自采仙茗一盏，亲酿美酒一瓮，素练魔舞歌姬数人，新填《红楼梦》
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">点题。</span>
+            
+          
+            盖作者自云所历不过红楼一梦耳。仙曲十二支，试随吾一游否？”宝玉听了，喜跃非常，便忘了秦氏在何处，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">细极。</span>
+            
+          
+            竟随了仙姑，至一所在，辰夹：士隐曾见此匾对，而僧道不能领入，留此回警幻邀宝玉后文。有石牌横建，上书“太虚幻境”四个大字，两边一副对联，乃是：假作真时真亦假，无为有处有还无。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">正恐观者忘却首回，故特将甄士隐梦景重一滃染。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            转过牌坊，便是一座宫门，也横书四个大字，道是“孽海情天”。又有一副对联，大书云：厚地高天，堪叹古今情不尽；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            痴男怨女，可怜风月债难偿。宝玉看了，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">菩萨天尊皆因僧道而有，以点俗人，独不许幻造太虚幻境以警情者乎？</span>
+            
+          
+            观者恶其荒唐，余则喜其新鲜。有修庙造塔祈福者，余今意欲起太虚幻境以较修七十二司更有功德。心下自思道：“原来如此。但不知何为‘古今之情’，又何为‘风月之债’？从今倒要领略领略。”宝玉只顾如此一想，不料早把些邪魔招入膏肓了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">奇极，妙文！</span>
+            
+          
+            当下随了仙姑进入二层门内，只见两边配殿，皆有匾额、对联，一时看不尽许多，惟见有几处写的是：“痴情司”、“结怨司”、“朝啼司”、“夜哭司”、“春感司”、“秋悲司”。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">虚陪六个。</span>
+            
+          
+            看了，因向仙姑道：“敢烦仙姑引我到第 35 页那各司中游玩游玩，不知可使得？”仙姑道：“此各司中皆贮的是普天之下所有的女子过去未来的簿册。尔凡眼尘躯，未便先知的。”宝玉听了，那里肯依，复央之再四。仙姑无奈，说：“也罢，就在此司内略随喜随喜罢了。”宝玉喜不自胜，抬头看这司的匾上，乃是“薄命司”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">正文。</span>
+            
+          
+            三字，两边对联写的是：春恨秋悲皆自惹，花容月貌为谁妍？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看了，便知
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“便知”二字是字法，最为紧要之至。</span>
+            
+          
+            感叹。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            进入门来，只见有十数个大橱，皆用封条封着。看那封条上，皆是各省的地名。宝玉一心只拣自己的家乡封条看，遂无心看别省的了。只见那边橱上封条上大书七字云：“金陵十二钗正册”。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">正文题。</span>
+            
+          
+            宝玉问道：“何为‘金陵十二钗正册’？”警幻道：“即贵省中十二冠首女子之册，故为‘正册’。”宝玉道：“常听
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“常听”二字，神理极妙。</span>
+            
+          
+            人说，金陵极大，怎么只十二个女子？如今单我们家里，上上下下，就有几百女孩子呢。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">贵公子口声。</span>
+            
+          
+            警幻冷笑道：“省省女子固多，不过择其紧要者录之。下边二橱则又次之。余者庸常之辈，则无册可录矣。”宝玉听说，再看下首二厨上，果然写着“金陵十二钗副册”，又一个写着“金陵十二钗又副册”。宝玉便伸手先将“又副册”橱门开了，拿出一本册来，揭开一看，只见这首页上画着一幅画，又非人物，亦非山水，不过是水墨滃染的满纸乌云浊雾而已。后有几行字迹，写道是：霁月难逢，彩云易散。心比天高，身为下贱。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            风流灵巧招人怨。寿夭多因毁谤生，多情公子空牵念。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">恰极之至！</span>
+            
+          
+            “病补雀金裘”回中与此合看。宝玉看了，又见后面画着一簇鲜花，一床破席。也有几句言词，写道是：枉自温柔和顺，空云似桂如兰。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            堪羡优伶有福，谁知公子无缘。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">骂死宝玉，却是自悔。</span>
+            
+          
+            宝玉看了不解。遂掷下这个，又去开了“副册”橱门，拿起一本册来，揭开看时，只见画着一株桂花，下面有一池沼，其中水涸泥干，莲枯藕败。后面书云：根并荷花一茎香，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">却是咏菱妙句。</span>
+            
+          
+            平生遭际实堪伤。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自从两地生孤木，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">拆字法。</span>
+            
+          
+            致使香魂返故乡。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看了仍不解。便又掷了，再去取“正册”看。只见头一页上便画着两株枯木，木上悬着一围玉带，又有一堆雪，雪下一股金簪。也有四句言词，道是：可叹停机德，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">此句薛。</span>
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">乐羊子妻事。</span>
+            
+          
+            堪怜咏絮才，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">此句林。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉带林中挂，金簪雪里埋。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">寓意深远，皆非生其地之意。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看了仍不解。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">世之好事者争传《推背图》之说，想前人断不肯煽惑愚迷，即有此说，第 36 页亦非常人供谈之物。</span>
+            
+          
+            此回悉借其法，为众女子数运之机。无可以供茶酒之物，亦无干涉政事，真奇想奇笔。待要问时，情知他必不肯泄漏，待要丢下，又不舍。遂又往后看时，只见画着一张弓，弓上挂一香橼。也有一首歌词云：二十年来辨是非，榴花开处照宫闱。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            三春争及初春景，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">显极。</span>
+            
+          
+            虎兔相逢大梦归。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面又画着两人放风筝，一片大海，一只大船，船中有一女子掩面泣涕之状。也有四句写云：才自精明志自高，生于末世运偏消。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">感叹句，自寓。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清明涕送江边望，千里东风一梦遥。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">好句！</span>
+            
+          
+            后面又画几缕飞云，一湾逝水。其词曰：富贵又何为？襁褓之间父母违。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            展眼吊斜晖，湘江水逝楚云飞。后面又画着一块美玉，落在泥垢之中。其断语云：欲洁何曾洁，云空未必空。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可怜金玉质，终陷淖泥中。后面忽见画着个恶狼，追扑一美女，欲啖之意。其书云：子系中山狼，得志便猖狂。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">好句！</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            金闺花柳质，一载赴黄粱。后面便是一所古庙，里面有一美人在内看经独坐。其判云：堪破三春景不长，缁衣顿改昔年妆。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可怜绣户侯门女，独卧青灯古佛旁。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">好句！</span>
+            
+          
+            后面便是一片冰山，上面有一只雌凤。其判曰：凡鸟偏从末世来，都知爱慕此生才。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一从二令三人木，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">拆字法。</span>
+            
+          
+            哭向金陵事更哀。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面又是一座荒村野店，有一美人在那里纺绩。其判云：势败休云贵，家亡莫论亲。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">非经历过者，此二句则云纸上谈兵。</span>
+            
+          
+            过来人那得不哭！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            偶因济刘氏，巧得遇恩人。第 37 页后面又画着一盆茂兰，旁有一位凤冠霞帔的美人。也有判云：桃李春风结子完，到头谁似一盆兰。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如冰水好空相妒，枉与他人作笑谈。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">真心实语。</span>
+            
+          
+            后面又画着高楼大厦，有一美人悬梁自缢。其判云：情天情海幻情身，情既相逢必主淫。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            漫言不肖皆荣出，造衅开端实在宁。宝玉还欲看时，那仙姑知他天分高明，性情颖慧，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">通部中笔笔贬宝玉，人人嘲宝玉，语语谤宝玉，今却于警幻意中忽写出此八字来，真是意外之意。</span>
+            
+          
+            此法亦别书中所无。恐把仙机泄漏，遂掩了卷册，笑向宝玉道：“且随我去游玩奇景，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是哄小儿语，细甚。</span>
+            
+          
+            何必在此打这闷葫芦！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">为前文“葫芦庙”一点。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉恍恍惚惚，不觉弃了卷册，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是梦中景况，细极。</span>
+            
+          
+            又随了警幻来至后面。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            但见珠帘绣幕，画栋雕檐，说不尽那光摇朱户金铺地，雪照琼窗玉作宫。更见仙花馥郁，异草芬芳，真好个所在。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">已为省亲别墅画下图式矣。</span>
+            
+          
+            又听警幻笑道：“你们快出来迎接贵客！”一语未了，只见房中又走出几个仙子来，皆是荷袂蹁跹，羽衣飘舞，姣若春花，媚如秋月。一见了宝玉，都怨谤警幻道：“我们不知系何‘贵客’，忙的接了出来！姐姐曾说今日今时必有绛珠妹子
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">绛珠为谁氏？</span>
+            
+          
+            请观者细思首回。的生魂前来游玩，故我等久待。何故反引这浊物来污染这清净女儿之境？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">奇笔摅奇文。</span>
+            
+          
+            作书者视女儿珍贵之至，不知今时女儿可知？余为作者痴心一哭，又为近之自弃自败之女儿一恨。宝玉听如此说，便吓得欲退不能退，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">贵公子不怒而反退，却是宝玉天分中一段情痴。</span>
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">贵公子岂容人如此厌弃，反不怒而反欲退，实实写尽宝玉天分中一段情痴来。</span>
+            
+          
+            若是薛阿呆至此闻是语，则警幻之辈共成齑粉矣。一笑。果觉自形污秽不堪。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            警幻忙携住宝玉的手，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">妙！</span>
+            
+          
+            警幻自是个多情种子。向众姊妹道：“你等不知原委：今日原欲往荣府去接绛珠，适从宁府所过，偶遇宁荣二公之灵，嘱吾云：‘吾家自国朝定鼎以来，功名奕世，富贵传流，虽历百年，奈运终数尽，不可挽回者。故遗之子孙虽多，竟无可以继业。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这是作者真正一把眼泪。</span>
+            
+          
+            其中惟嫡孙宝玉一人，禀性乖张，生性怪谲，虽聪明灵慧，略可望成，无奈吾家运数合终，恐无人规引入正。幸仙姑偶来，万望先以情欲声色等事警其痴顽，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">二公真无可奈何，开一觉世觉人之路也。</span>
+            
+          
+            或能使彼跳出迷人圈子，然后入于正路，亦吾兄弟之幸矣。’如此嘱吾，故发慈心，引彼至此。先以彼家上中下三等女子之终身册籍，令彼熟玩，尚未觉悟。故引彼再至此处，令其再历饮馔声色之幻，或冀将来一悟，亦未可知也。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-甲" title="甲侧">一段叙出宁、荣二公，足见作者深意。</span>
+            
+          
+            说毕，携了宝玉入室。但闻一缕幽香，竟不知其所焚何物。宝玉遂不禁相问，警幻冷笑道：“此香尘世中既无，尔何能知！此香乃系诸名山胜境内初生异卉之精，合各种宝林珠树之油所制，名‘群芳髓’。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">好香！</span>
+            
+          
+            宝玉听了，自是羡慕而已。大家入座，小丫鬟捧上茶来。宝玉自觉清香味异，纯美非常，因又问何名。警幻道：“此茶出在放春山遣香洞，又以仙花灵叶上所带之宿露而烹。此茶名曰‘千红一窟’。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">隐“哭”字。</span>
+            
+          
+            宝玉听了，点头称赏。因看房内，瑶琴、宝鼎、古画、新诗，无所不有，更喜窗下亦有唾绒，奁间时渍粉污。
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">是宝玉心事。</span>
+            
+          
+            壁上也有一副对联，书云：第 38 页幽微灵秀地，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">女儿之心，女儿之境。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无可奈何天。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">两句尽矣。</span>
+            
+          
+            撰通部大书不难，最难是此等处，可知皆从无可奈何而有。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看毕，无不羡慕。因又请问众仙姑姓名：一名痴梦仙姑，一名钟情大士，一名引愁金女，一名度恨菩提，各各道号不一。少刻，有小鬟来调桌安椅，设摆酒馔。真是：琼浆满泛玻璃盏，玉液浓斟琥珀杯。更不用再说那肴馔之盛。宝玉因闻得此酒清香甘冽，异乎寻常，又不禁相问。警幻道：“此酒乃以百花之蕊，万木之汁，加以麟髓之醅，凤乳之麯酿成，因名为‘万艳同杯’。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">与“千红一窟”一对，隐“悲”字。</span>
+            
+          
+            宝玉称赏不迭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            饮酒间，又有十二个舞女上来，请问演何词曲。警幻道：“就将新制《红楼梦》十二支演上来。”舞女们答应了，便轻敲檀板，款按银筝。听他歌道是：“开辟鸿蒙……”
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">故作顿挫摇摆。</span>
+            
+          
+            方歌了一句，警幻便说道：“此曲不比尘世中所填传奇之曲，必有生旦净末之别，又有南北九宫之限。此或咏叹一人，或感怀一事，偶成一曲，即可谱入管弦。若非个中人，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">三字要紧。</span>
+            
+          
+            不知谁是个中人。宝玉即个中人乎？然则石头亦个中人乎？作者亦系个中人乎？观者亦个中人乎？不知其中之妙。料尔亦未必深明此调，若不先阅其稿，后听其歌，翻成嚼蜡矣。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">警幻是个极会看戏人。</span>
+            
+          
+            近之大老观戏，必先翻阅角本。目睹其词，耳听彼歌，却从警幻处学来。说毕，回头命小丫鬟取了《红楼梦》原稿来，递与宝玉。宝玉接来，一面目视其文，一面耳聆其歌曰：
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">作者能处，惯于自站地步，又惯于陡起波澜，又惯于故为曲折，最是行文秘诀。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第一支·红楼梦引子］开辟鸿蒙，谁为情种？
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">非作者为谁？</span>
+            
+          
+            余又曰：“亦非作者，乃石头耳。”都只为风月情浓。趁着这奈何天，伤怀日，寂寥时，试遣愚
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“愚”字自谦得妙！</span>
+            
+          
+            衷。因此上，演出这怀金悼玉的《红楼梦》。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">读此几句，翻厌近之传奇中必用开场副末等套，累赘太甚。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">“怀金悼玉”，大有深意。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第二支·终身误］都道是金玉良姻，俺只念木石前盟。空对着，山中高士晶莹雪；终不忘，世外仙姝寂寞林。叹人间，美中不足今方信。纵然是齐眉举案，到底意难平。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">语句泼撒，不负自创北曲。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第三支·枉凝眉］一个是阆苑仙葩，一个是美玉无瑕。若说没奇缘，今生偏又遇着他，若说有奇缘，如何心事终虚化？一个枉自嗟呀，一个空劳牵挂。一个是水中月，一个是镜中花。想眼中能有多少泪珠儿，怎经得秋流到冬尽，春流到夏！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉听了此曲，散漫无稽，不见得好处，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">自批驳，妙极！</span>
+            
+          
+            但其声韵凄惋，竟能销魂醉魄。因此也不察其原委，问其来历，就暂以此释闷而已。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">妙！</span>
+            
+          
+            设言世人亦应如此法看此《红楼梦》一书，更不必追究其隐寓。因又看下道：［第四支·恨无常］喜荣华正好，恨无常又到。眼睁睁，把万事全抛；荡悠悠，把芳魂消耗。望家乡，路远山高。故向爹娘梦里相寻告：儿命已入黄泉，天第 39 页伦呵，须要退步抽身早！
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">悲险之至！</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第五支·分骨肉］一帆风雨路三千，把骨肉家园齐来抛闪。恐哭损残年，告爹娘，休把儿悬念。自古穷通皆有定，离合岂无缘？从今分两地，各自保平安。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            奴去也，莫牵连。
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">探卿声口如闻。</span>
+            
+          
+            ［第六支·乐中悲］襁褓中，父母叹双亡。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">意真辞切，过来人见之不免失声。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            纵居那绮罗丛，谁知娇养？幸生来，英豪阔大宽宏量，从未将儿女私情略萦心上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好一似，霁月光风耀玉堂。
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">堪与湘卿作照。</span>
+            
+          
+            厮配得才貌仙郎，博得个地久天长，准折得幼年时坎坷形状。终久是云散高唐，水涸湘江。这是尘寰中消长数应当，何必枉悲伤！
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">悲壮之极，北曲中不能多得。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第七支·世难容］气质美如兰，才华阜比仙。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">妙卿实当得起。</span>
+            
+          
+            天生成孤僻人皆罕。你道是啖肉食腥膻，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">绝妙！</span>
+            
+          
+            曲文填词中不能多见。视绮罗俗厌。却不知太高人愈妒，过洁世同嫌。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">至语。</span>
+            
+          
+            可叹这，青灯古殿人将老，辜负了，红粉朱楼春色阑。到头来，依旧是风尘肮脏违心愿。好一似，无瑕白玉遭泥陷，又何须，王孙公子叹无缘。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第八支·喜冤家］
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">“冤家”上加一“喜”字，真新真奇！</span>
+            
+          
+            中山狼，无情兽，全不念当日根由。一味的骄奢淫荡贪还构。觑着那，侯门艳质同蒲柳；作践的，公府千金似下流。叹芳魂艳魄，一载荡悠悠。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">题只十二钗，却无人不有，无事不备。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第九支·虚花悟］将那三春看破，桃红柳绿待如何？把这韶华打灭，觅那清淡天和。说什么，天上夭桃盛，
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">此休恰甚。</span>
+            
+          
+            云中杏蕊多。到头来，谁把秋捱过？则看那，白杨村里人呜咽，青枫林下鬼吟哦。更兼着，连天衰草遮坟墓。这的是，昨贫今富人劳碌，春荣秋谢花折磨。似这般，生关死劫谁能躲？闻说道，西方宝树唤婆娑，上结着长生果。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">末句开句收句。</span>
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">喝醒大众，是极。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第十支·聪明累］机关算尽太聪明，反算了卿卿性命。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">警拔之句。</span>
+            
+          
+            生前心已碎，死后性空灵。家富人宁，终有个家亡人散各奔腾。枉费了，意悬悬半世心；好一似，荡悠悠三更梦。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">过来人睹此，宁不放声一哭？</span>
+            
+          
+            忽喇喇似大厦倾，昏惨惨似灯将尽。呀！一场欢喜忽悲辛。叹人世，终难定！
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">见得到。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第十一支·留余庆］留余庆，留余庆，忽遇恩人；幸娘亲，幸娘亲，积得阴功。劝人生，济困扶穷，休似俺那爱银钱忘骨肉的狠舅奸兄！正是乘除加减，上有苍穹。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第十二支·晚韶华］镜里恩情，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">起得妙！</span>
+            
+          
+            更那堪梦里功名！那美韶华去之何迅！再休提绣帐鸳衾。只这带珠冠，披凤袄，也抵不了无常性命。虽说是，人生莫受老来贫，也须要阴骘积儿孙。气昂昂头戴簪缨，气昂昂头戴簪缨，光灿灿腰悬金印；威赫赫爵禄高登，威赫赫爵禄高登，昏惨惨黄泉路近。问古来将相可还存？也只是虚名儿与后人钦敬。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第十三支·好事终］画梁春尽落香尘。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">六朝妙句。</span>
+            
+          
+            擅风情，秉月貌，便第 40 页是败家的根本。箕裘颓堕皆从敬，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">深意他人不解。</span>
+            
+          
+            家事消亡首罪宁。宿孽总因情。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">是作者具菩萨之心，秉刀斧之笔，撰成此书，一字不可更，一语不可少。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ［第十四支·收尾·飞鸟各投林］
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">收尾愈觉悲惨可畏。</span>
+            
+          
+            为官的，家业凋零；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富贵的，金银散尽。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">二句先总宁荣。</span>
+            
+          
+            有恩的，死里逃生；无情的，分明报应。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欠命的，命已还；欠泪的，泪已尽。冤冤相报实非轻，分离聚合皆前定。欲知命短问前生，老来富贵也真侥幸。看破的，遁入空门；痴迷的，枉送了性命。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">将通部女子一总。</span>
+            
+          
+            好一似食尽鸟投林，落了片白茫茫大地真干净！
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">又照看“葫芦庙”。</span>
+            
+          
+            与“树倒猢狲散”反照。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            歌毕，还要歌副曲。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是极！</span>
+            
+          
+            香菱、晴雯辈岂可无，亦不必再。警幻见宝玉甚无趣味，
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">自站地步。</span>
+            
+          
+            因叹：“痴儿竟尚未悟！”那宝玉忙止歌姬不必再唱，自觉朦胧恍惚，告醉求卧。警幻便命撤去残席，送宝玉至一香闺绣阁之中，其间铺陈之盛，乃素所未见之物。更可骇者，早有一位女子在内，其鲜艳妩媚，有似乎宝钗，风流袅娜，则又如黛玉。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">难得双兼，妙极！</span>
+            
+          
+            正不知何意。忽警幻道：“尘世中多少富贵之家，那些绿窗风月，绣阁烟霞，皆被淫污纨绔与那些流荡女子悉皆玷辱。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">真极！</span>
+            
+          
+            更可恨者，自古来多少轻薄浪子，皆以‘好色不淫’为饰，又以‘情而不淫’作案，
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">“色而不淫”四字已滥熟于各小说中，今却特贬其说，批驳出矫饰之非，可谓至切至当，亦可以唤醒众人，勿为前人之矫词所惑也。</span>
+            
+          
+            此皆饰非掩丑之语也。好色即淫，知情更淫。是以巫山之会，云雨之欢，皆由既悦其色，复恋其情所致也。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“好色而不淫”，今翻案，奇甚！</span>
+            
+          
+            吾所爱汝者，乃天下古今第一淫人也。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">多大胆量敢作如此之文！</span>
+            
+          
+            宝玉听了，唬的忙答道：“仙姑差了。我因懒于读书，家父母尚每垂训饬，岂敢再冒‘淫’字？况且年纪尚小。不知‘淫’字为何物。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">绛云轩中诸事情景由此而生。</span>
+            
+          
+            警幻道：“非也。淫虽一理。意则有别。如世之好淫者，不过悦容貌，喜歌舞，调笑无厌，云雨无时，恨不能尽天下之美女供我片时之趣兴，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">说得恳切恰当之至！</span>
+            
+          
+            此皆皮肤淫滥之蠢物耳。如尔则天分中生成一段痴情，吾辈推之为‘意淫’。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">二字新雅。</span>
+            
+          
+            ‘意淫’二字，惟心会而不可口传，可神通而不可语达。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">按宝玉一生心性，只不过是体贴二字，故曰“意淫”。</span>
+            
+          
+            汝今独得此二字，在闺阁中，固可为良友，然于世道中未免迂阔怪诡，百口嘲谤，万目睚眦。今既遇令祖宁荣二公剖腹深嘱，吾不忍君独为我闺阁增光，见弃于世道，是特引前来，醉以灵酒，沁以仙茗，警以妙曲，再将吾妹一人，乳名兼美
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">妙！</span>
+            
+          
+            盖指薛林而言也。字可卿者，许配于汝。今夕良时，即可成姻。不过令汝领略此仙闺幻境之风光然如此，何况尘境之情景哉？而今后万万解释，改悟前情，将谨勤有用的工夫，置身于经济之道。”
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">说出此二句，警幻亦腐矣，然亦不得不然耳。</span>
+            
+          
+            说毕，便秘授以云雨之事，
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">这是情之未了一著，不得不说破。</span>
+            
+          
+            推宝玉入帐。那宝玉恍恍惚惚，依警幻所嘱之言，未免有阳台、巫峡之会。
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">如此方免累赘。</span>
+            
+          
+            数日来，柔情缱绻，软语温存，与可卿难解难分。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那日，警幻携宝玉、可卿闲游。至一个所在，但见荆榛遍地，
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">略露心迹。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            狼虎同群。
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">凶极！</span>
+            
+          
+            试问观者此系何处。忽而，大河阻路，黑水淌洋，又无桥梁可通。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">若有桥梁可通，则世路人情犹不算艰难。</span>
+            
+          
+            宝玉正自徬徨，只听警幻道：“宝玉休前进，作速回头要紧！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">机锋。</span>
+            
+          
+            点醒世人。宝玉忙止步问道：“此系何处？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            警幻道：“此即迷津也。深有万丈，遥亘千里，中无舟楫可通，
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">可思。</span>
+            
+          
+            只有一个木筏，乃木居士掌舵，灰侍者撑篙，不受金银之谢，但遇有缘者渡之。尔今偶游至此，设如堕落其中，则深负我从前一番以情悟道、守理衷情之言矣。”
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">第 41 页看他忽转笔作此语，则知此后皆是自悔。</span>
+            
+          
+            宝玉方欲回言，只听迷津内水响如雷，竟有一夜叉般怪物窜出，直扑而来。吓得宝玉汗下如雨，一面失声喊叫：“可卿救我！可卿救我！”慌得袭人、媚人等上来扶起，拉手说：“宝玉别怕，我们在这里！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-戚" title="戚夹">接得无痕迹。</span>
+            
+          
+            历来小说中之梦未见此一醒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦氏在外听见，连忙进来，一面说：“ㄚ鬟们，好生看着猫儿狗儿打架！”
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">细，又是照应前文。</span>
+            
+          
+            又闻宝玉口中连叫：“可卿救我”，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">云龙作雨，不知何为龙，何为云，何为雨。</span>
+            
+          
+            因纳闷道：“我的小名这里没人知道，他如何从梦里叫出来？”正是：一场幽梦同谁近，千古情人独我痴。
+            
+          
+            <span class="ann-inline ann-戚" title="戚总评">将一部全盘点出几个，以陪衬宝玉。</span>
+            
+          
+            使宝玉从此倍偏倍痴，倍聪明倍潇洒，亦非突如其来。作者真妙心妙口，妙笔妙人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 42 页
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第5回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">开生面梦演红楼梦 立新场情传幻境情</h3>
+        
+        
+        <p class="col-para">
+          
+            題曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            春困葳蕤擁繡衾，恍隨仙子到紅塵。問誰幻入華胥境，千古風流造業人。第四回中既將薛家母子在榮府內寄居等事略已表明，此回則暫不能寫矣。如今且說林黛玉自在榮府以來，賈母萬般憐愛，寢食起居，一如寶玉，迎春，探春，惜春三個親孫女倒且靠後，便是寶玉和黛玉二人之親密友愛處，亦自較別個不同，日則同行同坐，夜則同息同止，真是言和意順，略無參商。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不想如今忽然來了一個薛寶釵，年歲雖大不多，然品格端方，容貌豐美，人多謂黛玉所不及。而且寶釵行為豁達，隨分從時，不比黛玉孤高自許，目無下塵，故比黛玉大得下人之心。便是那些小丫頭子們，亦多喜與寶釵去頑。因此黛玉心中便有些悒鬱不忿之意，寶釵卻渾然不覺。那寶玉亦在孩提之間，況自天性所稟來的一片愚拙偏僻，視姊妹弟兄皆出一意，並無親疏遠近之別。其中因與黛玉同隨賈母一處坐臥，故略比別個姊妹熟慣些。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            既熟慣，則更覺親密，既親密，則不免一時有求全之毀，不虞之隙。這日不知為何，他二人言語有些不合起來，黛玉又氣的獨在房中垂淚，寶玉又自悔言語冒撞，前去俯就，那黛玉方漸漸的回轉來。因東邊寧府中花園內梅花盛開，賈珍之妻尤氏乃治酒，請賈母，邢夫人，王夫人等賞花。是日先攜了賈蓉之妻，二人來面請。賈母等於早飯後過來，就在會芳園游頑，先茶後酒，不過皆是寧榮二府女眷家宴小集，並無別樣新文趣事可記。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一時寶玉倦怠，欲睡中覺，賈母命人好生哄著，歇一回再來。賈蓉之妻秦氏便忙笑回道：「我們這裏有給寶叔收拾下的屋子，老祖宗放心，只管交與我就是了。」又向寶玉的奶娘丫鬟等道：「嬤嬤，姐姐們，請寶叔隨我這裏來。」賈母素知秦氏是個極妥當的人，生的裊娜纖巧，行事又溫柔和平，乃重孫媳中第一個得意之人，見他去安置寶玉，自是安穩的。當下秦氏引了一簇人來至上房內間。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉抬頭看見一幅畫貼在上面，畫的人物固好，其故事乃是《燃藜圖》，也不看係何人所畫，心中便有些不快。又有一幅對聯，寫的是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            世事洞明皆學問，人情練達即文章。及看了這兩句，縱然室宇精美，舖陳華麗，亦斷斷不肯在這裏了，忙說：「快出去！快出去！」秦氏聽了笑道：「這裏還不好，可往那裏去呢？不然往我屋裏去吧。」寶玉點頭微笑。有一個嬤嬤說道：「那裏有個叔叔往侄兒房裏睡覺的理？」秦氏笑道：「噯喲喲，不怕他惱。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他能多大呢，就忌諱這些個！上月你沒看見我那個兄弟來了，雖然與寶叔同年，兩個人若站在一處，只怕那個還高些呢。」寶玉道：「我怎麼沒見過？你帶他來我瞧瞧。」眾人笑道：「隔著二三十里，往那裏帶去，見的日子有呢。」說著大家來至秦氏房中。剛至房門，便有一股細細的甜香襲人而來。寶玉覺得眼餳骨軟，連說「好香！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」入房向壁上看時，有唐伯虎畫的《海棠春睡圖》，兩邊有宋學士秦太虛寫的一副對聯，其聯云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            嫩寒鎖夢因春冷，芳氣襲人是酒香。案上設著武則天當日鏡室中設的寶鏡，一邊擺著飛燕立著舞過的金盤，盤內盛著安祿山擲過傷了太真乳的木瓜。上面設著壽昌公主於含章殿下臥的榻，懸的是同昌公主製的聯珠帳。寶玉含笑連說：「這裏好！」秦氏笑道：「我這屋子大約神仙也可以住得了。」說著親自展開了西子浣過的紗衾，移了紅娘抱過的鴛枕。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            於是眾奶母伏侍寶玉臥好，款款散了，只留襲人，媚人，晴雯，麝月四個丫鬟為伴。秦氏便吩咐小丫鬟們，好生在廊檐下看著貓兒狗兒打架。那寶玉剛合上眼，便惚惚的睡去，猶似秦氏在前，遂悠悠蕩蕩，隨了秦氏，至一所在。但見朱欄白石，綠樹清溪，真是人跡稀逢，飛塵不到。寶玉在夢中歡喜，想道：「這個去處有趣，我就在這裏過一生，縱然失了家也願意，強如天天被父母師傅打呢。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」正胡思之間，忽聽山後有人作歌曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            春夢隨雲散，飛花逐水流。寄言眾兒女，何必覓閒愁。寶玉聽了是女子的聲音。歌聲未息，早見那邊走出一個人來，蹁躚裊娜，端的與人不同。有賦為證：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方離柳塢，乍出花房。但行處，鳥驚庭樹，將到時，影度迴廊。仙袂乍飄兮，聞麝蘭之馥郁，荷衣欲動兮，聽環佩之鏗鏘。靨笑春桃兮，雲堆翠髻，唇綻櫻顆兮，榴齒含香。纖腰之楚楚兮，迴風舞雪，珠翠之輝輝兮，滿額鵝黃。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            出沒花間兮，宜嗔宜喜，徘徊池上兮，若飛若揚。蛾眉顰笑兮，將言而未語，蓮步乍移兮，待止而欲行。羡彼之良質兮，冰清玉潤，慕彼之華服兮，閃灼文章。愛彼之貌容兮，香培玉琢，美彼之態度兮，鳳翥龍翔。其素若何，春梅綻雪。其潔若何，秋菊被霜。其靜若何，松生空谷。其艷若何，霞映澄塘。其文若何，龍游曲沼。其神若何，月射寒江。應慚西子，實愧王嬙。奇矣哉，生於孰地，來自何方，信矣乎，瑤池不二，紫府無雙。果何人哉？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如斯之美也！寶玉見是一個仙姑，喜的忙來作揖問道：「神仙姐姐不知從那裏來，如今要往那裏去？也不知這是何處，望乞攜帶攜帶。」那仙姑笑道：「吾居離恨天之上，灌愁海之中，乃放春山遣香洞太虛幻境警幻仙姑是也：司人間之風情月債，掌塵世之女怨男癡。因近來風流冤孽，纏綿於此處，是以前來訪察機會，布散相思。今忽與爾相逢，亦非偶然。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此離吾境不遠，別無他物，僅有自採仙茗一盞，親釀美酒一瓮，素練魔舞歌姬數人，新填「紅樓夢」仙曲十二支，試隨吾一遊否？」寶玉聽說，便忘了秦氏在何處，竟隨了仙姑，至一所在，有石牌橫建，上書「太虛幻境」四個大字，兩邊一副對聯，乃是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            假作真時真亦假，無為有處有還無。轉過牌坊，便是一座宮門，上面橫書四個大字，道是：「孽海情天」。又有一副對聯，大書云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            厚地高天，堪歎古今情不盡。癡男怨女，可憐風月債難償。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了，心下自思道：「原來如此。但不知何為「古今之情」，何為「風月之債」？從今倒要領略領略。」寶玉只顧如此一想，不料早把些邪魔招入膏肓了。當下隨了仙姑進入二層門內，至兩邊配殿，皆有匾額對聯，一時看不盡許多，惟見有幾處寫的是：「癡情司」，「結怨司」，「朝啼司」，「夜怨司」，「春感司」，「秋悲司」。看了，因向仙姑道：「敢煩仙姑引我到那各司中遊玩遊玩，不知可使得？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」仙姑道：「此各司中皆貯的是普天之下所有的女子過去未來的簿冊，爾凡眼塵軀，未便先知的。」寶玉聽了，那裏肯依，復央之再三。仙姑無奈，說：「也罷，就在此司內略隨喜隨喜罷了。」寶玉喜不自勝，抬頭看這司的匾上，乃是「薄命司」三字，兩邊對聯寫的是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            春恨秋悲皆自惹，花容月貌為誰妍。寶玉看了，便知感歎。進入門來，只見有十數個大櫥，皆用封條封著。看那封條上，皆是各省的地名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉一心只揀自己的家鄉封條看，遂無心看別省的了。只見那邊櫥上封條上大書七字云：「金陵十二釵正冊」。寶玉問道：「何為『金陵十二釵正冊』？」警幻道：「即貴省中十二冠首女子之冊，故為『正冊』。」寶玉道：「常聽人說，金陵極大，怎麼只十二個女子？如今單我家裏，上上下下，就有幾百女孩子呢。」警幻冷笑道：「貴省女子固多，不過擇其緊要者錄之。下邊二櫥則又次之。餘者庸常之輩，則無冊可錄矣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」寶玉聽說，再看下首二櫥上，果然寫著「金陵十二釵副冊」，又一個寫著「金陵十二釵又副冊」。寶玉便伸手先將「又副冊」櫥開了，拿出一本冊來，揭開一看，只見這首頁上畫著一幅畫，又非人物，也無山水，不過是水墨滃染的滿紙烏雲濁霧而已。後有幾行字跡，寫的是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            霽月難逢，彩雲易散。心比天高，身為下賤。風流靈巧招人怨，壽夭多因毀謗生，多情公子空牽念。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了，又見後面畫著一簇鮮花，一床破席，也有幾句言詞，寫道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枉自溫柔和順，空云似桂如蘭。堪羡優伶有福，誰知公子無緣。寶玉看了不解。遂擲下這個，又去開了副冊櫥門，拿起一本冊來，揭開看時，只見畫著一株桂花，下面有一池沼，其中水涸泥乾，蓮枯藕敗，後面書云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            根並荷花一莖香，平生遭際實堪傷。自從兩地生孤木，致使香魂返故鄉。寶玉看了仍不解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便又擲了，再去取「正冊」看，只見頭一頁上便畫著兩株枯木，木上懸著一圍玉帶，又有一堆雪，雪下一股金簪。也有四句言詞，道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可歎停機德，誰憐詠絮才。玉帶林中掛，金簪雪裏埋。寶玉看了仍不解。待要問時，情知他必不肯洩漏，待要丟下，又不捨。遂又往後看時，只見畫著一張弓，弓上挂著香櫞。也有一首歌詞云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二十年來辨是非，榴花開處照宮闈。三春爭及初春景，虎兔相逢大夢歸。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面又畫著兩人放風箏，一片大海，一隻大船，船中有一女子掩面泣涕之狀。也有四句寫云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才自精明志自高，生於末世運偏淆。清明涕送江邊望，千里東風一夢遙。後面又畫幾縷飛雲，一灣逝水。其詞曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富貴又何為，襁褓之間父母違。展眼吊斜暉，湘江水逝楚雲飛。後面又畫著一塊美玉，落在泥垢之中。其斷語云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欲潔何曾潔，云空未必空。可憐金玉質，終陷淖泥中。後面忽見畫著個惡狼，追撲一美女，欲啖之意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            其書云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子係中山狼，得志便猖狂。金閨花柳質，一載赴黃粱。後面便是一所古廟，裏面有一美人在內看經獨坐。其判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            勘破三春景不長，緇衣頓改昔年妝。可憐繡戶侯門女，獨臥青燈古佛旁。後面便是一片冰山，上面有一隻雌鳳。其判曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凡鳥偏從末世來，都知愛慕此生才。一從二令三人木，哭向金陵事更哀。後面又是一座荒村野店，有一美人在那裏紡績。其判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            勢敗休云貴，家亡莫論親。偶因濟村婦，巧得遇恩人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面又畫著一盆茂蘭，旁有一位鳳冠霞帔的美人。也有判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            桃李春風結子完，到頭誰似一盆蘭。如冰水好空相妒，枉與他人作笑談。後面又畫著高樓大廈，有一美人懸梁自縊。其判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            情天情海幻情身，情既相逢必主淫。漫言不肖皆榮出，造釁開端實在寧。寶玉還欲看時，那仙姑知他天分高明，性情穎慧，恐把仙機洩漏，遂掩了卷冊，笑向寶玉道：「且隨我去游玩奇景，何必在此打這悶葫蘆！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉恍恍惚惚，不覺棄了卷冊，又隨了警幻來至後面。但見珠簾繡幕，畫棟雕檐，說不盡那光搖朱戶金舖地，雪照瓊窗玉作宮。更見仙花馥郁，異草芬芳，真好個所在。又聽警幻笑道：「你們快出來迎接貴客！」一語未了，只見房中又走出幾個仙子來，皆是荷袂蹁躚，羽衣飄舞，姣若春花，媚如秋月。一見了寶玉，都怨謗警幻道：「我們不知係何『貴客』，忙的接了出來！姐姐曾說今日今時必有絳珠妹子的生魂前來游玩，故我等久待。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            何故反引這濁物來污染這清淨女兒之境？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉聽如此說，便嚇得欲退不能退，果覺自形污穢不堪。警幻忙攜住寶玉的手，向眾姊妹道：「你等不知原委：今日原欲往榮府去接絳珠，适從寧府所過，偶遇寧榮二公之靈，囑吾云：『吾家自國朝定鼎以來，功名奕世，富貴傳流，雖歷百年，奈運終數盡，不可挽回者。故遺之子孫雖多，竟無可以繼業。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            其中惟嫡孫寶玉一人，稟性乖張，生性怪譎，雖聰明靈慧，略可望成，無奈吾家運數合終，恐無人規引入正。幸仙姑偶來，萬望先以情欲聲色等事警其癡頑，或能使彼跳出迷人圈子，然後入於正路，亦吾兄弟之幸矣。』如此囑吾，故發慈心，引彼至此。先以彼家上中下三等女子之終身冊籍，令彼熟玩，尚未覺悟，故引彼再至此處，令其再歷飲饌聲色之幻，或冀將來一悟，亦未可知也。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說畢，攜了寶玉入室。但聞一縷幽香，竟不知其所焚何物。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉遂不禁相問。警幻冷笑道：「此香塵世中既無，爾何能知！此香乃係諸名山胜境內初生異卉之精，合各种寶林珠樹之油所製，名『群芳髓』。」寶玉聽了，自是羡慕而已。大家入座，小丫鬟捧上茶來。寶玉自覺清香異味，純美非常，因又問何名。警幻道：「此茶出在放春山遣香洞，又以仙花靈葉上所帶之宿露而烹，此茶名曰『千紅一窟』。」寶玉聽了，點頭稱賞。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因看房內，瑤琴，寶鼎，古畫，新詩，無所不有，更喜窗下亦有唾絨，奩間時漬粉污。壁上也見懸著一副對聯，書云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幽微靈秀地，無可奈何天。寶玉看畢，無不羡慕。因又請問眾仙姑姓名：一名癡夢仙姑，一名鐘情大士，一名引愁金女，一名度恨菩提，各各道號不一。少刻，有小丫鬟來調桌安椅，設擺酒饌。真是：瓊漿滿泛玻璃盞，玉液濃斟琥珀杯。更不用再說那肴饌之盛。寶玉因聞得此酒清香甘冽，異乎尋常，又不禁相問。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            警幻道：「此酒乃以百花之蕊，萬木之汁，加以麟髓之醅，鳳乳之麯釀成，因名為『萬艷同杯』。」寶玉稱賞不迭。飲酒間，又有十二個舞女上來，請問演何詞曲。警幻道：「就將新製《紅樓夢》十二支演上來。」舞女們答應了，便輕敲檀板，款按銀箏，聽他歌道是：「開闢鴻蒙……」方歌了一句，警幻便說道：「此曲不比塵世中所填傳奇之曲，必有生旦淨末之則，又有南北九宮之限。此或詠歎一人，或感懷一事，偶成一曲，即可譜入管弦。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            若非個中人，不知其中之妙。料爾亦未必深明此調。若不先閱其稿，後聽其歌，翻成嚼蠟矣。」說畢，回頭命小丫鬟取了《紅樓夢》原稿來，遞與寶玉。寶玉接來，一面目視其文，一面耳聆其歌曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            紅樓夢引子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            開闢鴻蒙，誰為情種？都只為風月情濃；趁著這奈何天，傷懷日，寂寥時，試遣愚衷，因此上演出這悲金悼玉的「紅樓夢」。終身誤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            都道是金玉良緣，俺只念木石前盟。空對著，山中高士晶瑩雪；終不忘，世外仙姝寂寞林。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            歎人間，美中不足今方信。縱然是齊眉舉案，到底意難平。枉凝眉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一個是閬苑仙葩，一個是美玉無瑕。若說沒奇緣，今生偏又遇著他；若說有奇緣，如何心事終虛化？一個枉自嗟呀，一個空勞牽掛；一個是水中月，一個是鏡中花。想眼中能有多少淚珠兒，怎經得秋流到冬，春流到夏？寶玉聽了此曲，散漫無稽，不見得好處，但其聲韻凄惋，竟能銷魂醉魄。因此也不察其原委，問其來歷，就暫以此釋悶而已。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因又看下道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恨無常
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            喜榮華正好，恨無常又到。眼睜睜，把萬事全拋；蕩悠悠，把芳魂消耗。望家鄉，路遠山高。故向爹娘夢裏相尋告：兒命已入黃泉，天倫呵，須要退步抽身早。分骨肉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一帆風雨路三千，把骨肉家園齊來拋閃。恐哭損殘年，告爹娘，休把兒懸念。自古窮通皆有定，離合豈無緣？從今分兩地，各自保平安。奴去也，莫牽連。樂中悲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            襁褓中，父母歎雙亡，縱居那綺羅叢，誰知嬌養？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幸生來，英豪闊大寬宏量，從未將兒女私情略縈心上，好一似，霽月光風耀玉堂。廝配得才貌仙郎，博得個地久天長，凖折得幼年時坎坷形狀。終久是雲散高唐，水涸湘江。這是塵寰中消長數應當，何必枉悲傷。世難容
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            氣質美如蘭，才華阜比仙，天生成孤癖人皆罕。你道是啖肉食腥膻，視綺羅俗厭；卻不知太高人愈妒，過潔世同嫌。可歎這，青燈古殿人將老；辜負了，紅粉朱樓春色闌；到頭來，依舊是風塵肮髒違心願。好一似，無瑕白玉遭泥陷；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又何須，王孫公子歎無緣。喜冤家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中山狼，無情獸，全不念當日根由，一味的驕奢淫蕩貪還構。覷著那，侯門艷質同蒲柳；作踐的，公府千金似下流。歎芳魂艷魄，一載蕩悠悠。虛花悟
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            將那三春看破，桃紅柳綠待如何？把這韶華打滅，覓那清淡天和。說什麼，天上夭桃盛，雲中杏蕊多；到頭來，誰把秋捱過？則看那，白楊村裏人嗚咽，青楓林下鬼吟哦；更兼著，連天衰草遮墳墓。這的是，昨貧今富人勞碌，春榮秋謝花折磨。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            似這般，生關死劫誰能躲？聞說道，西方寶樹喚婆娑，上結著長生果。聰明累
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            機關算盡太聰明，反算了卿卿性命。生前心已碎，死後性空靈。家富人寧，終有個家亡人散各奔騰。枉費了，意懸懸半世心；好一似，蕩悠悠三更夢。忽喇喇似大廈傾，昏慘慘似燈將盡。呀，一場歡喜忽悲辛；歎人世，終難定。留餘慶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            留餘慶，留餘慶，忽遇恩人；幸娘親，幸娘親，積得陰功。勸人生，濟困扶窮，休似俺那愛銀錢忘骨肉的狠舅奸兄。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正是乘除加減，上有蒼穹。晚韶華
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鏡裏恩情，更那堪夢裏功名；那美韶華去之何迅，再休提繡帳鴛衾。只這帶珠冠，披鳳襖，也抵不了無常性命。雖說是，人生莫受老來貧，也須要陰騭積兒孫。氣昂昂頭戴簪纓，光燦燦胸懸金印；威赫赫爵祿高登，昏慘慘黃泉路近。問古來將相可還存？也只是虛名兒與後人欽敬。好事終
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            畫梁春盡落香塵，擅風情，秉月貌，便是敗家的根本；箕裘頹墮皆從敬，家事消亡首罪寧，宿孽總因情。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            收尾：飛鳥各投林
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            為官的、家業凋零，富貴的、金銀散盡，有恩的、死裏逃生，無情的、分明報應，欠命的、命已還，欠淚的、淚已盡。冤冤相報實非輕，分離聚合皆前定；欲知命短問前生，老來富貴也真僥幸。看破的、遁入空門，痴迷的、枉送了性命；好一似食盡鳥投林，落了片白茫茫大地真乾淨。歌畢，還要歌副曲。警幻見寶玉甚無趣味，因歎：「癡兒竟尚未悟！」那寶玉忙止歌姬不必再唱，自覺朦朧恍惚，告醉求臥。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            警幻便命撤去殘席，送寶玉至一香閨繡閣之中，其間舖陳之盛，乃素所未見之物。更可駭者，早有一位女子在內，其鮮艷嫵媚，有似乎寶釵，風流裊娜，則又如黛玉。正不知何意，忽警幻道：「塵世中多少富貴之家，那些綠窗風月，繡閣煙霞，皆被淫污紈袴與那些流蕩女子悉皆玷辱。更可恨者，自古來多少輕薄浪子，皆以『好色不淫』為飾，又以『情而不淫』作案，此皆飾非掩醜之語也。好色即淫，知情更淫。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是以巫山之會，雲雨之歡，皆由既悅其色，復戀其情所致也。吾所愛汝者，乃天下古今第一淫人也。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉聽了，唬的忙答道：「仙姑差了。我因懶於讀書，家父母尚每垂訓飭，豈敢再冒『淫』字。況且年紀尚小，不知『淫』字為何物。」警幻道：「非也。淫雖一理，意則有別。如世之好淫者，不過悅容貌，喜歌舞，調笑無厭，雲雨無時，恨不能盡天下之美女供我片時之趣興，此皆皮膚淫濫之蠢物耳。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如爾則天分中生成一段癡情，吾輩推之為『意淫』。『意淫』二字，惟心會而不可口傳，可神通而不可語達。汝今獨得此二字，在閨閣中，固可為良友，然於世道中未免迂闊怪詭，百口嘲謗，萬目睚眥。今既遇令祖寧榮二公剖腹深囑，吾不忍君獨為我閨閣增光，見棄於世道，是以特引前來，醉以靈酒，沁以仙茗，警以妙曲，再將吾妹一人，乳名兼美字可卿者，許配於汝。今夕良時，即可成姻。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不過令汝領略此仙閨幻境之風光尚如此，何況塵境之情景哉？而今後萬萬解釋，改悟前情，留意於孔孟之間，委身於經濟之道。」說畢便秘授以雲雨之事，推寶玉入房，將門掩上自去。那寶玉恍恍惚惚，依警幻所囑之言，未免有兒女之事，難以盡述。至次日，便柔情繾綣，軟語溫存，與可卿難解難分。因二人攜手出去遊頑之時，忽至一個所在，但見荊榛遍地，狼虎同群，迎面一道黑溪阻路，並無橋梁可通。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正在猶豫之間，忽見警幻後面追來，告道：「快休前進，作速回頭要緊！」寶玉忙止步問道：「此係何處？」警幻道：「此即迷津也。深有萬丈，遙亙千里，中無舟楫可通，只有一個木筏，乃木居士掌舵，灰侍者撐篙，不受金銀之謝，但遇有緣者渡之。爾今偶游至此，設如墮落其中，則深負我從前諄諄警戒之語矣。」話猶未了，只聽迷津內水響如雷，竟有許多夜叉海鬼將寶玉拖將下去。嚇得寶玉汗下如雨，一面失聲喊叫：「可卿救我！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」嚇得襲人輩眾丫鬟忙上來摟住，叫：「寶玉別怕，我們在這裏！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卻說秦氏正在房外囑咐小丫頭們好生看著貓兒狗兒打架，忽聽寶玉在夢中喚他的小名，因納悶道：「我的小名這裏從沒人知道的，他如何知道，在夢裏叫出來？」正是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一場幽夢同誰訴，千古情人獨我知。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengjia">
+      <div class="compare-col-head">
+        <span class="badge">程甲本</span>
+        <span class="col-desc">程甲本（1791程伟元/高鹗活字本，120回）</span>
+        <span>第5回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">开生面梦演红楼梦 立新场情传幻境情</h3>
+        
+        
+        <p class="col-para">
+          
+            第四囘中旣將薛家母子在榮府中𭔃居等事畧已表明，此囘則暫不能寫矣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如今且說林黛玉自在榮府，一來賈母萬般憐愛，寢食起居，一如寶玉，而𨒖春、惜春、探春三個孫女倒且靠後。便是寶玉和黛玉二人之親宻友愛處，亦較别個不同。日則同行同坐，夜則同止同息，眞是言和意順，似𣾰如膠。不想如今忽然來了一個薛寶釵，年紀雖大不多，然品格端方，容貌美麗，人謂黛玉所不及。而寶釵行爲豁達，隨分從時，不比黛玉孤高自許，目無下塵，故深得下人之心。便是那些小丫頭們，亦多與寶釵頑笑。因此黛玉心中便有些不忿之意，寶釵却渾然不覺。那寶玉亦在孩提之間，况自天性所禀，一片愚拙偏僻，視姊妹兄弟皆出一意，並無親踈遠近之别。如今與黛玉同處賈母房中坐卧，故畧比别個姊妹熟慣些。旣熟慣，則更覺親宻。旣親宻，則不免有求全之毁，不虞之𨻶。這日不知爲何，他二人言語有些不合起來，黛玉又在房中獨自垂涙，寶玉又自悔言語冐撞，前去俯就，那黛玉方漸漸囘轉來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因東邊寧府花園内梅花盛開，賈珍之妻尤氏乃治酒具，請賈母、邢夫人、王夫人等賞花。是日先帶了賈蓉夫妻二人來面請。賈母等於早飯後過來，就在會芳園遊玩，先茶後酒。不過是寧榮二府眷屬家宴，並無别樣新文趣事可記。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一時寶玉倦怠，欲𪾶中覺，賈母命人好生哄着歇息一囘再來。賈蓉之妻秦氏便忙笑道：「我們這裡有給寳叔收拾下的屋子，老祖宗放心，只管交與我就是了。」親向寶玉的奶娘丫鬟等道：「嬤嬤、姐姐們，請寶叔隨我這裡來。」賈母素知秦氏是極妥當的人，生得嬝娜纖巧，行事又温柔和平，乃重孫媳中第一個得意之人，見他去安置寶玉，自是安稳的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當下秦氏引了一簇人來至上房内間，寶玉抬頭看見是一幅畵貼在上面，人物固好，其故事乃是「燃藜圖」也，心中便有些不快。又有一幅對聯，寫的是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            世事洞明皆學問，人情練達卽文章。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            及看了這兩句，縱然室宇精美，舖陳華麗，亦㫁㫁不肯在這裡了，忙說：「快出去！快出去！」秦氏𦗟了笑道：「這裡還不好，往那裡去呢？不然往我屋裡去罷。」寶玉㸃頭微笑，有一嬷嬷說道：「那裡有個叔叔往姪兒媳婦房裡𪾶覺的禮？」秦氏笑道：「噯喲，不怕他惱，他能多大了，就忌諱這些麽？上月你没有看見我那個兄弟來了，雖然和寳叔同年，兩個人若站在一處，只怕那一個還高些呢。」寳玉道：「我怎麽没有見過他，你帶他來我瞧瞧。」衆人笑道：「隔着二三十里，那裡帶去？見的日子有呢。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說着大家來至秦氏房中。剛至房中，便有一股細細的甜香襲人，寳玉便覺得眼餳骨軟，連說：「好香！」入房向壁上看時，有唐伯虎畵的「海棠春𪾶圖」，兩邊有宋學士秦太虛寫的一對聯云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            嫩寒鎻夢因春冷，芳氣襲人是酒香。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            案上設着武則天當日鏡室中設的寳鏡，一邉擺趙着飛燕立著舞的金盤，盤内盛着安禄山擲過傷了太眞乳的木爪。上面設着壽昌公主於含章殿下卧的寳榻，懸的是同昌公主製的連珠帳。寳玉含笑道：「這裡好！這裡好！」秦氏笑道：「我這屋子大約神仙也可以住得的。」說着，親自展開了浣過的紗衾，移了紅娘抱過的鴛枕，於是衆奶姆伏侍寶玉卧好了，𭭎𭭎散去，只留下襲人、秋紋、晴雯、麝月四個丫鬟爲伴。秦氏便分付小丫鬟們好生在簷下看着猫兒打架。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那寶玉纔合上眼，便恍恍惚惚的睡去，猶似秦氏在前，遂悠悠蕩蕩，隨了秦氏至一所在。但見朱欄玉砌，綠樹淸溪，眞是人跡不逢，飛塵罕到。寶玉在夢中歡喜，想道：「這個去處有趣，我就在這裡過一生，雖然失了家也愿意，强如天天被父母先生打去。」忽胡思之間，𦗟見山後有人作歌曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            春夢隨雲散，飛花逐水流。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            𭔃言衆兒女：何必覔閒愁。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉𦗟了是女兒的聲氣。歌音未息，早見那邊走出一個麗人來，蹁躚嬝娜，與凡人不同。有賦爲証：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方離柳塢，乍出花房。但行處，鳥驚庭樹；將到時，影度𮞉廊。仙袂乍飄兮，聞麝蘭之馥郁；荷衣欲動兮，𦗟環佩之鏗鏘。靨笑春桃兮，雲堆翠髻；唇綻櫻顆兮，榴齒含香。盼纖腰之楚楚兮，風廻雪舞；耀珠翠之輝煌兮，鴨綠鵝黃。出没花間兮，宜嗔宜喜；徘徊池上兮，若飛若揚。蛾眉顰笑兮，將言而未語；蓮歩乍移兮，欲止而欲行。羡彼之良質兮，氷淸玉潤；慕彼之華服兮，熌爍文章。愛彼之容貌兮，香培玉篆；美彼之態度兮，鳯翥龍翔。其素若何，春梅綻雪。其㓗若何，秋蕙披霜。其靜若何，松生空谷。其艶若何，霞映澄塘。其文若何，龍遊曲沼。其神若何，月射寒江。應慚西子，寔愧王嬙。竒矣哉！生于孰地？來自何方？信矣乎！瑶池不二，紫府無雙。果何人哉？若斯之美也！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉見是一個仙姑，喜的忙來作揖，笑問道：「神仙姐姐，不知從那裡來，如今要徃那裡去？我也不知這裡是何處，望乞携帶擕帶。」那仙姑道：「吾居離恨天之上，灌愁海之中，乃放春山遣香洞太虛幻境警幻仙姑是也：司人間之風情月債，掌塵世之女怨男痴。因進來風流𡨚孽，纏綿於此，是以前來訪察機會，佈散相思。今日與尔相逢，亦非偶然。此離吾境不遠，别無他物，僅有自採仙茗一盞，親釀美酒一甕，素練魔舞歌姫數人，新填『紅樓夢』仙曲十二支，可試隨我一遊否？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉聼了，喜躍非常，便忘了秦氏在何處，竟隨了仙姑至一所在。有石牌橫建，上書「太虛幻境」四大字，兩邉一幅對聯，乃是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            假作真時眞作假，無爲有處有還無。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            轉過牌坊，便是一座宮門，上橫書四個大字，道是：「孽海情天」。又有一幅對聯，大書云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            厚地高天，堪嘆古今情不盡。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            痴男怨女，可憐風月債難酬。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了，心下自思道：「原來如此。但不知何爲『古今之情』？又何爲『風月之債』？從今倒要領略領略。」寶玉只顧如此一想，不料早把些邪魔招入膏肓了。當下隨了仙姑進入二層門内，只見兩邉配殿，皆有匾額對聯，一時看不盡許多，惟見幾處寫着的是：「痴情司」、「結怨司」、「朝啼司」、「暮哭司」、「春感司」、「秋悲司」。看了，因向仙姑道：「敢煩仙姑引我到那各司中遊玩遊玩，不知可使得？」仙姑道：「此中各司貯的是普天之下所有的女子過去未來的簿冊，尔凡眼塵軀，未便先知的。」寶玉聼了，那裡肯依，復央之再四，警幻便看這司的匾說：「也罷，就在此司内略隨喜隨喜罷。」寶玉喜不能勝，抬頭看這司的匾上，乃是「薄命司」三字，兩邉寫着對聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            春恨秋悲皆自惹，花容月貌爲誰妍。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了，便知感歎。進入門中，只見有十數箇大橱，皆用封條封着。看那封條上，皆有各省字樣。寶玉一心只揀自己家鄉的封條看，只見那邉橱上封條太書「金陵十二釵正冊」，寶玉因問：「何爲『金陵十二釵正冊』？」警幻道：「卽貴省中十二冠首女子之册，故爲正册。」寳玉道：「常𦗟人說，金陵極大，怎麽只十二個女子？如今单我們家裡，上上下下就有幾百個女孩兒。」警幻㣲笑道：「貴省女子固多，不過擇其𦂳要者錄之，兩邉二橱則又次之。餘者庸常之軰，則無冊可錄矣。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉再看下首一橱，上寫着「金陵十二釵副冊」。又一橱上寫着「金陵十二釵又副册」。寳玉便伸手先將「又副册」橱門開了，拿出一本冊來，揭開看時，只見這首頁上畵的，旣非人物，亦非山水，不過是水墨滃𣑱、滿紙烏雲濁霧而已。後有幾行字跡，寫道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            霽月難逢，彩雲易散。心比天高，身爲下賤。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            風流靈巧招人怨。壽夭多因誹謗生，多情公子空牽念。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了，又見後面畵着一簇鮮花，一床破蓆，也有幾句言詞，寫道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枉自温柔和順，空云似桂如蘭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            堪羡優伶有福，誰知公子無緣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了不解，遂擲下這箇，去開了「副册」橱門，拿起一本冊來，揭開看時，只見畵着一枝桂花，下面有一池沼，其中水涸泥乾，蓮枯藕敗，後面書云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            根並荷花一莖香，平生遭際實堪傷。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自從兩地生孤木，致使香魂返故鄉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了又不解，又去取「正册」看，只見頭一頁上便畵着兩株枯木，木上懸着一圍玉帶。又有一堆雪，雪下一股金簮。也有四句詩道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可歎停機德，誰憐咏絮才。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉帶林中掛，金簮雪裡埋。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了仍不解，待要問時，知他必不肯洩漏天機。待要丢下，又不捨，遂徃後看時，只見畫着一張弓，弓上掛着一香櫞。也有一首歌詞云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二十年來辯是非，榴花開處照宫闈。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            三春怎及初春景，虎兎相逢大夢歸。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面又畫着兩人放風筝，一片大海，一隻大船，船中有一女子，掩面泣涕之狀。也有四句寫云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才自淸明志自高，生於末世運偏消。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            淸明涕送江邉望，千里東風一夢遙。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面又畫幾縷飛雲，一灣逝水。其詞曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富貴又何爲，襁褓之間父母違。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            展眼弔斜暉，湘江水逝楚雲飛。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面又畫著一塊美玉，落在泥汚之中。其斷語云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欲㓗何曾㓗，云空未必空。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可憐金玉質，終掉䧟泥中。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面忽畫一惡狼，追樸一美女，欲啖之意。其書云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子係中山狼，得志便猖狂。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            金閨花柳質，一載赴黃粱。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面便是一所古廟，裡面有一美人，在内看經獨坐。其判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            勘破三春景不長，緇衣頓攺昔年粧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可憐繡戸侯門女，獨卧青燈古佛傍。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面便是一片氷山，上有一支雌鳯。其判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凡鳥偏從末世來，都知愛慕此生才。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一從二令三人木，哭向金陵事更哀。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面又是一座荒村野店，有一美人在那裡紡績。其判曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            𫝑敗休云貴，家亡莫論親。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            偶因濟劉氏，巧得遇恩人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            詩後又畫一盆茂蘭，傍有一位鳯冠霞帔的美人。也有判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            桃李春風結子完，到頭誰似一盆蘭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如氷水好空相妒，枉與他人作笑談。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            詩後又畫一座高樓，上有一美人懸梁自盡。其判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            情天情海幻情身，情旣相逄必主淫。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            漫言不肖皆榮出，造釁開端寔在寧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉還欲看時，那仙姑知他天分高明、性情頴慧，恐洩滿天機，便掩了卷冊，笑向寶玉道：「且隨我去遊玩竒景，何必在此打這悶葫蘆！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉恍恍惚惚，不覺棄了卷冊，又隨了警幻來至後面。但見朱簾綉幙，畫棟雕簷，說不盡的光摇朱戸金鋪地，雪照瓊𥦗玉作宮。更見仙花馥郁，異草芳芬，直個好所在。又𦗟警幻笑道：「你們快出來迎接貴客！」一言未了，只見房中走出幾個仙子來，皆是荷袂蹁躚，羽衣飄舞，嬌若春花，媚如秋月。一見了寶玉，都怨謗警幻道：「我們不知係何貴客，忙的接了出來！姐姐曾說今日今時必有絳珠妹子的生魂前來遊玩，故我久待。何故反引這濁物來汚𣑱這淸凈女兒之境？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉𦗟如此說，便哧得欲退不能，果覺自形汚穢不堪。警幻忙擕住寶玉的手，向衆姊妹笑道：「你等不知原委：今日原欲往榮府去接絳珠，適後寧府經過，偶遇榮寧二公之靈，囑吾云：『吾家自國朝定鼎以來，功名奕世，富貴流傳，已歴百年，奈運終數盡，不可挽囘。我等之子孫雖多，竟無可以繼葉者。惟嫡孫寳玉一人，禀性乖張，性情怪譎，雖聰明靈慧，畧可望成，無奈吾家運數合終，恐無人規引入正。幸仙姑偶來，可望先以情慾聲色等事警其痴頑，或能使彼跳出迷人圈子，入于正路，亦吾兄弟之幸矣。』如此嘱吾，故發慈心，引彼至此。先以彼家上中下三等女子之終身册籍，令彼熟玩，尙未覺悟。故引彼再到此處，令其歴飮饌聲色之幻，或冀將來一悟，未可知也。」說𭺾，擕了寳玉入室。但聞一縷幽香，不知所聞何物。寳玉遂不住相問，警幻冷笑道：「此香塵世中所無，爾何能知！此係諸名山勝境初生異卉之精，合各種寶林珠樹之油所製，名爲『羣芳髓』。」寶玉聽了，自是羡𪷂而已。大家入座，小嬛捧上茶來，寶玉自覺香淸味美，迥非常品，因又問何名。警幻道：「此茶出在放春山遣香洞，又以仙花靈葉上所帶宿露而烹，此茶名曰『千紅一窟』。」寳玉𦗟了，㸃頭稱賞。因看房内瑶琴、寶鼎、古畵、新詩，無所不有。更喜𥦗下亦有唾絨，奩間時漬粉汚。壁上亦有一副對聯，書云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幽㣲靈秀地，無可奈何天。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寳玉看𭺾，無不羡慕，因又請問衆仙姑姓名：一名痴夢仙姑，一名鍾情大士，一名引愁金女，一名度恨菩提，各各道號不一。少刻，有小嬛來調桌安椅，擺設酒饌，真是：瓊漿滿泛玻瓈盞，玉液濃斟琥珀杯。更不用再說此饌之盛。寳玉因此酒香冽異常，又不禁相問。警幻道：「此酒乃以百花之蕤，萬木之汁，加以麟髓之醅、鳯乳之麯釀成，因名爲『萬艶同杯』。」寶玉稱賞不迭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            飮酒間，又有十二個舞女上來，請問演何調曲，警幻道：「就將新製『紅樓夢』十二支演上來。」舞女們答應了，便輕敲檀板，𭭎按銀箏，𦗟他歌道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            開闢鴻濛……
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方歌了一句，警幻道：「此曲不比塵世中所填傳竒之曲，必有生旦凈末之則，又有南北九宫之卽。此或咏嘆一人，或感懷一事，偶成一曲，卽可譜入管絃。若非個中人，不知其中之妙。料尔亦未必深明此調，若不先閱其稿，後聼其曲，反成嚼蠟矣。」說𭺾，囘頭命小嬛取了「紅樓夢」原稿來，遞與寳玉。寶玉接過來，一面目視其文，耳聆其歌曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （紅樓夢引子） 開闢鴻濛，誰爲情種？都只爲風月情濃。奈何天，傷懷日，寂寥時，試遣愚𮕵。因此上，演出那這悲金悼玉的「紅樓夢」。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （終身悞） 都道金玉良緣，掩只念木石前𥂀。空對着，山中高士晶營雪；終不忘，世外仙姝寂寞林。嘆人間，美中不足今方信。縱然是齊眉舉案，到底意難平。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （枉凝眉） 一個是閬苑仙葩，一個是美玉無瑕。若說没竒緣，今生偏又遇着他；若說有竒緣，如何心事終虛話？一個枉自嗟呀，一個空勞牽掛；一個是水中月，一個是鏡中花。想眼中能有多少淚珠兒，怎經得秋流到冬，春流到夏！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            𨚫說寳玉聼了此曲，散漫無稽，未見得好處。但其聲䪨凄婉，竟能鎖魂醉魄。因此也不問其原委，也不究其來歴，就暫以此釋悶而已。因又看下面道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （恨無常） 喜榮華正好，恨無常又到。眼睁睁把萬事全拋。蕩悠悠芳魂鎖耗。望家鄉，路遠山高。故向爹娘夢裡相𡬶告：兒命已入黃泉，天倫呵，須要退歩抽身早！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （分骨肉） 一㠶風雨路三千，把骨肉家園齊來拋閃。恐哭損殘年。告爹娘，休把兒懸念。自古窮通皆有定，離合豈無緣？從今分兩地，各自保平安。奴去也，莫牽連。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （樂中悲） 襁褓中，父母嘆雙亡。縱居那𦂶羅叢，誰知嬌養？幸生來英豪濶大寛宏量，從未將兒女私情畧縈心上。好一似霽月光風耀玉堂。厮配得才貌仙郎，愽得個地久天長，準折得㓜年時坎坷形狀。終久是雲散高唐，水涸湘江。這是塵寰中消長數應當，何必枉悲傷！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （世難容） 氣質美如蘭，才華馥比仙。天生成孤癖人皆罕。你道是啖肉食腥膻，視𦂶羅俗厭；却不知好高人愈妒，過㓗世同嫌。可嘆這，靑燈古殿人將老。孤負了，紅粉朱樓春色闌。到頭來，依舊是風塵骯髒違心愿。好一似無瑕白玉遭泥䧟。又何須王孫公子嘆無緣？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （喜𡨚家） 中山狼，無情獸，全不念當日根由。一味的驕奢淫蕩貪還搆。覷著那侯門艶質同蒲柳，作踐的公府千金似下流。嘆芳魂艶魄，一載蕩悠悠！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （虛花悟） 將那三春看破，桃紅柳綠待如何？把只韶華打滅，那淸淡天和。說什麽天上夭桃盛，雲中杏蕊多？到頭來，誰見把秋捱過？則看那，白楊村裡人嗚咽，青楓林下鬼吟哦；更兼著，連天衰草遮坟墓。這的是，昨貧今富人勞碌，春榮秋謝花折磨。似這般，生關死刼誰能躱？聞說道，西方寶橱喚婆娑，上結著，長生菓。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （聰明累） 機關算盡太聰明，反𮅕了卿卿性命。前生心已碎，死後性空靈。家富人寧，終有個家亡人散各奔騰。枉費了意懸懸半世心，好一似蕩悠悠三更夢。忽喇喇似大厦傾，昏𢡖𢡖似燈將盡。呀！一塲歡喜忽悲辛。嘆人世，終難定！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （留餘慶） 留餘慶，留餘慶，忽遇恩人。幸娘親，娘親，積得陰功。勸人生，濟困扶窮，休似俺那愛銀錢、忘骨肉的狠𠢎奸兄！正是乗除加减，上有蒼穹。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （晚韶華） 鏡裡恩情，更那堪夢裡功名！那美韶華去之何𨑙！再休提綉帳鴛衾。只這戴珠冠，披鳯袄，也抵不了無常性命。雖說是，人生莫受老來貧，也須要陰隲積兒孫。氣昂昂頭戴簮纓，光燦燦胸懸金印。威赫赫爵禄高登，昏𢡖𢡖黃泉路近！問古來將相可還存？也只是虛名兒與後人欽敬。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （好事終） 畵梁春盡落香塵。擅風情，秉月貌，便是敗家的根本。箕裘頺墮皆從敬，家事消亡首罪寧。宿孽總因情！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （飛鳥各投林） 爲官的，家業凋零；富貴的，金銀散盡。有恩的，死裡迯生；無情的，分明報應。欠命的，命已還；欠淚的，淚已盡。𡨚𡨚相報豈非輕，分離聚合皆前定。欲知命短問前生，老來富貴也眞徼倖。看破的，遁入空門；痴迷的，枉送了性命。好一似食盡鳥投林，落了片白茫茫大地眞干凈！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            歌𭺾，還又歌副歌。警幻見寶玉甚無趣味，因歎：「痴兒竟尙未悟！」那寶玉忙止歌姫不必再唱，自覺朦朧恍惚，告醉求卧。警幻便命撤去殘席，送寶玉至一香閨綉閣中，其間鋪陳之盛，乃素所未見之物。更可駭者，早有一位女子在内，其鮮艷嫵媚，有似乎寶釵。風流嬝娜，則又如黛玉。正不知何意，忽警幻道：「塵世中多少富貴之家，那些綠窻風月，綉閣烟霞，皆彼淫汚紈袴與那些流蕩女子悉皆玷辱。更可恨者，自古來，多少輕薄浪子，皆以『好色不淫』爲解，又以『情而不淫』作案，此皆餙非掩醜之語也。好色卽淫，知情更淫。是以巫山之會，雲雨之歡，皆由旣悅其色、復戀其情所致也。吾所愛汝者，乃天下古今第一淫人也。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寳玉聼了，唬的忙答道：「仙姑差了。我因懶於讀書，家父母尙每𡸁訓𩛙，豈敢再冐『淫』字？况且年紀尙㓜，不知『淫』爲何物。」警幻道：「非也。淫雖一理，意則有别。如世之好淫者，不過悅容貌，喜歌舞，調笑無厭，雲雨無時，恨不能天下之美女供我片時之趣興。此皆皮膚濫淫之蠢物耳。如爾則天分中生成一叚痴情，吾軰推之爲『意淫』。惟『意淫』二字，可心會而不可口傳，可神通而不能語達。汝今獨得此二字，在閨閣中固可爲良友，然於世道中未免迂濶怪詭，百口嘲謗，萬目睚眦。今旣遇令祖寧榮二公剖腹深囑，吾不忍君獨爲我閨閣增光而見棄于世道，故引子前來，醉以美酒，沁以仙茗，警以妙曲，再將吾妹一人，乳名兼美表字可卿者，許配與汝。今夕良時，卽可成姻。不過令汝領畧此仙閨幻境之風光尙然如此，何况塵境之情景哉？而今後，萬萬解釋，攺悟前情，留意于孔孟之間，委身于經濟之道。」說𭺾，便秘授以雲雨之事，推寶玉入房中，將門掩上自去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那寳玉恍恍惚惚，依警幻所嘱之言，未免有兒女之事，難以盡述。至次日，便柔情綣繾，軟語温存，與可卿難解難分。因二人擕手出去遊玩之時，忽然至一個所在，但見荆榛遍地，狼虎同行，𨒖面一道黑溪阻路，並無橋梁可通。正在猶豫之間，忽見警幻從後追來，說道：「快休前進，作速囘頭要𦂳！」寳玉忙止歩問道：「此係何處？」警幻道：「此卽迷津也，深有萬丈，遙亘千里，中無舟揖可通，只有一個木筏，乃木居士掌柁，灰侍者撑篙，不受金銀之謝，但遇有緣者渡之。爾今偶遊至此，設如墮落其中，則深負我從前諄諄警戒之語矣。」話猶未了，只𦗟迷津内响如雷聲，有許多夜义海鬼，將寶玉拖將下去，嚇得寶玉汗下如雨，一面失聲喊呌：「可卿救我！」嚇得襲人輩衆丫鬟忙上來摟住，呌：「寳玉不怕，我們在這裡。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却說秦氏正在房外囑咐小丫頭們好生看着猫兒狗兒打架，忽聞寶玉在夢中喚他的小名，因納悶道：「我的小名這裡從無人知道，他如何知得，在夢中呌出來？」正在不解，且𦗟下囘分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本</span>
+        <span class="col-desc">程乙本（1792程伟元/高鹗重订本，120回）</span>
+        <span>第5回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">开生面梦演红楼梦 立新场情传幻境情</h3>
+        
+        
+        <p class="col-para">
+          
+            第四回中既將薛家母子在榮府中寄居等事略已表明，此回暫可不寫了。如今且說林黛玉自在榮府以來，賈母萬般憐愛，寢食起居一如寶玉，迎春、探春、惜春三個親孫女倒且靠後了。就是寶玉黛玉二人的親密友愛，也較別人不同，日則同行同坐，夜則同止同息，真是言和意順，略無參商。不想如今忽然來了一個薛寶釵，年紀雖大不多，然品格端方，容貌豐美，人多謂黛玉所不及。那寶釵卻又行為豁達，隨分從時，不比黛玉孤高自許，目無下塵，故深得下人之心。就是小丫頭們，亦多和寶釵親近。因此，黛玉心中便有些不忿。寶釵卻是渾然不覺。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那寶玉也在孩提之間，況他天性所稟，一片愚拙偏僻，視姊妹兄弟皆出一意，並無親疏遠近之別。如今與黛玉同隨賈母一處坐臥，故略比別的姊妹熟慣些；既熟慣，便更覺親密；既親密，便不免一時有不虞之隙，求全之毀。這日，不知為何，二人言語有些不和起來，黛玉又在房中獨自垂淚。寶玉也自悔言語冒撞，前去俯就，那黛玉方漸漸的回轉過來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因東邊寧府花園內梅花盛開，賈珍之妻尤氏乃治酒請賈母、邢夫人、王夫人等賞花。是日，先帶了賈蓉夫妻二人來面請賈母等於早飯後過來，就在會芳園遊玩，先茶後酒。不過是寧榮二府眷屬家宴，並無別樣新文趣事可記。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一時，寶玉倦怠，欲睡中覺。賈母命人好生哄著，歇息一回再來。賈蓉之妻秦氏便忙笑道：「我們這裡有給寶二叔收拾下的屋子，老祖宗放心，只管交給我就是了。」因向寶玉的奶娘丫鬟等道：「嬤嬤姐姐們，請寶二叔跟我這裡來。」賈母素知秦氏是極妥當的人，－－因他生得嬝娜纖巧，行事又溫柔和平，乃重孫媳中第一個得意之人－－見他去安置寶玉，自然是放心的了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當下秦氏引了一簇人來至上房內間，寶玉抬頭看見是一幅畫貼在上面，人物固好，其故事乃是「燃藜圖」，心中便有些不快。又有一副對聯，寫的是：「世事洞明皆學問，人情練達即文章。」及看了這兩句，縱然室宇精美，鋪陳華麗，亦斷斷不肯在這裡了，忙說：「快出去！快出去！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦氏聽了，笑道：「這裡還不好，往那裡去呢？要不，就往我屋裡去罷。」寶玉點頭微笑。一個嬤嬤說道：「那裡有個叔叔往侄兒房裡睡覺的禮呢？」秦氏笑道：「不怕他惱，他能多大了？就忌諱這些個？上月你沒有看見我那個兄弟來了？雖然和寶二叔同年，兩個人要站在一處，只怕那一個還高些呢。」寶玉道：「我怎麼沒有見過？你帶他來我瞧瞧。」眾人笑道：「隔著二三十里，那裡帶去？見的日子有呢。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說著大家來至秦氏臥房。剛至房中，便有一股細細的甜香襲人。寶玉便覺眼餳骨軟，連說：「好香！」入房，向壁上看時，有唐伯虎畫的「海棠春睡圖」，兩邊有宋學士秦太虛寫的一副對聯云：「嫩寒鎖夢因春冷，芳氣襲人是酒香。」案上設著武則天當日鏡室中設的寶鏡。一邊擺著趙飛燕立著舞過的金盤，盤內盛著安祿山擲過傷了太真乳的木瓜。上面設著壽昌公主於含章殿下臥的寶榻，懸的是同昌公主製的連珠帳。寶玉含笑道：「這裡好，這裡好！」秦氏笑道：「我這屋子大約神仙也可以住得了。」說著，親自展開了西施浣過的紗衾，移了紅娘抱過的鴛枕。於是眾奶母伏侍寶玉臥好了，款款散去，只留下襲人、媚人、晴雯、麝月四個丫鬟為伴。秦氏便叫小丫鬟們好生在簷下看著貓兒打架。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那寶玉纔合上眼，便恍恍惚惚的睡去，猶似秦氏在前，悠悠蕩蕩，跟著秦氏到了一處。但見朱欄玉砌，綠樹清溪，真是人跡不逢，飛塵罕到。寶玉在夢中歡喜，想道：「這個地方兒有趣！我若能在這裡過一生，雖然失了家也願意，強如天天被父母先生管束呢！」正在胡思之間，聽見山後有人作歌曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            春夢隨雲散，飛花逐水流。寄言眾兒女，何必覓閒愁？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉聽了，是個女孩兒的聲氣。歌音未息，早見那邊走出一個麗人來，蹁躚嬝娜，與凡人大不相同。有賦為證：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方離柳塢，乍出花房。但行處，鳥驚庭樹；將到時，影度迴廊。仙袂乍飄兮，聞麝蘭之馥郁；荷衣欲動兮，聽環珮之鏗鏘。靨笑春桃兮，雲髻堆翠；唇綻櫻顆兮，榴齒含香。盼纖腰之楚楚兮，風迴雪舞；耀珠翠之的的兮，鴨綠鵝黃。出沒花間兮，宜嗔宜喜；徘徊池上兮，若飛若揚。蛾眉欲顰兮，將言而未語；蓮步乍移兮，欲止而仍行。羨美人之良質兮，冰清玉潤；慕美人之華服兮，熌爍文章。愛美人之容貌兮，香培玉篆；比美人之態度兮，鳳翥龍翔。其素若何？春梅綻雪。其潔若何？秋蕙披霜。其靜若何？松生空谷。其豔若何？霞映澄塘。其文若何？龍遊曲沼。其神若何？月射寒江。－－遠慚西子，近愧王嬙。奇矣哉！生於孰地？來自何方？信矣乎瑤池不二，紫府無雙。果何人哉若斯之美也？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉見是一個仙姑，喜的忙來作揖，笑問道：「神仙姐姐，不知從那裡來，如今要往那裡去？我也不知這裡是何處，望乞攜帶，攜帶。」那仙姑道：「吾居離恨天之上，灌愁海之中，乃放春山遣香洞太虛幻境警幻仙姑是也。司人間之風情月債，掌塵世之女怨男癡。因近來風流冤孽，纏綿於此，是以前來訪察機會，佈散相思。今日與爾相逢，亦非偶然。此離吾境不遠，別無他物，僅有自採仙茗一盞，親釀美酒一甕，素練魔舞歌姬數人，新填《紅樓夢》仙曲十二支。可試隨吾一遊否？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉聽了，喜躍非常，便忘了秦氏在何處了，竟隨了仙姑至一個所在。忽然前面有一座石牌橫建，上書「太虛幻境」四大字，兩邊一副對聯，乃是：「假作真時真亦假，無為有處有還無。」轉過牌坊，便是一座宮門，上面橫書著四個大字，道是：「孽海情天」，也有一副對聯，大書云：「厚地高天，堪歎古今情不盡；痴男怨女，可憐風月債難酬。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了，心下自思道：「原來如此。但不知何為『古今之情』？又何為『風月之債』？從今倒要領略，領略。」寶玉只顧如此一想，不料早把些邪魔招入膏肓了。當下隨了仙姑，進入二層門內，只見兩邊配殿皆有匾額對聯。一時看不盡許多，惟見幾處寫著的是：「癡情司」，「結怨司」，「朝啼司」，「暮哭司」，「春感司」，「秋悲司」。看了，因向仙姑道：「敢煩仙姑引我到那各司中遊玩遊玩，不知可使得麼？」仙姑道：「此中各司存的是普天下所有的女子過去未來的簿冊，爾乃凡眼塵軀，未便先知的。」寶玉聽了，那裡肯捨？又再四的懇求。那警幻便說：「也罷，就在此司內略隨喜隨喜罷。」寶玉喜不自勝，抬頭看這司的匾上，乃是「薄命司」三字，兩邊寫著對聯道：「春恨秋悲皆自惹，花容月貌為誰妍？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了，便知感歎。進入門中，只見有十數個大櫥，皆用封條封著。看那封條上，皆有各省地名。寶玉一心只揀自己家鄉的封條看，只見那邊櫥上封條大書「金陵十二釵正冊」。寶玉因問：「何為『金陵十二釵正冊』？」警幻道：「即爾省中十二冠首女子之冊，故為正冊。」寶玉道：「常聽人說，金陵極大，怎麼只十二個女子？如今單我們家裡，上上下下就有幾百個女孩兒。」警幻微笑道：「一省女子固多，不過擇其緊要者錄之。兩邊二櫥則又次之，餘者庸常之輩便無冊可錄了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉再看下首一櫥，上寫著「金陵十二釵副冊」；又一櫥，上寫著「金陵十二釵又副冊」。寶玉便伸手先將又副冊櫥門開了，拿出一本冊來。揭開看時，只見這首頁上畫的，既非人物，亦非山水，不過是水墨滃染，滿紙烏雲濁霧而已。後有幾行字跡，寫道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            霽月難逢，彩雲易散。心比天高，身為下賤。風流靈巧招人怨。壽夭多因誹謗生，多情公子空牽念。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了不甚明白。又見後面畫著一簇鮮花，一床破蓆。也有幾句言詞，寫道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枉自溫柔和順，空云似桂如蘭。堪羨優伶有福，誰知公子無緣！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了，益發解說不出是何意思。遂將這一本冊子擱起來，又去開了副冊櫥門，拿起一本冊來，打開看時，只見首頁也是畫，卻畫著一株桂花，下面有一方池沼，其中水涸泥乾，蓮枯藕敗。後面書云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            根並荷花一莖香，平生遭際實堪傷。自從兩地生孤木，致使香魂返故鄉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了又不解。又去取那正冊看時，只見頭一頁上畫著是兩株枯木，木上懸著一圍玉帶；地下又有一堆雪，雪中一股金簪。也有四句詩道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可歎停機德，堪憐詠絮才！玉帶林中掛，金簪雪裡埋。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看了仍不解，待要問時，知他必不肯洩漏天機，待要丟下，又不捨，遂往後看。只見畫著一張弓，弓上掛著一個香櫞。也有一首歌詞云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二十年來辨是非，榴花開處照宮闈。三春爭及初春景？虎兔相逢大夢歸。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後面又畫著兩個人放風箏，一片大海，一隻大船，船中有一女子，掩面泣涕之狀。畫後也有四句，寫著道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才自精明志自高，生於末世運偏消。清明涕送江邊望，千里東風一夢遙。後面又畫著幾縷飛雲，一灣逝水。其詞曰：富貴又何為？襁褓之間父母違。展眼弔斜暉，湘江水逝楚雲飛。後面又畫著一塊美玉，落在泥污之中。其斷語云：欲潔何曾潔？云空未必空。可憐金玉質，終陷淖泥中！後面忽畫一惡狼，追撲一美女，有欲啖之意。其下書云：子係中山狼，得志便猖狂。金閨花柳質，一載赴黃粱！後面便是一所古廟，裡面有一美人在內看經獨坐。其判云：勘破三春景不長，緇衣頓改昔年粧。可憐繡戶侯門女，獨臥青燈古佛旁！後面是一片冰山，山上有一只雌鳳。其判云：凡鳥偏從末世來，都知愛慕此生才。一從二令三人木，哭向金陵事更哀！後面又是一座荒村野店，有一美人在那裡紡績。其判曰：勢敗休云貴，家亡莫論親。偶因濟劉氏，巧得遇恩人。詩後又畫一盆茂蘭。旁有一位鳳冠霞帔的美人。也有判云：桃李春風結子完，到頭誰似一盆蘭？如冰水好空相妒，枉與他人作笑談。詩後又畫一座高樓，上有一美人懸梁自盡。其判云：情天情海幻情身，情既相逢必主淫。漫言不肖皆榮出，造釁開端實在寧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉還欲看時，那仙姑知他天分高明，性情穎慧，恐泄漏天機，便掩了卷冊，笑向寶玉道：「且隨我去遊玩奇景，何必在此打這悶葫蘆？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉恍恍惚惚，不覺棄了卷冊，又隨警幻來至後面。但見畫棟雕簷，珠簾繡幕，仙花馥郁，異草芬芳，真好所在也！正是：「光搖朱戶金鋪地，雪照瓊窗玉作宮。」又聽警幻笑道：「你們快出來迎接貴客！」一言未了，只見房中走出幾個仙子來，荷袂蹁躚，羽衣飄舞，嬌若春花，媚如秋月。見了寶玉，都怨謗警幻道：「我們不知係何貴客，忙的接出來。姐姐曾說今日今時必有個絳珠妹子的生魂前來遊玩，故我等久待，何故反引這濁物來污染清淨女兒之境？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉聽如此說，便嚇的欲退不能，果覺自形污穢不堪。警幻忙攜住寶玉的手，向眾仙姬笑道：「你等不知原委。今日原欲往榮府去接絳珠，適從寧府經過，偶遇榮寧二公之靈，囑吾云：『吾家自國朝定鼎以來，功名奕世，富貴流傳，已歷百年；奈運終數盡，不可挽回！我等之子孫雖多，竟無可以繼業者。惟嫡孫寶玉一人，稟性乖張，用情怪譎，雖聰明靈慧，略可望成，無奈吾家運數合終，恐無人規引入正。幸仙姑偶來，望先以情欲聲色等事警其癡頑，或能使他跳出迷人圈子，入於正路，亦吾兄弟之幸矣。』如此囑吾，故發慈心，引彼至此。先以他家上中下三等女子的終身冊籍，令其熟玩，尚未覺悟；故引了再到此處，遍歷那飲饌聲色之幻，或冀將來一悟，未可知也。」說畢，攜了寶玉入室。但聞一縷幽香，不知所焚何物，寶玉不禁相問。警幻冷笑道：「此香乃塵世所無，爾如何能知！此係諸名山勝境初生異卉之精，合各種寶林珠樹之油所製：名為『群芳髓』。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉聽了，自是羨慕。於是大家入座，小鬟捧上茶來。寶玉覺得香清味美，迥非常品，因又問何名。警幻道：「此茶出在放春山遣香洞，又以仙花靈葉上所帶的宿露烹了，名曰『千紅一窟』。」寶玉聽了，點頭稱賞，因看房內，瑤琴、寶鼎、古畫、新詩，無所不有。更喜窗下亦有唾絨，奩間時漬粉污。壁上也掛著一副對聯，書云：「幽微靈秀地，無可奈何天。」寶玉看畢，因又請問眾仙姑姓名：一名癡夢仙姑，一名鍾情大士，一名引愁金女，一名度恨菩提，各各道號不一。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            少刻，有小鬟來調桌安椅，擺設酒饌。正是：「瓊漿滿泛玻璃盞，玉液濃斟琥珀杯。」寶玉因此酒香冽異常，又不禁相問。警幻道：「此酒乃以百花之蕊，萬木之汁，加以麟髓鳳乳釀成，因名為『萬艷同杯』。」寶玉稱賞不迭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            飲酒間，又有十二個舞女上來請問演何詞曲。警幻道：「就將新制紅樓夢十二支演上來。」舞女們答應了，便輕敲檀板，款按銀箏。聽他歌道是：「開闢鴻蒙，」方歌了一句，警幻道：「此曲不比塵世中所填傳奇之曲，必有生旦淨末之則，又有南北九宮之限。此或詠歎一人，或感懷一事，偶成一曲，即可譜入管弦，若非個中人，不知其中之妙。料爾亦未必深明此調，若不先閱其稿，後聽其歌，反成嚼蠟矣。」說畢，回頭命小鬟取了紅樓夢原稿來，遞與寶玉。寶玉接過來，一面目視其文，耳聆其歌曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            紅樓夢引子開闢鴻濛，誰為情種？都只為風月情濃，趁著這奈何天，傷懷日，寂寥時，試遣愚衷：因此上，演出這懷金悼玉的紅樓夢。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            終身誤都道是金玉良緣，俺只念木石前盟。空對著山中高士晶瑩雪，終不忘世外仙姝寂寞林。歎人間，美中不足今方信：縱然是齊眉舉案，到底意難平！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枉凝眉一個是閬苑仙葩，一個是美玉無瑕。若說沒奇緣，今生偏又遇著他；若說有奇緣，如何心事終虛化？一個枉自嗟呀，一個空勞牽掛。一個是水中月，一個是鏡中花。想眼中能有多少淚珠兒，怎禁得秋流到冬盡，春流到夏？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卻說寶玉聽了此曲，散漫無稽，未見得好處，但其聲韻悽惋，竟能銷魂醉魄。因此也不問其原委，也不究其來歷，就暫以此釋悶而已。因又看下面道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恨無常喜榮華正好，恨無常又到。眼睜睜，把萬事全拋。蕩悠悠，芳魂銷耗。望家鄉，路遠山高，故向爹娘夢裡相尋告：兒命已入黃泉，天倫呵，須要退步抽身早！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            分骨肉一帆風雨路三千，把骨肉家園齊來拋閃。恐哭損殘年，告爹娘，休把兒懸念：自古窮通皆有定，離合豈無緣？從今分兩地，各自保平安。奴去也，莫牽連！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            樂中悲襁褓中，父母歎雙亡。縱居那綺羅叢，誰知嬌養？幸生來英豪闊大寬宏量，從未將兒女私情，略縈心上，好一似霽月光風耀玉堂。廝配得才貌仙郎，博得個地久天長，準折得幼年時坎坷形狀。終久是雲散高唐，水涸湘江：這是塵寰中消長數應當，何必枉悲傷？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            世難容氣質美如蘭，才華馥比仙，天生成孤癖人皆罕。你道是啖肉食腥膻，視綺羅俗厭；卻不知太高人愈妒，過潔世同嫌。可歎這青燈古殿人將老，孤負了紅粉朱樓春色闌！到頭來，依舊是風塵骯髒違心願，好一似無瑕白玉遭泥陷。又何須王孫公子歎無緣？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            喜冤家中山狼，無情獸，全不念當日根由，一味的驕奢淫蕩貪歡媾。覷著那侯門豔質同蒲柳，作踐的公府千金似下流。歎芳魂豔魄，一載蕩悠悠！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            虛花悟將那三春看破，桃紅柳綠待如何？把這韶華打滅，覓那清淡天和。說什麼天上夭桃盛，雲中杏蕊多？到頭來，誰見把秋捱過？則看那白楊村裡人嗚咽，青楓林下鬼吟哦，更兼著連天衰草遮墳墓。這的是昨貧今富人勞碌，春榮秋謝花折磨。似這般生關死劫誰能躲？聞說道西方寶樹喚婆娑，上結著長生果。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            聰明累機關算盡太聰明，反算了卿卿性命！生前心已碎，死後性空靈。家富人寧，終有個家亡人散各奔騰。枉費了意懸懸半世心，好一似蕩悠悠三更夢。忽喇喇，似大廈傾，昏慘慘，似燈將盡。呀！一場歡喜忽悲辛，歎人世，終難定！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            留餘慶留餘慶，留餘慶，忽遇恩人。幸娘親，幸娘親，積得陰功。勸人生：濟困扶窮，休似俺那愛銀錢忘骨肉的狠舅奸兄！正是乘除加減，上有蒼穹。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            晚韶華鏡裡恩情，更那堪夢裡功名！那美韶華去之何迅？再休提繡帳鴛衾，只這戴珠冠，披鳳襖，也抵不了無常性命！雖說是人生莫受老來貧，也須要陰騭積兒孫。氣昂昂頭戴簪纓，光燦燦胸懸金印，威赫赫爵祿高登，昏慘慘黃泉路近。問古來將相可還存？也只是虛名兒與後人欽敬。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好事終畫梁春盡落香塵。擅風情，秉月貌，便是敗家的根本。箕裘頹墮皆從敬，家事消亡首罪寧，宿孽總因情！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            飛鳥各投林為官的，家業凋零；富貴的，金銀散盡；有恩的，死裡逃生；無情的，分明報應；欠命的，命已還；欠淚的，淚已盡：冤冤相報實非輕，分離聚合皆前定。欲知命短問前生，老來富貴也真徼倖。看破的，遁入空門；痴迷的，枉送了性命：好一似食盡鳥投林，落了片白茫茫大地真乾淨！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            歌畢，還要歌副曲。警幻見寶玉甚無趣味，因歎：「癡兒竟尚未悟！」那寶玉忙止歌姬，不必再唱，自覺朦朧恍惚，告醉求臥。警幻便命撤去殘席，送寶玉至一香閨繡閣中。其間鋪陳之盛乃素所未見之物。更可駭者，早有一位仙姬在內，其鮮豔嫵媚，大似寶釵，嬝娜風流，又如黛玉。正不知是何意，忽見警幻說道：「塵世中多少富貴之家，那些綠窗風月，繡閣煙霞，皆被那些淫污紈袴與流蕩女子玷辱了。更可恨者，自古來，多少輕薄浪子皆以好色不淫為飾，又以情而不淫作案，此皆飾非掩醜之語耳。好色即淫，知情更淫。是以巫山之會、雲雨之歡，皆由既悅其色、復戀其情所致。吾所愛汝者，乃天下古今第一淫人也。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉聽了，嚇的慌忙答道：「仙姑差了。我因懶於讀書，家父母尚每垂訓飭，豈敢再冒『淫』字？況且年紀尚幼，不知『淫』為何事。」警幻道：「非也。淫雖一理，意則有別。如世之好淫者，不過悅容貌，喜歌舞，調笑無厭，雲雨無時，恨不能盡天下之美女供我片時之趣興，此皆皮膚濫淫之蠢物耳。如爾，則天分中生成一段癡情，吾輩推之為意淫。惟『意淫』二字可心會而不可口傳，可神通而不可語達。汝今獨得此二字，在閨閣中雖可為良友，卻於世道中未免迂闊怪詭，百口嘲謗，萬目睚眥。今既遇爾祖寧榮二公，剖腹深囑，吾不忍子獨為我閨閣增光，而見棄於世道，故引子前來，醉以美酒，沁以仙茗，警以妙曲，再將吾妹一人－－乳名兼美，表字可卿者－－許配與汝。今夕良時，即可成姻。不過令汝領略此仙閨幻境之風光尚然如此，何況塵世之情景呢？從今後，萬萬解釋，改悟前情，留意於孔孟之間，委身於經濟之道。」說畢，便秘授以「雲雨」之事，推寶玉入房中，將門掩上自去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那寶玉恍恍惚惚，依著警幻所囑，未免有兒女之事，難以盡述。至次日，便柔情繾綣，軟語溫存，與可卿難解難分。因二人攜手出去遊玩之時，忽至一個所在，但見荊榛遍地，狼虎同群，迎面一道黑溪阻路，並無橋梁可通。正在猶豫之間，忽見警幻從後追來，說道：「快休前進！作速回頭要緊！」寶玉忙止步問道：「此係何處？」警幻道：「此乃迷津，深有萬丈，遙亙千里，中無舟楫可通，只有一個木筏，乃木居士掌柁，灰侍者撐篙，不受金銀之謝，但遇有緣者渡之。爾今偶遊至此，設如墜落其中，便深負我從前諄諄警戒之語了。」話猶未了，只聽迷津內響如雷聲，有許多夜叉海鬼，將寶玉拖將下去。嚇得寶玉汗下如雨，一面失聲喊叫：「可卿救我！」嚇得襲人輩眾丫鬟忙上來摟住，叫：「寶玉，不怕，我們在這裡呢。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卻說秦氏正在房外囑咐小丫頭們好生看著貓兒狗兒打架，忽聞寶玉在夢中喚他的小名兒，因納悶道：「我的小名兒，這裡從無人知道，他如何得知，在夢中叫出來？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未知何因，下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi_ocr">
+      <div class="compare-col-head">
+        <span class="badge">程乙本OCR</span>
+        <span class="col-desc">程乙本OCR（欧阳健校注本PDF本地识别）</span>
+        <span>第5回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">开生面梦演红楼梦 立新场情传幻境情</h3>
+        
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗 饮仙①由 曲演红楼梦[一]
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            则暂不能写矣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如今且说林黛玉自在荣府以来，贾母万般怜爱，寝食起居，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一如宝玉，迎春、探春、惜春三个亲孙女倒且靠后；便是宝玉和黛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉二人之亲密友爱处，亦自较别个不同，日则同行同坐，夜则同
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            息同止，真是言和意顺,略无参商②。不想如今忽然来了…个薛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝钗，年岁虽大不多，然品格端方，容貌丰美，人多谓黛玉所不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            及。而且宝钗行为豁达，随分从时③，不比黛玉孤高自许，目无
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            下尘，故比黛玉大得下人之心。便是那些小丫头子们，亦多喜与
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝去顽。因此黛玉心中便有些郁不念之意，宝钗却浑然不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            觉。那宝玉亦在孩提之间，况自天性所烹来的片愚拙偏僻，视
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姊妹弟兄皆出一一意，并无亲蔬远近之别。其中因与黛玉同随贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母处坐卧，故略比[二]别个姊妹熟惯些。既熟惯，则更觉亲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①仙酸(lo劳)一一仙酒。酸:本指发酵后未经过滤、汁淬相拌的原酿，后用
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            以指醇酒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②略无参（shen申）商一指彼此感情融洽，没有一点隔阈、矛盾。“参”和
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “商”都是星宿名，属二十八宿。因两星此出彼没，故常用来比喻两人分离不得见面。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            商丘管商星，实沈去大夏管参星。故参商也用以比喻人与人之间感情不和。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③随分从时—一安于本分、顺应环境。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            68
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗饮仙酸曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            密；既亲密，则不免一时有求全之毁，不虞之隙①。这日不知为
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            何，他二人言语有些不合起来，黛玉文气的独在房中垂泪，宝玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又自悔言语冒撞，前去俯就，那黛玉方渐渐的回转来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因东边宁府中花园内梅花盛开，贾珍之妻允氏乃治酒，请贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母、邢夫人、王夫人等赏花。是日先携了贾蓉之妻[三)，二人来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面请。贾母等于早饭后过来，就在会芳园游顽，先茶后酒，不过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            皆是宁荣二府女着家宴小集，并无别样新文趣事可记。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一时宝玉倦息，欲睡中觉，贾母命人好生哄着，歇一回再来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾蓉之妻秦氏便忙笑回道：“我们这里有给宝叔收拾下的屋子，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            老祖宗放心，只管交与我就是了。”又向宝玉的奶娘丫養等道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “嬷嬷、姐姐们，请宝叔随我这里来。”贾母素知秦氏是个极妥当
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的人，生的裳娜纤巧，行事又温柔和平，乃重孙媳中第一→个得意
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之人，见他去安置宝玉，自是安稳的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当下秦氏引了一簇人来至上房内间。宝玉抬头看见一幅画
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贴在上面，画的人物固好，其故事乃是《燃藜图》②，也不看系何
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人所画，心中便有些不快。文有一副对联，写的是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            .世事洞明皆学问，人情练达即文章。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            及看了这两句，纵然室宇精美，铺陈华丽，亦断断不背在这里了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①求全之毁，不虞之隙因要求完美而常有责难；因相处亲密而常有料不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到的矛盾。毁：低毁，责难。不虞：没料到。隙：嫌隙、裂痕。从《孟子·离娄上》“有不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            虞之誉，有求全之毁”句衍化而来，含义亦有所不同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②《燃藜图》一一这是劝人勤学苦读的画。题材来自六朝无名氏三辅黄图·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            阁部）所载故事：“刘向于成帝之末，校书天禄阁，专精罩思。夜有老人著黄衣，挂蒙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            杖，阁雨进，见向暗中独坐诵书，老人乃吹杖端烟然（燃），因以见面。授‘五行洪
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            范”之文··*至曙而去。请问姓名，云，我是太乙之精。”（普王嘉《拾遗记》卷六所载
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            略同。）藜：一年生草本植物，茎高数尺，老可为杖；燃烧时光亮耐久，可以当烛。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            69
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第五
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            忙说：“快出去，快出去！”秦氏听了笑道：“这里还不好，可往那里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去呢？不然往我屋里去吧。”宝玉点头微笑。有一个嬷嬷说道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “那里有个叔寂往侄儿房里睡觉的理？”秦氏笑道：“暖哟哟，不怕
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他恼，他能多大呢，就忌讳这些个！上月你没看见我那个兄弟来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，虽然与宝叔同年，两个人若站在一处，只怕那个还高些呢。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉道：“我怎么没见过，你带他来我瞧瞧。”众人笑道：“隔着二
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            三十里，往那里带去，见的日子有呢。”说着大家来至秦氏房中。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刚至房门，便有一股细细的甜香袭人而来。宝玉觉得眼①骨
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            软，连说“好香！”入房向壁上看时，有唐伯虎画的《海
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            棠春睡图》②,两边有宋学士秦太写的一副对联③,其联云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            嫩寒锁梦因春冷，芳气笼人是酒香。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            案上设着武则天当日镜室中设的宝镜④，一边摆着飞燕
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            立着舞过的金盘5，盘内盛着安禄山掷过伤了太真乳的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①眼场(xing行)眼皮滞涩、朦胧欲睡。炀：古“糖字，《本草纲目·谷部》：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “即软糖也，北人谓之场。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②唐伯虎画的&lt;海棠春睡图》唐伯虎：即唐寅，参阅第30页注①。海棠春
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            睡：喻杨贵妃醉态。《明皇杂录》：“上尝登沉香享，妃子。·妃子时卵酒末醒，高力士
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            从侍儿扶腋而至。上皇笑白：色是妃子醉耶？海棠睡未足耳。“此图是否实有，未能
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            确知。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③宋学士秦太虚写的-副对联一北宋词人秦观，一字太虚，乃苏（轼)门四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            学士之一。词风婉约媚丽，多写男女情爱。这副对联不见于其《准海集》。寒：春
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天的微寒。锁梦：不成梦，不能入睡。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①武则天当日镜室中设的宝镜一一武则天：唐高宗的皇后，后登极称帝，改国
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            号为周。史载她的宫闹生活十分秽乱。据说在高宗时她曾造了一座镜殿，四壁都安
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着镜子（见清朱鹤龄注李商隐《镜槛》诗）。作者在这里用了一系列与古代香艳故事
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的风流韵事有关的器物，谊染秦氏房中陈设的华丽糍艳。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赵飞燕立着舞过的金盘一赵飞燕：汉成帝的辜后，身轻善舞。据乐史《杨
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            太真外传》引《汶成帝内传》：“汉成帝获飞燕，身轻欲不胜风，恐其飘囊，帝为造水晶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盘，令官人掌之而歌舞。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            70
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗饮仙曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            木瓜①。上面设着寿昌公主(四)于含章殿下卧的榻②,悬的是同
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            昌公主制的联珠帐③。宝玉含笑连说：“这里好！”秦氏笑遵：“我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这屋子大约神仙也可以住得了。”说着亲自展开了西子浣过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的纱袭④，移了红娘抱过的枕5。于是众奶母伏侍宝玉卧好，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            款款散了，只留袭人、媚人、晴雯、月四个丫为伴。秦氏便分
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            时小丫蔓们，好生在廊檐下着猫儿狗儿打架。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那宝玉刚合上眼，便您您的睡去，犹似秦氏在前，遂悠悠荡
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            荡，随了秦氏，至一一所在。但见朱栏白石，绿树清溪，真是人迹希
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            逢，飞尘不到。宝玉在梦中欢喜，想道：“这个去处有趣，我就在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里过一生，纵然失了家也愿意，强如天天被父母师傅打呢。”正
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            胡思之间，忽听山后有人作歌日：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            春梦随云散，飞花遂水流；·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寄言众儿女，何必觅闲愁。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①安禄山掷过伤了太真乳的木一一太真：即杨玉环，道号太真，受宠于唐玄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宗，封为贵妃。安史之乱前，玄宗宠信安禄山，杨贵妃曾认安禄山为养子，关系暖味。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            木瓜伤乳事，可能从《诗经·卫风·木瓜》“投我以木瓜”句联想而来。文据宋代高承
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            《事物纪原》“词子”条：“贵妃私安禄山，指瓜伤胸乳之间，遂作诃子饰之。“掷瓜伤乳，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因“掷”、“指”音同，“瓜”、“爪”形近，或即由此转附会而来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寿昌公主于含章殿下卧的一一寿昌公主应是寿阳公主之误。寿阳公主：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            南朝宋武帝刘裕的女儿。据《太乎御览时序部》引《杂五行书》：“宋武帝女寿阳公
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            主，人日（旧历正月初七）卧于含章殿檐下，梅花落于公主额上，成五出花，拂之不去，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            皇后留之，·宫女奇其异，竞效之，今梅花妆是也。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③同昌公主制的联珠帐一一苏《杜阳杂编》：唐懿宗“威通九年，同昌公主出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            降，宅于广化里，·堂中设连珠之帐，却寒之帘。连珠帐，续真珠以成也。”（见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （旧小说）七）
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①西子浣(huan换)过的纱袭一一西子：即西施。袭：被子。传说中有西子浣
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            纱的故事，明代梁最鱼著传奇《浣纱记》即本此。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①红娘抱过的驾枕一红娘：崔莺莺（见第30页注①）的丫。这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里是指营莺到西厢与张生幽会时，红娘送袭枕事。见《西厢记》第四本第一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            折。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第五
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉听了是女子的声音。歌音未息，早见那边走出个人来，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            跃農娜,端的与人不同。有赋①为证:
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方离柳坞②，乍出花房。但行处，鸟惊庭树③；将到时，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            影度回廊④。仙袂乍飘兮，闻麝兰③之馥郁；荷衣欲动
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            兮，听环佩之。屠笑春桃兮，云堆翠馨；唇绽樱颗兮；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            榴齿③含香。纤腰之楚楚③兮，回风舞雪@;珠翠之辉辉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            兮，满额鹅黄①。出没花间兮，宜嗔宜喜；池上兮，若
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            飞若扬。蛾眉笑兮，将言而未语；莲步乍移兮，待止而
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赋文体名。起于战国，盛于两汉。赋有辨体的，也有散体的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            柳坞（wi误）一一一植柳以为屏障。坞：原指作为屏障的土堡。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鸟惊庭树一一极言仙姑之美。《庄子·齐物论》：“毛、丽姬，人之所美也；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鱼见之深入，鸟见之高飞，麋鹿见之决骤：四者熟知天下之正色哉？”后因以“鱼人鸟
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            惊”形容女子的美貌，与“沉鱼落雁”义同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④影度回廊一一身影在回廊上移动。这里似从《吴郡志》所载吴王夫差闻西
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            施着木鞋步回廊之声的传说化出，形容仙姑身姿之美。回廊：曲折回环的走廊。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③麝兰一一麝香和兰草，为古代贵族妇女常佩之香料。亦用以代指香气。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③荷衣一用荷花、荷叶制成的衣裳，神仙的一种服饰。屈原《九歌·少司
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            命》：“荷衣兮蕙带。&#34;
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①唇绽楼颗兮一形容双唇似刚成熟的楼桃那样鲜红饱满。张宽《太真明皇
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            并笛图》：“露湿樱唇金缕衣。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③榴齿一形容牙齿整齐如一排石榴子。《博物论》：“石榴子似人齿，带淡红
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            色，光咬若琥珀。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④楚楚一一原义为鲜明整洁的样子,这里作纤细秀美解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回风舞雪一一形容仙子体态轻盈飘忽。曹植《洛神赋》：“仿佛兮若轻烟之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            蔽月，飘飘兮若流风之回雪。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①满额鹅黄一一妇女在额上涂嫩黄色作妆饰的习俗。或谓始于汉代，或谓始
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            于六朝。李商隐《蝶》：“寿阳公主嫁时妆，八字宫眉捧额黄。&#34;鹅黄：嫩黄，黄色之娇美
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            者，如幼鹅的毛色。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宜宜喜-一无论是生气还是高兴，都使人感到美。《西厢记》第一折：“我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见他宜嗔宜喜春风面。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ?莲步一一旧时对美女脚步的称谓。语本《南史·齐东昏侯纪》：“凿金为莲华
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （花)以帖地，令潘妃行其上，日：此步步生莲华（花)也。&#34;
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            72
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二饮仙醛曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欲行。羡彼之良质兮，冰清玉润；慕被之华服兮，闪灼文
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            章①。爱彼之貌容兮，香培玉琢②；美彼之态度兮，凤龙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            翔③。其素若何，春梅绽雪。其洁若何，秋菊{五]被霜。其
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            静若何，松生空谷。其艳若何，霞映澄塘。其文若何，龙游
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            曲沼。其神若何，月射寒江。应惭茜子，实愧王④。奇矣
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            哉，生于孰地，来自何方；信矣乎，瑶池不二，紫府①无双。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            果何人哉？如斯之美也！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉见是个仙姑，喜的忙来作辑问道：“神仙姐姐不知从
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那里来，如今要往那里去？也不知这是何处，望携带携带。”那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            仙姑笑道：“吾居离恨天之上，灌愁海之中，乃放春山香洞{六}
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            太虚幻境警幻維姑是也：司人间之风情月债，掌尘世之女怨男
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            痴。因近来风流冤孽，缠绵于此处，是以前来访察机会，布散相
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            思。今忽与尔相逢，亦非偶然。此离吾境不远，别无他物，仅有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自采仙茗一盏，亲酿美酒一瓮，素练魔舞@歌姬数人，新填《红
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            楼梦》仙曲十二支，试随吾一游否？”宝玉听说，便忘了秦氏
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            在何处，竟随了仙姑，至一所在，有石牌横建，上书“太虚幻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            境&#34;四个大字，两边一副对联，乃是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            闪灼文章花纹灿烂。文章：花纹错杂相间。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            香培玉琢一用香料造就，用美玉雕成。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤事龙翔一一意即龙飞凤舞，形容仙子体态风度的飘逸。（zhi助）：鸟向
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王一一邸王昭君，汶元帝时宫人，貌美。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瑶池、紫府均古代传说中的仙境。瑶池在昆仑山上，西主母所居之处。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见《史记·大宛列传赞》《穆天子传》卷三。紫府在青丘凤山，天真仙女曾游此地。见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            《海内十洲记·长洲》。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③魔舞一一即天魔舞。本为唐代一种官廷舞乐，王建《宫词》：十六天魔舞袖
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            长。“元顺帝至正十四年制关魔舞，系富廷大型队舞，以宫女丰六人，盛妆扮成菩萨
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            相，有多种乐器伴奏，应节而舞。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第五画
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            假作真时真亦假，无为有处有还无。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            转过牌坊，便是-一座宫门，上面横书四个大字，道是：“孽海情
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天”。又有一副对联,大书云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            厚地高天，堪叹古今情不尽；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            痴男怨女，可怜风月债难偿。，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看了，心下自思道：“原来如此。但不知何为“舌今之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            情’，何为“风月之债？从今倒要领略领略。”宝玉只顾如此一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            想，不料早把些邪魔招入臂育①了。当下随了仙姑进入二层门
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            内，至两边配殿，皆有匾额对联，一时看不尽许多，惟见有几处写
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看了，因向仙姑道：“敢烦仙姑引我到那各司中游玩游玩，不知可
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            使得？”仙姑道：“此各司中皆贮的是普天之下所有的女子过去未
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来的薄册，尔凡眼尘躯，未便先知的。”宝玉听了，那里肯依，复央
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之再四。仙姑无奈，说：“也罢，就在此司内略随喜随喜②罢
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。”宝玉喜不自胜，抬头看这司的匾上，乃是“薄命司”三字，两
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            边对联写的是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            春恨秋悲皆自惹，花容月貌为谁妍。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看了，便知感叹。进人门来，只见有十数个大厨，皆用
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            封条封着。看那封条上，皆是各省的地名。宝玉一心只栋自己
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的家乡封条看，遂无心看别省的了。只见那边厨上封条上大书
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ① 音育(huang荒)一一古代中医称心脏与横瞩膜之间的部位叫膏育。霄：心
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之下。育：横瞩膜。《左传》成公十年：晋景公患重病，求医于秦国，秦桓公派名医缓
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            前往医治，缓未到，晋景公梦见他的病化作两个童子藏到膏之下，育之上。缓诊断后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说：“疾不可为也。在育之上，膏之下，攻之不可，达之不得，药不至，不可为也。”后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            遂称病重垂危、不可救药叫病入膏育。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②随喜一一一佛教术语。谓见人作善事而随之生欢喜心。后游览参观寺院，亦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            称随喜。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗饮仙酸曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            七字云：“金陵十二钗正册”。宝玉道：“何为金陵十二钗正
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            册”？”警幻道：“即贵省中十二冠首女子之册，故为‘正册’。”宝玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“常听人说，金陵极大，怎么只十二个女子？如今单我家里，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上上下下，就有几百女孩子呢。”警幻冷笑道：“贵省女子固多，不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过择其紧要者录之。下边二厨则又次之。途者庸常之辈，则无
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            册可录矣。”宝玉听说，再看下首二厨上，果然写着“金陵十二钗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            副册”，又一个写着“金陵十二锣又副册”。宝玉便伸手先将“又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            副册”厨开了，拿出一本册来，揭开看，只见这首页上画着一幅
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            画，又非人物，也无山水，不过是水墨染的满纸乌云浊雾而已。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后有几行字迹，写的是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雾月难逢，彩云易散。心比天高，身为下贱。风流灵巧
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            招人怨。寿天多因毁谤生，多情公子空牵念。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看了，又见后面画着一簇鲜花，一床破席，也有几句言
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            词，写道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枉自温柔和顺，空云似桂如兰；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            堪羡优伶有福，谁知公子无缘。②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看了不解。遂掷下这个，又去开了副册厨门，拿起一本珊
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，揭开看时，只见画着一株桂花，下面有一池沼，其中水凋泥
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            干，莲枯藕败，后面书云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“彝月难逢”一首一一晴雯判词。画面喻晴雯处境的污独与险恶。荠月难
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            逢：雨过关晴时的明月叫“荠月”，点“晴”字，喻晴雯人品高尚，然而遵遇艰难。《宣和
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            事·元集》：“大概光风荠月之时少。”彩云易散：隐指雯的横遭摧残而寿天。“彩
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            云”，寓“雯&#34;字（雯，即彩云）。白居易《简简吟》：“大都好物不坚牢，彩云易散琉璃
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            脆。”身为下贱：指晴雯身为女奴，地位十分低下。多情公：指贾宝玉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②“枉自温柔和顺”首一袭人判词。画面寓“花气袭（谐音席）人”四字，隐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            花袭人姓名。优伶：旧时对歌舞戏剧艺人的称谓，这里指蒋玉菌。公子：指贾宝玉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            根据脂批，袭人出嫁先于宝玉出家，故有末二句判词。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 7.5
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第五
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            根并荷花一茎香，平生遭际实堪伤。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自从两地生孤木，致使香魂返故乡。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看了仍不解。便又掷了，再去取“正册”看，只见头一一贡上便
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            画着两株枯木，木上悬着一围玉带；文有一堆雪，雪下一股金替。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也有四句言词，道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可叹停机德，堪怜咏絮才。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉带林中挂，金馨雪里埋。②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看了仍不解。待要问时，情知他必不肯泄漏：待要丢下，又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不舍。遂又往后看时，只见画着一张弓，弓上挂着香橡。也有：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            首歌词云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二十年来辨是非，榴花开处照宫澜。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            三春争及初春景,虎咒{七}相逢大梦归。③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面又画着两人放风筝，片大海，只大船，船中有一女子掩
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面泣涕之状。也有四句写云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“根并荷花一蒸香”一首一一香菱判词。画面“一枝桂花”暗指“夏金桂”，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “莲枯藕败”隐指英莲及其结局。根并荷花：指菱根摸着莲根。隐寓香菱就是原来的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            英莲。遭际：遵遇。两地生孤木：拆字法，两个“土”地）字，加一个“木”字，指“桂”，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寓夏金桂。照画面与后二句判词，香菱的结局当被夏金桂虐待致死。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            范要求的一种妇德。东汉乐羊子远出求学，中道而归，其妻以停下织机割断经线为
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            喻，劝其不要中断学业，以期求取功名。见《后汉书·列女传》。这里指薛宝钗。咏絮
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才：指女子敏捷的才恩。晋人谢道，聪明有才辩，某天大雪，叔谢安问：“白雪纷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赞赏不已。见《世说新语·言语》。这里指林黛玉。玉带林中挂：前三字倒读谐“林黛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉”三字。又暗示贾宝玉对林黛玉的牵挂。金馨雪里埋金馨，喻“宝钗”，雪，谐音
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “薛”。句意暗寓其结局之冷落与凄苦。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“二十年来辨是非”一首一一元春判词。画面的“一张弓”，谐音“宫闹”的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “宫”字；“写”上悬着个“香檬（yuon元）”，谐元春的“元”字。三春：这里隐指迎春、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            探春、惜春。初春：指元春。争及：怎及。咒（si四）：犀牛类猛兽。大梦归：死亡。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            76
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗饮仙曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才自精明志自高，生于末世运偏消。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清明送江边望，千里东风一梦遥。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面又画儿缕飞云，一湾逝水。其词日：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富贵又何为，祸之间父母违。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            展眼吊斜晖，湘江水逝楚云飞。②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面又画着一块美玉，落在泥垢之中。其断语云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欲洁何曾洁，云空未必空。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可岭金玉质,终陷淳泥中。③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面忽见画着个恶狼，追扑一美女，欲啖之意。其书云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子系中狼，得志便狂。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            金闺花柳质，一载赴黄梁。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“才自精明志自高”一首一一探春判词。画面暗指探春远嫁海隅，犹如断线
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的风筝，一去不返。后二句诗与此意同。运偏消：命运偏偏愈来愈不济。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②·“富贵又何为”一首一史湘云判词。前二句说史湘云自幼父母双亡，家庭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的富贵并不能给她以温暖。之间：指婴儿时期。（qiang抢）：背孩子用的系
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            带；裸（bio保）：包孩子用的小被。后二句说史湘云婚后好景不长，转眼之间夫妻离
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            散。吊：凭吊，伤悼。湘江水逝楚云飞：藏“湘&#34;“云”二字，并暗用玉《高唐赋》中楚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            怀王梦会巫山神女事，喻夫妻生活的短暂，与该判词画面含意相同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中”喻其结局。后二句诗与此意同。洁：既指清洁，亦指佛教所说的净。佛教宣扬现
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            实世界是污秒的，唯有天堂佛国才算“净土”，所以佛教又称净教。妙玉有“洁麟”，又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            身在佛门，故云欲“洁”。空超脱尘缘。金玉质：喻妙玉“出身不凡，心性高洁”。漠
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （ndo闹）：泥沼，烂泥。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④“子系中山狼”一首一一迎春判词。画面与判词均暗示迎春嫁了忘恩负义的凶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恶丈夫，致被折磨而死。子：旧时对男子的尊称。系：是。“子”“系&#34;又合而成“孙（琢）”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得走投无路，东郭先生将狼藏进袋中救了它；赵简子一走，狼反而要吃掉东郭先生（见明
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            代马中锡《东田集》)。后遂以中山狼比喻忘恩负义的人。赴黄梁：这里喻死亡。唐人沈
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            既济《枕中记)说：寒儒卢生枕在道士吕翁给他的一一个神奇的枕上睡去，梦中享尽荣华富
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贵，梦醒，还不到蒸熟一顿黄粱米饭的时间，后以瑜人生如梦。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第五
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面便是一所古庙，里面有一美人在内看经独坐。其判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            勘破三春景不长，细衣顿改昔年妆。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可怜绣户侯门女，独卧青灯古佛旁。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面便是一片冰山，上面有一只雌凤。·其判日：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丸鸟偏从未世来，都知爱慕此生才。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一从二令三人木，哭向金陵事更哀。②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面又是一座荒村野店，有一美人在那里纺绩。其判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            势败休云贵，家亡莫论亲。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            偶因济刘氏，巧得遇恩人。③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面文画着一一盆茂兰，旁有一一位凤冠霞啵的美人。也有判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            桃李春凤结子完，到头谁似二盆兰。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如冰水好空相妒，枉与他人作笑谈。④
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“勘破三春景不长”一首—一惜春判词。画面与判词暗示惜春的结局是出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            家为尼。据脂批，惜春为尼后过着“细衣乞食”的生活。兰春：见第76页注③。勘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            破看破。缝（z资）衣：黑色的衣服，这里指僧尼服装。青灯：佛前海灯。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            片冰山”喻王熙凤椅作靠山的财势似冰山难以持久。“凡鸟”合而成“風（凤）”字，点
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            其名，事出《世说新语·简》：嵇康与吕安是好友，一次吕安去拜访康，康不在，其
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            兄喜出门迎接，吕安不入，在门上题一“凤”字而去，嵇喜很高兴，以为称自己是凤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凰，其实吕安嘲笑他是“凡鸟”。一从二令兰人木：摊确知其含义。或请指贾对王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            熙凤态度变化的三个阶段：始则听从，续则使令，最后休弃（&#34;人木”合成“休”字）。据
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            脂批，贾府“事败”，王照凤曾落入“狱神庙”，后短命而死。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“势败休云贵”一首巧姐判词。画面暗指巧姐的结局是成为以纺绩为
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            生的乡村妇女。判词前二句写巧姐在贾府势败后被“狠舅好兄”所卖。后二句写巧
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐为刘姥姥所救。巧：语意双关，含巧姐之“巧”与凑巧之巧”。恩人：指刘姥姥。，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④“桃李春风结子完”二首一一李判词。画面暗示李晚年因子得贵、命加身。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            首句桃李”、“完”寓李幼二字，全句寓李绒生子后就青春丧偶。次句寓贾兰的“兰”字，兼指
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            将来费府诸子孙中唯贾兰显贵，后二句句意难以确定，或请化用唐代借人寒山《无题&gt;诗“欲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            识生死臀，且将冰水比。水结即成冰，冰消返成水。说李一生三从四德，晚年荣华方至，却
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            随即死去，只留得个谐封虚名，自白地给世人作谈资笑料。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            78
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗饮仙曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面又画着高楼大厦，有一美人悬梁自缢。其判云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            情天情海幻情身，情既相逢必主淫。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            漫言不肖皆荣出，造畔开端实在宁。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉还欲看时，那仙姑知他天分高明，性情颖慧，恐把仙机
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            泄漏，遂掩了卷册，笑向宝玉道：“且随我去游玩奇景，何必在此
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            打这闷葫芦！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉恍恍憾憾，不觉弃了卷册，又随了警幻来至后面。但见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            珠帘绣幕，画栋雕檐，说不尽那光摇朱户金铺地，雪照琼窗玉作
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宫。更见仙花馥郁，异草芬芳，真好个所在。又听警幻笑道：“你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            们快出来迎接贵客！”一语未了，只见房中又走出几个仙子来，皆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是荷袂蹦跃，羽衣飘舞，姣若春花，媚如秋月。一见了宝玉，都怨
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            谤警幻道：“我们不知系何贵客”，忙的接了出来！姐姐曾说今
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日今时必有绛珠妹子的生魂前来游玩，故我等久待。何故反引
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这浊物来污染这清净女儿之境？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉听如此说，便吓得欲退不能退，果觉自形污秽不堪。警
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            府去接绛珠，适从宁府所过，偶遇宁荣二公之灵，瞩吾云：“吾家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自国朝定鼎②以来，功名奕世③，富贵传流，虽历百年，奈运终数
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“情天情海幻情身”一首一秦可判词。根据脂批，小说第十三回回日原
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            为：“秦可卿淫丧天香楼”。画上所画当指此。脂批又云：“老朽因（秦可卿)有魂托凤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐贾家后事二件··其言其意则令人悲切感服，姑教之，因命芹溪（雪芹）删去。”但
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            曹雪芹虽删去了这段情节，却在判词和画中仍保留了初稿里关于秦可卿结局的某些
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            暗示。情天情海：与“太虚幻境&#34;的匾额“孽海情天”义同，喻世间风月情多。幻情身：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幻变的情的化身。后两句意谓别以为不长进的东西都出自荣国府，造祸开端的其实
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是宁国府里的人，指贾珍等伤风坏俗的秽行。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②定鼎一一传说夏禹曾收九州之金，铸造九鼎，夏商周三代都把它们作为传国
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的重器。后世因称新朝定都建国为定鼎。语见《左传》宣公三年：“成王定鼎于郏娜。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 79
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第五
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            尽，不可挽回者。故遗之子孙虽多，竟无可以继业。其中惟嫡孙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉一人，票性乖张，生情怪橘，虽聪明灵慧，略可望成，无奈吾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            家运数合终，恐无人规引入正。幸仙姑偶来，万望先以情欲声色
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等事警其痴顽，或能使彼被跳出迷人圈子，然后入于正路，亦吾兄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            弟之幸矣。如此瞩吾，故发慈心，引彼至此。先以彼家上中下三
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等女子之终身册籍，令彼熟玩，尚未觉悟；故引彼再至此处，令其
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            再历饮撰声色之幻，或冀将来一悟，亦未可知也。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说毕，携了宝玉入室。但闻一缕幽香，竟不知其所楚何物。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉遂不禁相问。警幻冷笑道：“此香尘世中既无，尔何能知！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此香乃系诸名山胜境内初生异卉之精，合各种宝林珠树之油所
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            制，名‘群芳髓”。”宝玉听了，自是羡慕而已。大家入座，小丫翼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            捧上茶来。宝玉自觉清香异味，纯美非常，因文问何名。警幻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“此茶出在放春山遣香洞，文以仙花灵叶上所带之宿露而烹，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此茶名日‘千红一一窟’。”宝玉听了，点头称赏。因看房内，瑶琴、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝鼎、古画、新诗，无所不有；更喜窗下亦有唾绒④，间时渍粉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            污。壁上也见悬着一一副对联，书云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幽微灵秀地，无可奈何天。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看毕，无不羡慕。因又请问众仙姑姓名：一名痴梦仙姑，一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            名钟情大士，一名引愁金女，一一名度恨菩提@，各各道号不一。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            少刻，有小丫髪来调桌安椅，设摆酒撰。真是：琼浆满泛玻璃盏，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③‘奕(yi义)世——一代接一代,世代绵延。奕:重、累。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            睡绒一一古代妇女刺绣，每当换线停针，用齿咬断绣线，口中常沾留线绒，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            随口吐出，俗谓睡绒。李煜词（一斛珠》：“烂嚼红茸，笑向檀郎唾。”“茸”与“绒”通。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大士一一佛教称佛和菩萨为大士。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③菩提一一佛教名词。梵文音译，意译为觉悟、成佛。释迦在毕钵罗树下觉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            悟成佛，佛家遂称该处为菩提场，该树为菩提树。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            80
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗饮仙曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉液浓琥珀杯。更不用再说那肴撰之盛。宝玉因闻得此酒清
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            香甘冽，异乎寻常，文不禁相问。警幻道：“此酒乃以百花之蕊，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            万木之汁，加以麟髓之籍、凤乳之麯①酿成，因名为‘万艳同
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            杯。”宝玉称赏不迭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            饮酒间，又有十二个舞女上来，请问演何词曲。警幻道：“就
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            将新制《红楼梦》十二支演上来。”舞女们答应了，便轻敲檀板?，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            款按银筝③，听他歌道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            开辟鸿蒙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方歌了一句，警幻便说道：“此曲不比尘世中所填传奇之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            曲④，必有生旦净未之则③，又有南北九宫之限@。此或咏叹一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人，或感怀一事，偶成一曲，即可谱入管弦。若非个中人①，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不知其中之妙。料尔亦未必深明此调。若不先阅其稿，后听其
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            歌，翻成嚼蜡矣。”说毕，回头命小丫了《红楼梦》原稿来，递
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①酪(pei 胚）、(qu 曲）一—酪:未经过滤的酒。麯:酿酒用的发酵物，多用大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            麦麸皮等制成。这里“麟髓之醋”，“凤乳之楚”均极言酿造仙酒的原料之珍异。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②檀板一一乐器名。拍板，亦名牙板。因用木制成，故名檀板，因其色
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            红，亦称红牙板。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            款按银筝一款：动作缓慢、舒徐的样子。按：弹筝的动作。筝：一种弦乐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            传奇之曲一一明代以后通称南戏为传奇。曲：曲词。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            生旦净末之则一一传统戏曲中的脚色类型，主要分为生、且、净、丑四类，或
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            生、旦、净、末、丑五类，总称为“行当”。演员扮演人物，皆按“行当”，各有自己的表演
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            程式（即法则），不能随意混用。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            @南北九宫之限一一南北九宫，指古代戏曲的宫调（即调式)。南：指南曲（传
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            奇）北：指北曲（杂剧）九宫：即九个宫调（正宫、中吕、南吕、仙昌、黄钟五宫，大石
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            调、双调、商调、越调四调，合为九官调）。戏剧的曲牌，是受宫调限制的，某一曲牌属
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            于某一宫调之内，不能放入其它官调来用。有的曲牌可以兼入两宫，但要按曲谱规
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            定。所以戏剧的宫调限制是很严的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①个中人一一指处在中，洞悉内情的人。在这里作“行家”解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            81
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            与宝玉。宝玉接来，一面目视其文，一面耳聆其歌日：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            {红楼梦引子］开辟鸿蒙，谁为情种？都只为风月情
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            浓。趁着这（八)奈何天，伤怀日，寂塞时，试遣愚衷。因此
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上，演出这怀金悼玉的《红楼梦》。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【终身误】：都道是金玉良姻，俺只念木石前盟。空对
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着，山中高士晶莹雪；终不忘，世外仙姝寂寞林。叹人间，美
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中不足今方信。纵然是齐眉举案，到底意难平。②，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [枉凝眉] 个是闻苑仙葩，一个是美玉无瑕。若说没
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            奇缘，今生偏又遇着他；若说有奇缘，如何心事终虚化？一个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枉自嵯呀，一个空劳牵挂。一个是水中月，一个是镜中花。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            想眼中能有多少汨珠儿，怎经得秋流到冬尽，春流到夏！③·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉听了此曲，散漫无稽，不见得好处；但其声韵凄婉，竟能
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            销魂醉魄，因此也不察其原委，问其来历，就暂以此释闷而已。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因文看下道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [根无常] 喜荣华正好，恨无常文到。眼静静，把万事
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①【红楼梦引子]一首一一《红楼梦》-二支曲与金陵十二钣册子判词互为补
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            充，预示了书中主要人物的命运和结局。开辟鸿蒙：开天辟地以来。鸿蒙：日指字宙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            形成以前的原始浑沌状态。遭：排，抒发。愚：“我的自谦词。裹：裹曲，情怀。坏
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            金悼玉：以薛宝钗（金）和林黛玉（玉）代指金陵十二钗。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②【终身误】一首一一曲名意邸误了终身。曲子从贾宝玉婚后仍念念不忘死
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去的林黛玉，写薛宝钗婚后境遇的冷落和难堪。金玉良姻：指贾宝玉与薛宝的姻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            缘，书中有金锁配玉的说法。本石前盟：指贾宝玉与林黛玉的爱情，书中有神瑛侍者
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            以甘露滋溉绛珠仙草的神话描写。齐眉举案：《后汉书·梁鸿传》：“（梁鸿）为人赁春
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （春米），每归，妻为具食，不敢于鸿前御视，举案齐眉。”后遂以“举案齐”喻妻子对
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丈夫的恭顺，成为妇的楷模。案通“槐”，即碗。见清人胡鸡玉《订讷杂录》。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③【枉凝眉]一首一一曲名意谓徒然悲愁。曲子从宝黛爱情遇变故而破灾，写
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林黛玉泪尽而死的悲惨命运。闻（lang郎）苑仙葩（pa趴）：指林黛玉。闻苑：神仙的园
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林；仙葩：仙花。美玉无瑕：指宝玉。瑕：玉的病。嵯呀：伤感叹息。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            82
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗饮仙酸曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            全抛。荡悠悠，把芳魂消耗。望家乡，路远山高。故向爹娘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            梦里相寻告：儿命已入黄泉，天伦啊，须要退步抽身早！①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [分骨肉] 帆风雨路兰干，把骨肉家园齐来抛闪。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恐哭损残年，告参娘，休把儿悬念。自古穷通皆有定，离合
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            岂无缘？从今分两地，各自保平安。奴去也，莫牵连。②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【乐中悲】中,父母叹双亡。纵居那绮罗丛，谁知
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            娇养？率生来，英豪阔大宽宏量，从未将儿女私情略蒙心
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上。好一似，雾月光风耀玉堂。厮配得才貌仙郎，博得个地
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            久天长，准折得幼年时坎珂形状。终久是云散高唐，水滴湘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            江。这是[九]尘寰中消长数应当,何必枉悲伤!③：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【世难容】气质美如兰，才华阜比仙。天生成孤癖人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            皆罕。你道是啖肉食腥腹，视绮罗俗厌；却不知太高人愈
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妒，过洁世同嫌。可叹这，青灯古殿人将老；辜负了，红粉朱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①【很无常】首一一一曲名有不得寿终与荣辱无定双重意思。曲子从元妃的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            暴死，写贯府的即将大祸临头。无常：本佛教用语，指世间一切事物忽生忽灭，变幻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无定，后讹称勾命鬼。这里指元春的死亡，兼有风云变幻的意味。黄泉：旧时谓天玄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            地黄，称地下水为黄泉，后用以代指寞间。天伦：旧时指父子，兄弟等天然的亲属关
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            系，这里是父亲的代称。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②[分骨肉}一首一一曲名即骨肉分离的意思。曲子从探春远嫁海隅时对父
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母的强颜劝慰，写她与骨肉亲人分离时的悲苦心境。抛闪：抛开。残年：晚年，指老
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            年人。穷通：人生遭遇的窘困和显达。定：指命中注定。缘：缘分，机缘。奴：旧时女
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子的自称。牵连：牵挂留连。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③【乐中悲】首一曲名谓乐中寓悲。写史湘云虽生于富贵之家，但自幼父
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母双亡，虽嫁得“才貌仙郎”，又中途离散。绮罗丛：代指富贵家庭。葬月光风：雨过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天晴时明净景象，愉史湘云胸怀开朗，落光明。光风：《楚辞·招魂》：“光风转蕙”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王逸注：“光风，谓雨已（止）日出雨风，草木有光也。撕配：相配。才貌仙郎：据脂批，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当指卫若兰。准折：抵销；弥补。坎珂：道路不平，喻人生道路的曲折多艰。“云散”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            两句喻史湘云的夫妻离散，晚景孤凄。水潤（he合）湘江：传说舜南巡死于苍梧，二
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妃随征，于湘江，俗呼湘君（见汉刘向《列女传》）。消长：《易·泰》：“君子道长，小人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道消。&#34;消：灭；长：生，这里指盛衰变化。数：气数，运数。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 88
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第五
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            楼春色阑。到头来，依旧是风尘肮脏违心愿。好一似，无瑕
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            白玉遭泥陷；又何须，王孙公子叹无缘。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【喜冤家］中山狼，无情兽，全不念当日根由。一味的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            骄奢淫荡贪还构。觀着那，侯门艳质蒲柳；作践的，公府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            干金似下流。叹芳魂艳魄，一载荡悠悠。②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【虚花悟】将那三春看破,桃红柳绿待如何？把这韶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            华打灭，觅那清淡天和。说什么，天上天桃盛，云中香蕊多。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到头来，谁把秋握过？则看那，白杨村里人鸣咽，青枫林下
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鬼吟哦。更兼着，连天衰草遮攻墓。这的是，昨贫今富人劳
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            碌，春荣秋谢花折磨。似这般，生关死劫谁能躲？闻说道，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            西方宝树唤婆婆，上结着长生果。③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①【世难容}-～首一一曲名意谓难为世俗所容。写妙玉的为人及其不幸遭际。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            罕：少见。啖（dan旦）：吃。腹：羊气。红粉：胭脂、香粉，代指年轻女子。朱楼：指
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富贵人家女子住的绣楼。春色阑：春色将尽，喻女子的青春将逝。风尘航脏：一说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “风尘&#34;指扰壤的尘世；航脏读如亢减（kangzang)，又作抗脏，不屉不阿的意思。文天
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            祥《得儿女消息诗》：“肮脏到头方是汉，娉更欲向何人？”一说“风尘”犹云烟花，旧
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            指姆妓的生活：航脏作不洁解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②【喜冤家]一首一曲名意谓喜庆婚嫁招来冤家对头。写迎春的婚后不幸遭际。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贪还构：词意难确指，或系贪婪和构陷的意思。舰（q去）：看。候门艳质：犹言侯门千金小
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐。蒲柳：即水杨，易生易凋，旧时常用以比喻本性低贱或易于衰朽的东西，此取前一义。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            写惜春因看破贾府好景不长而决意皈依佛门。韶华：美好时光，喻青春年华。天和：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自然的和气，亦即所谓元气。觅天和：犹言修道养性。天上天桃、云中杏蕊：荣华
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富贵。《诗·周南·桃天）：“桃之天天，灼灼其华。”天天：茂盛艳丽的样子。《汉武帝内
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            唐代高螨（下第后上永崇高待郎》诗以“天上薯桃和露种，日边红否倚云裁”喻在朝显
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贵。白杨村：指坟地，舌人在基地多种白杨。青枫林：用杜甫《梦李白》“魂来枫林青”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之意。婆姿：似为梵文“婆颇姿”的省称，意即光明；或谓即“婆罗”，一种常绿乔木，相
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            传佛祖释迦牟尼在此树下涅榮（逝世）。长生果：避拟的一种食之能长生不老的巢
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            实：或喻解脱人世一切痛苦而修成正果。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            84 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗饮仙曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [聪明累］ #
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            机关算尽太聪明，反算了卿卿性命。生前心已
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            碎，死后性空灵。家富人宁，终有个家亡人散各奔腾。费了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            意悬悬半世心；好一似，荡悠悠三更梦。忽喇喇似大厦倾，昏惨
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ：惨似灯将尽。呀！一场欢喜忽悲辛。叹人世,终难定！①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【留徐庆］留庆，留饶庆，忽遇恩人；幸娘亲，幸娘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亲，积得阴功。劝人生，济困扶穷，休似俺那爱银钱忘骨肉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的狠舅奸兄！正是乘除加减，上有苍穹。②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【晚韶华】镜里恩情，更那堪梦里功名！那美韶华去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之何迅！再休提绣帐鸳。只这带珠冠，披凤袄，也抵不了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无常性命。虽说是，人生莫受老来贫，也须要阴鹭积儿孙。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            气昂昂头戴馨缨，气昂昂头戴馨缨；光灿灿胸悬金印；威赫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赫爵禄高登，威赫赫爵禄高登；昏惨惨黄泉路近。问古来将
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            相可还存？也只是虚名儿与后人钦敬。③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [好事终 [ 画梁春尽落香尘。擅风情，秉月貌，便是败
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①【聪明累]一首一一曲名即聪明反为聪明误之意。写王熙凤的悲惨结局和
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            费府一败涂地的情景。机关：心机，权术。黄庭坚《牧童诗》：“骑牛远远过前村，短笛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            横吹隔闻。多少长安名利客，机关用尽不如君。&#34;卿卿：夫妻间的爱称。（世说新
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “亲卿爱卿，是以卿，我不卿卿，谁当卿卿？遂恒听之。”这里用“卿卿”有嘲弄之意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            意悬邀：提心吊胆，时刻劳神。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ·②{留饶庆-首-一曲名意谓前辈留下的穗泽。写贾府势败家亡时骨肉相残
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            及巧姐由刘姥姥救出火坑事。涂庆：与“阴功”义近，意为前辈的善行而使后辈获得善
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            报。（易·坤：“积善之家，必有途庆。”奸兄：似指曾得凤姐好处的蕃之。续书指贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芸，恐非。脂批云：“醉金刚一回文字伏芸哥仗义探魔”，可知贸芸后来对府有仗义行
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            为。乘除加减：意谓人生的荣枯消长，浮沉赏罚，皆有定数，丝毫不爽。苍穹：青天。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③{晚韶华}一首一曲名寓“夕阳无限好，只是近黄昏”之意。写李绒一生的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枯荣变化。镜里恩情：指李纹卓享。梦里功名：似指贾兰“爵禄高登后她即死去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            珠冠、风袄：旧时谐命夫人穿戴的服饰。绣帐鸳：代指夫妻生活。阴鹭（zhi治）：阴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            德。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 &amp;5
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            家的根本。：箕裘颓随皆从敬，家事消亡首罪宁。宿总因
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            情。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【收尾·飞鸟各投林】为官的，家业调零；富贵的，金银
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            散尽；有恩的，死里逃生；无情的，分明报应。欠命的，命已
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            还；欠泪的，泪已尽。冤冤相报实非轻，分离聚合皆前定。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欲知命短间前生，老来富贵也真侥幸。看破的，遁入空门；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            痴迷的，枉送了性命。好一似食尽鸟投林，落了片白范范大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            地真干净！②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            歌毕，还要歌副曲。警幻见宝玉甚无趣味，因叹：“痴儿竟尚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未悟！”那宝玉忙止姬不必再唱，自觉朦胧恍忽，告醉求卧。警
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幻便命撤去残席，送宝玉至一香闺绣阁之中，其间铺陈之盛，乃
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            素所未见之物。更可骇者，早有一位女子在内，其鲜艳妩媚，有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            似乎宝钗，风流袭娜，又如黛玉。正不知何意，忽警幻道：“尘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            世中多少富贵之家，那些绿窗风月，绣阁烟霞，皆被淫污纹与
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那些流荡女子悉皆站辱。更可恨者，自古来多少轻薄浪子，皆以
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ‘好色不淫’为饰，又以“情而不淫③作案，此皆饰非掩丑之语
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也。好色即淫，知情更淫。是以巫山之会，云雨之欢，皆由既
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①【好事终]首-一曲名意谓情事终了，含有嘲讽意味。曲子从秦可卿的悬
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            梁自缢，写贾府纲常毁随，道德败坏。画梁春尽落香尘：暗指秦可卿于天香楼悬梁自
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            尽。箕裘（iqiu基球）：簸箕和皮袍。《礼记：学记》：“良冶之子，必学为裘；良弓之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子，必学为箕。”意思是善于治补人家的子弟，必先学会补皮衣为冶接作准备；善于造
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            弓人家的子弟，必定学会做簸箕为造号做准备。后人遂常用“箕裘”来比瑜祖先的事
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            业。箕裘颓堕：指费府的儿孙不能继承祖业。敬：指贾敬。宁：指宁国府。宿睡：犹
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            言祸根。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②【收尾·飞鸟各投林)一首一一曲名喻家败人散各奔东西。此曲总写贾宝玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ，和金陵卡二钗等的不幸结局和贸府最终“树倒糊狱散”的衰败景象。据脂批透露，贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            府“事败抄没”后，“子孙流散”，“一败涂地”。贾宝玉“悬崖撒手”，“弃而为僧”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③情而不淫感情志趣相投，却不流于淫乱。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            86 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钗饮仙醛曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            悦其色、复恋其情所致也。吾所爱汝者，乃天下古今第一淫人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉听了，唬的忙答道：“姑差了。我因懒于读书，家父母
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            尚每垂训伤，岂敢再冒“淫”字。况且年纪尚小，不知淫，字为何
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            物。”警幻道：“非也。淫虽一理，意则有别。如世之好淫者，不过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            悦容貌，喜歌舞，调笑无庆，云无时，恨不能尽天下之美女供我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            片时之趣兴，此皆皮肤淫滥之鑫物耳。如尔则天分中生成一段
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            痴情，吾辈推之为“意淫，。“意淫二字，惟心会而不可口传，可
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            神通而不可语达。汝今独得此二字，在闺阁中，固可为良友，然
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            于世道中未免迁阔怪诡，百口嘲谤，万目毗①。今既遇令祖宁
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            荣二公剖腹深瞩，吾不忍君独为我闺阁增光，见弃于世道，是以
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            特弓前来，醉以灵酒，沁以仙茗，警以妙曲，再将吾妹一人，乳名
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            兼美字可卿者，许配于汝。今夕良时，即可成姻。不过令汝领略
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此仙闺幻境之风光尚如此，何况尘境之情景哉？而今后万万解
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            释②，改悟前情，留意于孔孟之间，委身于经济之道③。”说毕便秘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            授以云雨之事，推宝玉入房，将门掩上自去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那宝玉恍恍憾，依警幻所嘱之言，未免有儿女之事，难以
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            尽述。至次日，便柔情缝继④，软语温存，与可卿难解难分。因
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二人携手出去游顽之时，忽至一个所在，但见荆榛遍地，狼虎同
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            群，迎面一一道黑溪阻路，并无桥梁可通。正在犹豫之间，忽见警
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①睡毗（yo zi牙自）-—一瞪眼、怒目而视。也引伸为小的怨。《史记·范睢
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            传：“一-饭之德必偿，睡之怨必报。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            解释-一这里是领悟、不受困惑的意思。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            经济之道一指封建社会的治国理民，经邦济世之道。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            缝（qianquan浅大）犹言缠绵。语出（诗经·大雅·民劳》，本为牢固相
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            结之意。后多用以形容情投意合、难舍难分的样子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            87
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第五.
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面追来，告道：“快休前进，作速回头要紧！”宝玉忙止步问
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“此系何处？”警幻道：“此即迷津①也。深有万丈，遥直干
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里，中无舟辑可通，只有一个木筏，乃木居土掌舵，灰侍者撑笃，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不受金银之谢，但遇有缘者渡之。尔今偶游至此，设如堕落其
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中，则深负我从前谋谭警戒之语矣。”话犹未了，只听迷津内水响
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如雷，竟有许多夜叉②海鬼将宝玉拖将下去。吓得宝玉汗下如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨，一面失声喊叫：“可卿救我！”吓得袭人辈众丫蔓忙上来楼住，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            叫：“宝玉别怕，我们在这里！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说秦氏正在房外瞩小丫头们好生看着猫儿狗儿打架，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            忽听宝玉在梦中唤他的小名，因纳闷道：“我的小名这里从没人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            知道的，他如何知道，在梦里叫出来？”正是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一场幽梦同谁近，干舌情人独我痴。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            校记
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【一］此回回前，己卵、梦稿、蒙府、戚序、舒序本有：“题日:春困葳获
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            拥绣，恍随仙子别红尘。问谁幻入华胥境，千古风流造孽人。”（已卯本
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “题日”作“题云”，在第四回之末；梦稿本无&#34;题日”二字。）
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [二] “略比”，原作“略与”，从梦稿本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [三] “之妻”，原作“夫妻”，从甲成本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [四] “寿昌公主”，各本同。惟舒序本作“寿长公主。按，含章殿下
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卧，系寿阳公主（刘宋武帝女）梅花妆事。此处究竟是笔误、抄，还是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①迷津一一一佛家谓三界（欲界、色界、无色界）六道（天道、人道、阿修罗道、畜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            生道、饿鬼道、地狱道）都是迷误虚妄的境界，故称迷津；世间众生，都陷溺于迷津”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之中，须赖佛家教义，觉迷情海，慈航普渡。后用“迷津”比喻人沉满于迷途之中。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            津：江河的渡口。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ② 夜叉一一梵语音译,亦作药，意译为能瞰鬼、捷疾鬼。佛教多泛指恶鬼。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后来借以形容相貌丑陋，性情凶恶的人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            88
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游幻境指迷十二钣 、饮仙酸曲演红楼梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有意虚写，无从断定，故仍其旧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [五] “秋菊”，原作“秋兰”，从甲戌本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [六] “放春山遣香洞”，原作“放春山选香洞”，“山”又点改为“”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            从已卵、甲戌、蒙府、戚序、甲辰本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “虎兜”，原作“虎兔”，甲戌、蒙府、戚序、甲辰、舒序本均同。从
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            已卯、梦稿本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [八] “趁着这”，原无，从甲戌、戚序、蒙府本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “这是”，原无，从各本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            89
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="fax_chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本影印</span>
+        <span class="col-desc">程乙本校注本影印页（贵州人民出版社PDF）</span>
+        <span>第5回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">开生面梦演红楼梦 立新场情传幻境情</h3>
+        
+        <div class="fax-view" data-fax="fax_chengyi">
+          <div class="fax-toolbar">
+            <button type="button" class="fax-prev" data-dir="-1">←</button>
+            <span class="fax-page-info">第<span class="fax-cur">1</span>页</span>
+            <button type="button" class="fax-next" data-dir="1">→</button>
+          </div>
+          <div class="fax-stage">
+            <img class="fax-img" alt="影印页">
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

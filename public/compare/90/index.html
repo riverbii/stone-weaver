@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第90回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="90">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/89" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" >第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" >第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" >第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" >第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" >第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" >第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" selected>第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" >第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" >第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" >第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/91" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi_ocr" data-label="程乙本OCR" checked>
+          程乙本OCR
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/90">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第90回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</h3>
+        
+        
+        <p class="col-para">
+          
+            卻說黛玉自立意自戕之後，漸漸不支，一日竟至絕粒。從前十幾天內，賈母等輪流看望，他有時還說幾句話，這兩日索性不大言語。心里雖有時昏暈，卻也有時清楚。賈母等見他這病不似無因而起，也將紫鵑雪雁盤問過兩次，兩個那里敢說。便是紫鵑欲向侍書打聽消息，又怕越鬧越真，黛玉更死得快了，所以見了侍書，毫不提起。那雪雁是他傳話弄出這樣緣故來，此時恨不得長出百十個嘴來說“我沒說”，自然更不敢提起。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到了這一天黛玉絕粒之日，紫鵑料無指望了，守著哭了會子，因出來偷向雪雁道：“你進屋里來好好兒的守著他。我去回老太太，太太和二奶奶去，今日這個光景大非往常可比了。”雪雁答應，紫鵑自去。這里雪雁正在屋里伴著黛玉，見他昏昏沉沉，小孩子家那里見過這個樣兒，只打諒如此便是死的光景了，心中又痛又怕，恨不得紫鵑一時回來才好。正怕著，只聽窗外腳步走響，雪雁知是紫鵑回來，才放下心了，連忙站起來掀著里間帘子等他。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只見外面帘子響處，進來了一個人，卻是侍書。那侍書是探春打發來看黛玉的，見雪雁在那里掀著帘子，便問道：“姑娘怎麼樣？”雪雁點點頭兒叫他進來。侍書跟進來，見紫鵑不在屋里，瞧了瞧黛玉，只剩得殘喘微延，唬的驚疑不止，因問：“紫鵑姐姐呢？”雪雁道：“告訴上屋里去了。”那雪雁此時只打諒黛玉心中一無所知了，又見紫鵑不在面前，因悄悄的拉了侍書的手問道：“你前日告訴我說的什麼王大爺給這里寶二爺說了親，是真話么？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”侍書道：“怎麼不真。”雪雁道：“多早晚放定的？”侍書道：“那里就放定了呢。那一天我告訴你時，是我聽見小紅說的。後來我到二奶奶那邊去，二奶奶正和平姐姐說呢，說那都是門客們借著這個事討老爺的喜歡，往後好拉攏的意思。別說大太太說不好，就是大太太願意，說那姑娘好，那大太太眼里看的出什麼人來！再者老太太心里早有了人了，就在咱們園子里的。大太太那里摸的著底呢。老太太不過因老爺的話，不得不問問罷咧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又聽見二奶奶說，寶玉的事，老太太總是要親上作親的，憑誰來說親，橫豎不中用。”雪雁聽到這里，也忘了神了，因說道：“這是怎麼說，白白的送了我們這一位的命了！”侍書道：“這是從那里說起？”雪雁道：“你還不知道呢。前日都是我和紫鵑姐姐說來著，這一位聽見了，就弄到這步田地了。”侍書道：“你悄悄兒的說罷，看仔細他聽見了。”雪雁道：“人事都不省了，瞧瞧罷，左不過在這一兩天了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”正說著，只見紫鵑掀帘進來說：“這還了得！你們有什麼話，還不出去說，還在這里說。索性逼死他就完了。”侍書道：“我不信有這樣奇事。”紫鵑道：“好姐姐，不是我說，你又該惱了。你懂得什麼呢！懂得也不傳這些舌了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這里三個人正說著，只聽黛玉忽然又嗽了一聲。紫鵑連忙跑到炕沿前站著，侍書雪雁也都不言語了。紫鵑彎著腰，在黛玉身後輕輕問道：“姑娘喝口水罷。”黛玉微微答應了一聲。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雪雁連忙倒了半鐘滾白水，紫鵑接了托著，侍書也走近前來。紫鵑和他搖頭兒，不叫他說話，侍書只得咽住了。站了一回，黛玉又嗽了一聲。紫鵑趁勢問道：“姑娘喝水呀？”黛玉又微微應了一聲，那頭似有欲抬之意，那里抬得起。紫鵑爬上炕去，爬在黛玉旁邊，端著水試了冷熱，送到唇邊，扶了黛玉的頭，就到碗邊，喝了一口。紫鵑才要拿時，黛玉意思還要喝一口，紫鵑便托著那碗不動。黛玉又喝了一口，搖搖頭兒不喝了，喘了一口氣，仍舊躺下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            半日，微微睜眼說道：“剛才說話不是侍書么？”紫鵑答應道：“是。”侍書尚未出去，因連忙過來問候。黛玉睜眼看了，點點頭兒，又歇了一歇，說道：“回去問你姑娘好罷。”侍書見這番光景，只當黛玉嫌煩，只得悄悄的退出去了。原來那黛玉雖則病勢沉重，心里卻還明白。起先侍書雪雁說話時，他也模糊聽見了一半句，卻只作不知，也因實無精神答理。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            及聽了雪雁侍書的話，才明白過前頭的事情原是議而未成的，又兼侍書說是鳳姐說的，老太太的主意親上作親，又是園中住著的，非自己而誰？因此一想，陰极陽生，心神頓覺清爽許多，所以才喝了兩口水，又要想問侍書的話。恰好賈母，王夫人，李紈，鳳姐聽見紫鵑之言，都赶著來看。黛玉心中疑團已破，自然不似先前尋死之意了。雖身体軟弱，精神短少，卻也勉強答應一兩句了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳳姐因叫過紫鵑問道：“姑娘也不至這樣，這是怎麼說，你這樣唬人。”紫鵑道：“實在頭里看著不好，才敢去告訴的，回來見姑娘竟好了許多，也就怪了。”賈母笑道：“你也別怪他，他懂得什麼。看見不好就言語，這倒是他明白的地方，小孩子家，不嘴懶腳懶就好。”說了一回，賈母等料著無妨，也就去了。正是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心病終須心藥治，解鈴還是系鈴人。不言黛玉病漸減退，且說雪雁紫鵑背地里都念佛。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雪雁向紫鵑說道：“虧他好了，只是病的奇怪，好的也奇怪。”紫鵑道：“病的倒不怪，就只好的奇怪。想來寶玉和姑娘必是姻緣，人家說的‘好事多磨’，又說道‘是姻緣棒打不回’。這樣看起來，人心天意，他們兩個竟是天配的了。再者，你想那一年我說了林姑娘要回南去，把寶玉沒急死了，鬧得家翻宅亂。如今一句話，又把這一個弄得死去活來。可不說的三生石上百年前結下的么。”說著，兩個悄悄的抿著嘴笑了一回。雪雁又道：“幸虧好了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            咱們明兒再別說了，就是寶玉娶了別的人家兒的姑娘，我親見他在那里結親，我也再不露一句話了。”紫鵑笑道：“這就是了。”不但紫鵑和雪雁在私下里講究，就是眾人也都知道黛玉的病也病得奇怪，好也好得奇怪，三三兩兩，唧唧噥噥議論著。不多幾時，連鳳姐兒也知道了，邢王二夫人也有些疑惑，倒是賈母略猜著了八九。那時正值邢王二夫人鳳姐等在賈母房中說閒話，說起黛玉的病來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈母道：“我正要告訴你們，寶玉和林丫頭是從小兒在一處的，我只說小孩子們，怕什麼？以後時常聽得林丫頭忽然病，忽然好，都為有了些知覺了。所以我想他們若盡著擱在一塊兒，畢竟不成体統。你們怎麼說？”王夫人聽了，便呆了一呆，只得答應道：“林姑娘是個有心計兒的。至于寶玉，呆頭呆惱，不避嫌疑是有的，看起外面，卻還都是個小孩兒形象。此時若忽然或把那一個分出園外，不是倒露了什麼痕跡了么。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            古來說的：‘男大須婚，女大須嫁。’老太太想，倒是赶著把他們的事辦辦也罷了。”賈母皺了一皺眉，說道：“林丫頭的乖僻，雖也是他的好處，我的心里不把林丫頭配他，也是為這點子。況且林丫頭這樣虛弱，恐不是有壽的。只有寶丫頭最妥。”王夫人道：“不但老太太這麼想，我們也是這樣。但林姑娘也得給他說了人家兒才好，不然女孩兒家長大了，那個沒有心事？倘或真與寶玉有些私心，若知道寶玉定下寶丫頭，那倒不成事了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賈母道：“自然先給寶玉娶了親，然後給林丫頭說人家，再沒有先是外人後是自己的。況且林丫頭年紀到底比寶玉小兩歲。依你們這樣說，倒是寶玉定親的話不許叫他知道倒罷了。”鳳姐便吩咐眾丫頭們道：“你們聽見了，寶二爺定親的話，不許混吵嚷。若有多嘴的，隄防著他的皮。”賈母又向鳳姐道：“鳳哥兒，你如今自從身上不大好，也不大管園里的事了。我告訴你，須得經點兒心。不但這個，就象前年那些人喝酒耍錢，都不是事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你還精細些，少不得多分點心兒，嚴緊嚴緊他們才好。況且我看他們也就只還服你。”鳳姐答應了。娘兒們又說了一回話，方各自散了。從此鳳姐常到園中照料。一日，剛走進大觀園，到了紫菱洲畔，只聽見一個老婆子在那里嚷。鳳姐走到跟前，那婆子才瞧見了，早垂手侍立，口里請了安。鳳姐道：“你在這里鬧什麼？”婆子道：“蒙奶奶們派我在這里看守花果，我也沒有差錯，不料邢姑娘的丫頭說我們是賊。”鳳姐道：“為什麼呢？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”婆子道：“昨兒我們家的黑兒跟著我到這里頑了一回，他不知道，又往邢姑娘那邊去瞧了一瞧，我就叫他回去了。今兒早起聽見他們丫頭說丟了東西了。我問他丟了什麼，他就問起我來了。”鳳姐道：“問了你一聲，也犯不著生氣呀。”婆子道：“這里園子到底是奶奶家里的，并不是他們家里的。我們都是奶奶派的，賊名兒怎麼敢認呢。”鳳姐照臉啐了一口，厲聲道：“你少在我跟前嘮嘮叨叨的！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你在這里照看，姑娘丟了東西，你們就該問哪，怎麼說出這些沒道理的話來。把老林叫了來，攆出他去。”丫頭們答應了。只見邢岫煙赶忙出來，迎著鳳姐陪笑道：“這使不得，沒有的事，事情早過去了。”鳳姐道：“姑娘，不是這個話。倒不講事情，這名分上太豈有此理了。”岫煙見婆子跪在地下告饒，便忙請鳳姐到里邊去坐。鳳姐道：“他們這种人我知道，他除了我，其餘都沒上沒下的了。”岫煙再三替他討饒，只說自己的丫頭不好。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳳姐道：“我看著邢姑娘的分上，饒你這一次。”婆子才起來，磕了頭，又給岫煙磕了頭，才出去了。這里二人讓了坐。鳳姐笑問道：“你丟了什麼東西了？”岫煙笑道：“沒有什麼要緊的，是一件紅小襖兒，已經舊了的。我原叫他們找，找不著就罷了。這小丫頭不懂事，問了那婆子一聲，那婆子自然不依了。這都是小丫頭糊涂不懂事，我也罵了幾句，已經過去了，不必再提了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”鳳姐把岫煙內外一瞧，看見雖有些皮綿衣服，已是半新不舊的，未必能暖和。他的被窩多半是薄的。至于房中桌上擺設的東西，就是老太太拿來的，卻一些不動，收拾的乾乾淨淨。鳳姐心上便很愛敬他，說道：“一件衣服原不要緊，這時候冷，又是貼身的，怎麼就不問一聲兒呢。這撒野的奴才了不得了！”說了一回，鳳姐出來，各處去坐了一坐，就回去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到了自己房中，叫平兒取了一件大紅洋縐的小襖兒，一件松花色綾子一斗珠兒的小皮襖，一條寶藍盤錦鑲花綿裙，一件佛青銀鼠褂子，包好叫人送去。那時岫煙被那老婆子聒噪了一場，雖有鳳姐來壓住，心上終是不安。想起“許多姊妹們在這里，沒有一個下人敢得罪他的，獨自我這里，他們言三語四，剛剛鳳姐來碰見。”想來想去，終是沒意思，又說不出來。正在吞聲飲泣，看見鳳姐那邊的丰兒送衣服過來。岫煙一看，決不肯受。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丰兒道：“奶奶吩咐我說，姑娘要嫌是舊衣裳，將來送新的來。”岫煙笑謝道：“承奶奶的好意，只是因我丟了衣服，他就拿來，我斷不敢受。你拿回去千萬謝你們奶奶，承你奶奶的情，我算領了。”倒拿個荷包給了丰兒。那丰兒只得拿了去了。不多時，又見平兒同著丰兒過來，岫煙忙迎著問了好，讓了坐。平兒笑說道：“我們奶奶說，姑娘特外道的了不得。”岫煙道：“不是外道，實在不過意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”平兒道：“奶奶說，姑娘要不收這衣裳，不是嫌太舊，就是瞧不起我們奶奶。剛才說了，我要拿回去，奶奶不依我呢。”岫煙紅著臉笑謝道：“這樣說了，叫我不敢不收。”又讓了一回茶。平兒同丰兒回去，將到鳳姐那邊，碰見薛家差來的一個老婆子，接著問好。平兒便問道：“你那里來的？”婆子道：“那邊太太姑娘叫我來請各位太太，奶奶，姑娘們的安。我才剛在奶奶前問起姑娘來，說姑娘到園中去了。可是從邢姑娘那里來么？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”平兒道：“你怎麼知道？”婆子道：“方才聽見說。真真的二奶奶和姑娘們的行事叫人感念。”平兒笑了一笑說：“你回來坐著罷。”婆子道：“我還有事，改日再過來瞧姑娘罷。”說著走了。平兒回來，回复了鳳姐。不在話下。且說薛姨媽家中被金桂攪得翻江倒海，看見婆子回來，述起岫煙的事，寶釵母女二人不免滴下淚來。寶釵道：“都為哥哥不在家，所以叫邢姑娘多吃幾天苦。如今還虧鳳姐姐不錯。咱們底下也得留心，到底是咱們家里人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”說著，只見薛蝌進來說道：“大哥哥這幾年在外頭相與的都是些什麼人，連一個正經的也沒有，來一起子，都是些狐群狗党。我看他們那里是不放心，不過將來探探消息兒罷咧。這兩天都被我干出去了。以後吩咐了門上，不許傳進這种人來。”薛姨媽道：“又是蔣玉菡那些人哪？”薛蝌道：“蔣玉菡卻倒沒來，倒是別人。”薛姨媽聽了薛蝌的話，不覺又傷心起來，說道：“我雖有兒，如今就象沒有的了，就是上司准了，也是個廢人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你雖是我侄兒，我看你還比你哥哥明白些，我這後輩子全靠你了。你自己從今更要學好。再者，你聘下的媳婦兒，家道不比往時了。人家的女孩兒出門子不是容易，再沒別的想頭，只盼著女婿能干，他就有日子過了。若邢丫頭也象這個東西，”說著把手往里頭一指，道：“我也不說了。邢丫頭實在是個有廉恥有心計兒的，又守得貧，耐得富。只是等咱們的事情過去了，早些把你們的正經事完結了，也了我一宗心事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”薛蝌道：“琴妹妹還沒有出門子，這倒是太太煩心的一件事。至于這個，可算什麼呢。”大家又說了一回閒話。薛蝌回到自己房中，吃了晚飯，想起邢岫煙住在賈府園中，終是寄人篱下，況且又窮，日用起居，不想可知。況兼當初一路同來，模樣兒性格兒都知道的。可知天意不均：如夏金桂這种人，偏教他有錢，嬌養得這般潑辣，邢岫煙這种人，偏教他這樣受苦。閻王判命的時候，不知如何判法的。想到悶來也想吟詩一首，寫出來出出胸中的悶氣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又苦自己沒有工夫，只得混寫道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            蛟龍失水似枯魚，兩地情怀感索居。同在泥涂多受苦，不知何日向清虛。寫畢看了一回，意欲拿來粘在壁上，又不好意思。自己沉吟道：“不要被人看見笑話。”又念了一遍，道：“管他呢，左右粘上自己看著解悶兒罷。”又看了一回，到底不好，拿來夾在書里。又想自己年紀可也不小了，家中又碰見這樣飛災橫禍，不知何日了局，致使幽閨弱質，弄得這般凄涼寂寞。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正在那里想時，只見寶蟾推門進來，拿著一個盒子，笑嘻嘻放在桌上。薛蝌站起來讓坐。寶蟾笑著向薛蝌道：“這是四碟果子，一小壺兒酒，大奶奶叫給二爺送來的。”薛蝌陪笑道：“大奶奶費心。但是叫小丫頭們送來就完了，怎麼又勞動姐姐呢。”寶蟾道：“好說。自家人，二爺何必說這些套話。再者我們大爺這件事，實在叫二爺操心，大奶奶久已要親自弄點什麼兒謝二爺，又怕別人多心。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二爺是知道的，咱們家里都是言合意不合，送點子東西沒要緊，倒沒的惹人七嘴八舌的講究。所以今日些微的弄了一兩樣果子，一壺酒，叫我親自悄悄兒的送來。”說著，又笑瞅了薛蝌一眼，道：“明兒二爺再別說這些話，叫人聽著怪不好意思的。我們不過也是底下的人，伏侍的著大爺就伏侍的著二爺，這有何妨呢。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”薛蝌一則秉性忠厚，二則到底年輕，只是向來不見金桂和寶蟾如此相待，心中想到剛才寶蟾說為薛蟠之事也是情理，因說道：“果子留下罷，這個酒兒，姐姐只管拿回去。我向來的酒上實在很有限，擠住了偶然喝一鐘，平日無事是不能喝的。難道大奶奶和姐姐還不知道么。”寶蟾道：“別的我作得主，獨這一件事，我可不敢應。大奶奶的脾氣兒，二爺是知道的，我拿回去，不說二爺不喝，倒要說我不盡心了。”薛蝌沒法，只得留下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶蟾方才要走，又到門口往外看看，回過頭來向著薛蝌一笑，又用手指著里面說道：“他還只怕要來親自給你道乏呢。”薛蝌不知何意，反倒訕訕的起來，因說道：“姐姐替我謝大奶奶罷。天氣寒，看涼著。再者，自己叔嫂，也不必拘這些個禮。”寶蟾也不答言，笑著走了。薛蝌始而以為金桂為薛蟠之事，或者真是不過意，備此酒果給自己道乏，也是有的。及見了寶蟾這种鬼鬼祟祟不尷不尬的光景，也覺了幾分。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卻自己回心一想：“他到底是嫂子的名分，那里就有別的講究了呢。或者寶蟾不老成，自己不好意思怎麼樣，卻指著金桂的名兒，也未可知。然而到底是哥哥的屋里人，也不好。”忽又一轉念：“那金桂素性為人毫無閨閣理法，況且有時高興，打扮得妖調非常，自以為美，又焉知不是怀著坏心呢？不然，就是他和琴妹妹也有了什麼不對的地方兒，所以設下這個毒法兒，要把我拉在渾水里，弄一個不清不白的名兒，也未可知。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”想到這里，索性倒怕起來。正在不得主意的時候，忽聽窗外扑哧的笑了一聲，把薛蝌倒唬了一跳。未知是誰，下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi_ocr">
+      <div class="compare-col-head">
+        <span class="badge">程乙本OCR</span>
+        <span class="col-desc">程乙本OCR（欧阳健校注本PDF本地识别）</span>
+        <span>第90回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</h3>
+        
+        
+        <p class="col-para">
+          
+            中国古典文学名花
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说黛玉自立意自②之后，渐渐不支，一日竟至绝粒。从
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            前十几天内，贾母等轮流看望，他有时还说几句话，这两日索性不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大言语；心里虽有时昏晕，却也有时清楚。贾母等见他这病不似无
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因而起，也将紫鹃、雪雁盘问过两次。两个那里敢说？便是紫鹃欲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            向侍书打听消息，又怕越闹越真，黛玉更死得快了，所以见了侍书，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            毫不提起。那雪雁是他传话弄出这样原故来，此时恨不得长出百
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            十个嘴来说“我没说”，自然更不敢提起。到了这一天黛玉绝粒之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日，紫鹃料无指望了，守着哭了会子，因出来偷向雪雁道：“你进屋
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里来，好好儿的守着他，我去回老太太、太太和二奶奶去。今日这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个光景，大非往常可比了。”雪雁答应，紫自去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里雪雁正在屋里伴着黛玉，见他昏昏沉沉，小孩子家那里见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过这个样儿，只打量如此便是死的光景了，心中又痛又怕，恨不得
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            紫鹃一时回来才好。正怕着，只听窗外脚步走响，雪雁知是紫鹃回
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，才放下心了，连忙站起来，掀着里间帘子等他。只见外面帘子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            响处，进来了一个人，却是侍书。那侍书是探春打发来看黛玉的，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见雪雁在那里掀着帘子，便问道：“姑娘怎么样？”雪雁点点头儿，叫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他进来。侍书跟进来，见紫鹃不在屋里，瞧了瞧黛玉，只剩得残喘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            微延，晓的惊疑不止。因问：“紫鹃姐姐呢？”雪雁道：“告诉上屋里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去了。” PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自我 一自我摧残。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            : (0,34
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那雪雁此时只打量黛玉心中一无所知了，又见紫鹃不在面前，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因俏悄的拉了侍书的手，问道：“你前日告诉我说的什么王大爷给
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里宝二爷说了亲，是真话么？”侍书道：“怎么不真？”雪雁道：“多
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            早晚放定的？”侍书道：“那里就放定了呢？那一天我告诉你时，是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我听见小红说的。后来我到二奶奶那边去，二奶奶正和平姐姐说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            呢，道：“那都是门客们借着这个事讨老爷喜欢，往后好拉拢的意
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            思。别说大太太说不好，就是大太太愿意，说那姑娘好，那大太太
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眼里看的出什么人来？再者，老太太心里早有了人了，就在咱们园
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子里的，大太太那里摸的着底呢？老太太不过因老爷的话，不得不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            问问罢例。又听见二奶奶说：宝玉的事，老太太总是要亲上作亲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的，凭谁来说亲，横竖不中用。”雪雁听到这里，也忘了神了，因说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“这是怎么说？白白的送了我们这一位的命了！”侍书道：“这是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            从那里说起？”雪雁道：“你还不知道呢！前日都是我和紫鹃姐姐说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来着，这一位听见了，就弄到这步田地了。”侍书道：“你悄悄儿的说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            罢，看仔细他听见了。”雪雁道：“人事都不醒了，瞧瞧罢，左不过在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这一两天了。”正说着，只见紫鹏掀帘进来说：“这还了得！你们有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            什么话还不出去说，还在这里说！索性逼死他就完了！”侍书道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “我不信有这样奇事。”紫鹃道：“好姐姐，不是我说，你又该恼了，你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            懂得什么呢？懂得也不传这些舌了！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这重三个人正说着，只听黛玉忽然又嗽了一声，紫鹃连忙跑到
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            炕沿前站着，侍书、雪雁也都不言语了。紫鹃弯着腰，在黛玉身后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            轻轻问道：“姑娘，喝口水罢？”黛玉微微答应了声。雪雁连忙倒
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了半钟滚白水，紫鹃接了托着，侍书也走近前来。紫鹏和他摇头儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不叫他说话，侍书只得咽住了。站了一回，黛玉又嗽了一声。紫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鹃势问道：“姑娘，喝水呀！”黛玉文微微应了一声，那头似有欲抬
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之意，那里得起？紫爬上炕去，爬在黛玉旁边，端着水，试了冷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            热，送到唇边，扶了黛玉的头，就到碗边喝了一口。紫才要拿时，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉意思还要喝一口，紫鹃便托着那碗不动。黛玉又喝了一口，摇
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            摇头儿，不喝了。喘了一口气，仍旧躺下。半日，微微睁眼，说道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “刚才说话不是侍书么？”紫鹃答应着：“是。”侍书尚未出去，因连忙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过来问候。黛玉静眼看了，点点头儿。又歇了一歇，说道：“回去问
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你姑娘好罢。”侍书见这番光景，只当黛玉嫌烦，只得悄俏的退出去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来那黛玉虽则病势沉重，心里却还明白。起先侍书、雪雁说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话时，他也模糊听见了一半句，却只作不知，也因实无精神答理。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            及听了雪雁、侍书的话，才明白这前头的事情原是议而未成的。又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            兼侍书说是凤姐说的，老太太的主意，亲上作亲，又是园中住着的，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            非自已而谁？因此一想，阴极阳生，心神顿觉清爽许多，所以才喝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一两口水，又要想问侍书的话。恰好贾母、王夫人、李约、凤姐听见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            紫鹃之言都赶着来看。黛玉心中疑团已破，自然不似先前寻死之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            意了。虽身体软弱，精神短少，却也勉强答应一两句了。凤姐因叫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过紫，问道：“姑娘也不至这样。这是怎么说，你这样唬人！紫鹃
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“实在头里看着不好，才敢去告诉的。回来见姑娘竞好了许多，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也就怪了。”贾母笑道：“你也别怪他。他懂得什么？看见不好就言
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            语，这倒是他明白的地方。小孩子家不嘴懒脚嫩就好。”说了一回，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母等料着无妨，也就去了。正是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心病终须心药治，解铃还是系铃人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不言黛玉病渐减退，且说雪雁、紫背地里都念佛。雪雁向
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            紫鹃说道：“亏他好了。只是病的奇怪，好的也奇怪。”紫鹃道：“病
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的倒不怪，就只好的奇怪，想来宝玉和姑娘必是姻缘。人家说的，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “好事多磨；又说道：“是姻缘棒打不回”。这么看起来，人心天意，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他们两个竟是天配的了。再者：你想那一年，我说了林姑娘要回南
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去，把宝玉没急死了，闹得家翻宅乱；如今一句话，又把这一个弄的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            死去活来，可不说的“三生石上五百年前结下的”么？”说着，两个悄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            悄的抿着嘴笑了一回。雪雁又道：“幸亏好了！咱们明儿再别说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。就是宝玉娶了别的人家儿的姑娘，我亲见他在那里结亲，我也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            再不露一句话了。&#34;紫鹃笑道：“这就是了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不但紫和雪雁在私下里讲究，就是众人也都知道黛玉的病
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也病的奇怪，好也好得奇怪，三三两两，唧唧议论着。不多几
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            时，连凤姐儿也知道了，邢、王二夫人也有些疑惑，倒是贾母略猜着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了八九。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那时正值邢、王二夫人、凤姐等在贾母房中说闲话，说起黛玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的病来。贾母道：“我正要告诉你们。宝玉和林丫头是从小儿在一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            处的，我只说小孩子们，怕什么？以后时常听得林丫头忽然病，忽
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            然好，都为有了些知觉了。所以我想他们若尽着搁在一块儿，毕竟
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不成体统。你们怎么说？”王夫人听了，便呆了一呆，只得答应道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “林姑娘是个有心计儿的。室于宝玉，呆头呆脑，不避嫌疑是有的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看起外面，却还都是个小孩儿形像。此时若忽然或把那一个分出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            园外，不是倒露了什么痕迹了么？古来说的：“男大须婚，女大须
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            嫁。老太太想，倒是赶着把他们的事办办也罢了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母皱了一皱眉，说道：“林丫头的乖僻，虽也是他的好处，我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的心里不把林丫头配他，也是为这点子；况且林丫头这样虚弱，恐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不是有寿的。只是宝丫头最妥。”王夫人道：“不但老太太这么想，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我们也是这么想。但林姑娘也得给他说了人家儿才好，不然，女孩
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿家长大了，那个没有心事？尚或真与宝玉有些私心，若知道宝玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            定下宝丫头，那倒不成事了。”贾母道：“自然先给宝玉娶了亲，然后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            给林丫头说人家。再没有先是外人，后是自已的。况且林丫头年
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            纪到底比宝玉小两岁。依你们这么说，倒是宝玉定亲的话，不许叫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他知道倒罢了。”凤姐便盼时众丫头们道：“你们听见了？宝二爷定
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亲的话，不许混吵曦。若有多嘴的，提防着他的皮！&#34;贾母又向凤姐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“凤哥儿，你如今自从身上不大好，也不大管园里的事了。我告
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            诉你，须得经点儿心。不但这个，就像前年那些人喝酒耍钱，都不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是事。你还精细些，少不得多分点心儿，严紧严紧他们才好。况且
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中国古英文学名药
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我看他们也就还服你些。”凤姐答应了。娘儿们又说了一回话，方
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            各自散了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            从此，凤姐常到园中照料。一日，刚走到大观园，到了紫菱洲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            畔，只听见一个老婆子在那里曦。凤姐走到跟前，那婆子才瞧见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，早垂手侍立，口里请了安。凤姐道：“你在这里闹什么？”婆子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“蒙奶奶们派我在这里看守花果，我也没有差错，不料邢姑娘的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丫头说我们是贼。&#34;凤姐道：“为什么呢？”婆子道：“昨儿我们家的黑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿跟着我到这里顽了一回，他不知道，又往邢姑娘那里去瞧了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瞧，我就叫他回去了。今儿早起，听见他们丫头说，丢了东西了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我问他丢了什么，他就问起我来了。”风姐道：“问了你一声，也犯不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着生气呀。”婆子道：“这里园子，到底是奶奶家里的，并不是他们家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里的。我们都是奶奶派的，贼名儿怎么敢认呢？”凤姐照脸蟀了-
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            口，厉声道：“你少在我跟前崂吻的！你在这里照看，姑娘丢了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            东西，你们就该问哪！怎么说出这些没道理的话来？把老林叫了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来！摔他出去！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丫头们答应了。只见邢岫烟赶忙出来，迎着凤姐陪笑道：“这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            使不得，没有的事。事情早过去了。”凤姐道：“姑娘，不是这个话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倒不讲事情，这名分上太岂有此理了！”烟见婆子跪在地下告饶，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便忙请凤姐到里边去坐。凤姐道：“他们这种人，我知道他，除了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我，其余都没上没下的了。”岫烟再三替他讨饶，只说自已的丫头不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好。凤姐道：“我看着邢姑娘的分上，饶你这一次！”婆子才起来磕
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了头，又给岫烟磕了头，才出去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里二人让了坐，凤姐笑问道：“你丢了什么东西了？”烟笑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“没有什么要紧的，是一件红小袄儿，已经旧了的。我原叫他们
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            找，找不着就罢了。这小丫头不懂事，问了那婆子一声，那婆子自
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            然不依了。这都是小丫头糊涂不懂事，我也骂了几句。已经过去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，不必再提了。”凤姐把岫烟内外一瞧，看见虽有些皮棉衣裳，已
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是半新不旧的，未必能暖和，他的被窝多半是薄的。至于房中桌上
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            摆设的东西，就是老太太拿来的，却一些不动，收拾的干干净净。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐心上便很爱敬他，说道：“件衣裳，原不要紧，这时候冷，又是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贴身的，怎么就不问一声儿呢？这撒野的奴才，了不得了！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说了一回，凤姐出来，各处去坐了一坐，就回去了。到了自己
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            房中，叫平儿取了一件大红洋的小袄儿，一件松花色绫子一抖珠
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿的小皮袄，一条宝蓝盘锦镶花线裙，一件佛青银鼠褂子，包好叫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人送去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那时烟被那老婆子噪了一场，虽有凤姐来压住，心上终是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不定，想起“许多姊妹们在这里，没有一个下人敢得罪他们的。独
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自我这里，他们言三语四，刚刚凤姐来碰见。”想来想去，终是没意
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            思，又说不出来。正在吞声饮泣，看见凤姐那边的丰儿送衣裳过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来。岫烟一看，决不肯受。丰儿道：“承奶奶时我说：“姑娘要嫌
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是旧衣裳，将来送新的来”。”岫烟笑谢道：“奶奶的好意。只是因我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丢了衣裳，他就拿来，我断不敢受。拿回去，千万谢你们奶奶！承
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你奶奶的情，我算领了。”倒拿个荷包给了丰儿。那丰儿只得拿了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去了。不多时，又见平儿同着丰儿过来，烟忙迎着问了好，让了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            坐。平儿笑说道：“我们奶奶说，姑娘特外道的了不得。”岫烟道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “不是外道，实在不过意。”平儿道：“奶奶说姑娘要不收这衣，不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是嫌太旧，就是瞧不起我们奶奶，刚才说了，我要拿回去，奶奶不依
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我呢。”岫烟红着脸笑谢道：“这样说了，叫我不敢不收。”又让了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回茶。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            平儿和丰儿回去，将到凤姐那边，碰见薛家差来的一个老婆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子，接着问好。平儿便问道：“你那里去的？”婆子道：“那边太太、姑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            娘叫我来请各位太太、奶奶、姑娘们的安。我才刚在奶奶前问起姑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            娘来，说姑娘到园中去了。可是从邢姑娘那里来么？”平儿道：“你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            叫人感念！”平儿笑了一笑，说道：“你回来坐着罢。”婆子道：“我还
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有事，改日再过来瞧姑娘罢。”说着走了。平儿回来，回复了凤姐，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中国古典文学务花
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不在话下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且说薛姨妈家中被金桂搅得翻江倒海，看见婆子回来，说起岫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            烟的事，宝钗母女二人不免滴下泪来。宝钗道：“都为哥哥不在家，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            所以叫邢姑娘多吃几天苦。如今还亏凤姐姐不错。咱们底下也得
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            留心，到底是咱们家里人。说着，只见薛进来说道：“大哥哥这几
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            年在外头相与的，都是些什么人！连一个正经的也没有。来一起
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子，都是些狐群狗党！我看他们那里是不放心，不过将来探探消息
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿罢。这两天都被我赶出去了。以后盼了门上，不许传进这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            种人来。&#34;薛姨妈道：“又是蒋玉函那些人哪？”薛蝌道：“蒋玉函却倒
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            没来，倒是别人。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            薛姨妈听了薛蝌的话，不觉又伤起心来，说道：“我虽有儿，如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今就像没有的了。就是上司准了，也是个废人。你虽是我侄儿，我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看你还比你哥哥明白些，我这后辈子全靠你了。你自已从今后要
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            学好。再者，你聘下的媳妇儿，家道不比往时了。人家的女孩儿出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            门子不是容易，再没别的想头，只盼着女婿能干，他就有日子过了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            若邢丫头也像这个东西.··.”说着，把手往里头指道：“我也不说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。邢丫头实在是个有廉耻有心计儿的，又守得贫，耐得富。只是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等咱们的事过去了，早些把你们的正经事完结了，也了我一宗心
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            事。”薛蝌道：“琴妹妹还没有出门子，这倒是太太烦心的件事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            至于这个，可算什么呢！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大家又说了一回闲话，薛蝌回到自已屋里，吃了晚饭，想起邢
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            岫烟住在贾府园中，终是寄人篇下；况且又穷，日用起居不想可知。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            况兼当初一路同来，模样儿，性格儿都知道的。可知天意不均：如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            夏金桂这种人，偏叫他有钱，娇养得这般泼辣；邢岫烟这种人偏教
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他这样受苦。阎王判命的时候，不知如何判法的？想到闷来，也想 PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            吟诗一首，写出来出出胸中的闷气；又苦自已没有工夫，只得混写
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            蛟龙失水似枯鱼，俩地情怀感索居。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            同在泥涂多受苦，不知何日向清虚！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            写毕，看了一回，意欲拿来粘在壁上，又不好意思，自己沉吟
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“不要被人看见笑话！”又念了一遍，道：“管他呢！左右粘上自
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            已看着解闷儿罢。又看了一回，到底不好，拿来夹在书里。又想：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “自己年纪可也不小了，家中又碰见这样飞灾横祸，不知何日了局。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            致使幽闺弱质，弄得这般凄凉寂寞！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正在那里想时，只见宝蟾推门进来，拿着一个盒子，笑嘻嘻放
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            在桌上。薛蝌站起来让坐。宝蟾笑着向薛道：“这是四碟果子，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一小壶儿酒。大奶奶叫给二爷送来的。”薛蝌陪笑道：“大奶奶费
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心！但是叫小丫头们送来就完了，怎么又劳动姐姐呢？”宝蟾道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “好说。自家人，二爷何必说这些套话？再者，我们大爷这件事，道
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            实①叫二爷操心。大奶奶久已要亲自弄点什么儿谢二爷，又怕别
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人多心。二爷是知道的，咱们家里都是言合意不合。送点子东西
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            没要紧，倒没的惹人七嘴八舌的讲究。所以今儿些微的弄了一两
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            样果子，一壶酒，叫我亲自悄悄儿的送来。说着，又笑瞅了薛蝌一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眼，道：“明儿二爷再别说这些话，叫人听着怪不好意思的。我们不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过也是底下的人，伏侍的着大爷，就伏侍的着二爷，这有何妨呢？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            薛蝌一则秉性忠厚，二则到底年轻，只是向来不见金桂和宝蟾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如此相待，心中想到刚才宝蟾说为薛蟠之事，也是情理，因说道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “果子留下罢，这个酒儿，姐姐只管拿回去。我向来的酒上实在很
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有限，挤住了，偶然喝一钟；平白无事，是不能喝的。难道大奶奶和
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐姐还不知道么？”宝蟾道：“别的我作得主，独这一件事，我可不敢
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            应。大奶奶的脾气儿，二爷是知道的。我拿回去，不说二爷不喝，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倒要说我不尽心了。”薛蝌没法，只得留下。宝蟾方才要走，又到门
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            口往外看看，回过头来向着薛蝌一笑，又用手指着里面说道：“他还
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①道实一一程甲本作“实在”。此疑为误排。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只怕要来亲自给你道乏呢。”薛蝌不知何意，反倒仙仙的起来；因说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“姐姐替我谢大奶奶罢。天气寒，看凉着。再者，自已叔嫂也不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            必拘这些个礼。”宝蟾不答，笑着走了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            薛蝌始而以为金桂为薛蟠之事，或者真是不过意，备此酒果给
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自己道乏，也是有的。及见了宝蟾这种鬼鬼崇崇、不尴不尬的光
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            景，也觉有几分，却自已回心想：“他到底是嫂子的名分，那里就
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有别的讲究①了呢？或者宝蟾不老成，自已不好意思怎么着，却
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            指着金桂的名儿，也未可知。然而到底是哥哥的屋里人，也不好
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ..”忽又一转念：“那金桂素性为人，毫无闺阁理法，况且有时高
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            兴，打扮的妖调非常，自以为美，又怎么不是怀着坏心呢？不然，就
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是他和琴妹妹也有了什么不对的地方儿，所以设下这个毒法儿，要
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            把我拉在浑水里，弄一个不清不白的名儿，也未可知？&#34;想到这里，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            索性倒怕起来了。正在不得主意的时候，忽听窗外“扑嘛”的笑了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一声，把薛蝌倒吓了一跳。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未知是谁，下回分解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            讲究一 一名堂，花样。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

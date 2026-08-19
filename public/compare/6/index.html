@@ -1,0 +1,4847 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第6回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="6">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/5" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" >第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" >第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" >第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" selected>第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" >第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" >第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" >第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" >第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" >第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" >第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/7" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="gong" data-label="脂评汇校" checked>
+          脂评汇校
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengjia" data-label="程甲本" checked>
+          程甲本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi" data-label="程乙本" checked>
+          程乙本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi_ocr" data-label="程乙本OCR" checked>
+          程乙本OCR
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="fax_chengyi" data-label="程乙本影印" checked>
+          程乙本影印
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/6">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="gong">
+      <div class="compare-col-head">
+        <span class="badge">脂评汇校</span>
+        <span class="col-desc">脂评汇校本（庚辰本系为主，参校诸脂本，含脂批）</span>
+        <span>第6回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾宝玉初试云雨情 刘姥姥一进荣国府</h3>
+        
+        
+        <p class="col-para">
+          
+            甲：宝玉、袭人亦大家常事耳，写得是已全领警幻意淫之训。此回借刘妪，却是写阿凤正传，并非泛文，且伏“二进”“三进”及巧姐之归着。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此回刘妪一进荣国府，用周瑞家的，又过下回无痕，是无一笔写一人文字之笔。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            风流真假一般看，借贷亲疏触眼酸。总是幻情无了处，银灯挑尽泪漫漫。题曰：朝扣富儿门，富儿犹未足。虽无千金酬，嗟彼胜骨肉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说秦氏因听见宝玉从梦中唤他的乳名，心中自是纳闷，又不好细问。彼时宝玉迷迷惑惑，若有所失。众人忙端上桂圆汤来，呷了两口，遂起身整衣。袭人伸手与他系裤带时，不觉伸手至大腿处，只觉冰凉一片沾湿。唬的忙退出手来，问是怎么了。宝玉红涨了脸，把他的手一捻。袭人本是个聪明女子，年纪本又比宝玉大两岁，近来也渐通人事，今见宝玉如此光景，心中便觉察一半了，不觉也羞的红涨了脸面，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">存身分。</span>
+            
+          
+            不敢再问。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">既少通人事，无心者则再不复问矣；既问，则无限幽思，皆在于伏身之一笑，所以必当有偷试之一番。</span>
+            
+          
+            行文轻巧，皆出于自然，毫无一些勉强。妙极！仍旧理好衣裳，遂至贾母处来，胡乱吃毕了晚饭，过这边来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            袭人忙趁众奶娘丫鬟不在旁时，另取出一件中衣来与宝玉换上。宝玉含羞央告道：“好姐姐，千万别告诉人。”袭人亦含羞笑问道：“你梦见什么故事了？
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">是必当问者。</span>
+            
+          
+            若不问则下文涉于唐突。是那里流出来的那些脏东西？”宝玉道：“一言难尽。”说着便把梦中之事细说与袭人听了，然后说至警幻所授云雨之情，羞的袭人掩面伏身而笑。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">试想。</span>
+            
+          
+            宝玉亦素喜袭人柔媚娇俏，遂强袭人同领警幻所训云雨之事。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">数句文完一回提纲文字。</span>
+            
+          
+            袭人素知贾母已将自己与了宝玉的，今便如此，亦不为越礼，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">写出袭人身份。</span>
+            
+          
+            遂和宝玉偷试一番，幸得无人撞见。自此宝玉视袭人更比别个不同，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">伏下晴雯。</span>
+            
+          
+            袭人待宝玉更为尽心。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">一段小儿女之态，可谓追魂摄魄之笔。</span>
+            
+          
+            暂且别无话说。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">一句接住上回“红楼梦”大篇文字，另起本回正文。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            按荣府中一宅人合算起来，人口虽不多，从上至下也有三四百丁，虽事不多，一天也有一二十件，竟如乱麻一般，并无个头绪可作纲领。正寻思从那一件事自那一个人写起方妙，恰好忽从千里之外，芥豆之微，小小一个人家，因与荣府略有些瓜葛，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">略有些瓜葛，是数十回后之正脉也。</span>
+            
+          
+            真千里伏线。这日正往荣府中来，因此便就此一家说来，倒还是头绪。你道这一家姓甚名谁，又与荣府有甚瓜葛？诸公若嫌琐碎粗鄙呢，则快掷下此书，另觅好书去醒目；
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">加杂世态，巧伏下文。</span>
+            
+          
+            若谓聊可破闷时，待蠢物
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">妙谦，是石头口角。</span>
+            
+          
+            逐细言来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方才所说的这小小之家，乃本地人氏，姓王，祖上曾作过小小的一个京官，昔年与凤姐之祖王夫人之父认识。因贪王家的势利，便连了宗认作侄儿。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">与贾雨村遥遥相对。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">可怜。</span>
+            
+          
+            那时只有王夫人之大兄凤姐之父
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">两呼两起，不过欲观者自醒。</span>
+            
+          
+            与王夫人随在京中的，知有此一门连宗之族，余者皆不认识。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">强认亲的榜样。</span>
+            
+          
+            目今其祖已故，只有一个儿子，名唤王成，因家业萧条，仍搬出城外原乡第 43 页中住去了。王成新近亦因病故，只有其子，小名狗儿。狗儿亦生一子，小名板儿，嫡妻刘氏，又生一女，名唤青儿。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">《石头记》中公勋世宦之家以及草莽庸俗之族，无所不有，自能各得其妙。</span>
+            
+          
+            一家四口，仍以务农为业，因狗儿白日间又作些生计，刘氏又操井臼等事，青板姊妹两个无人看管，狗儿遂将岳母刘姥姥
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">音老，出《谐声字笺》。</span>
+            
+          
+            称呼毕肖。接来一处过活。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">总是用过近法。</span>
+            
+          
+            这刘姥姥乃是个积年的老寡妇，膝下又无儿女，只靠两亩薄田度日。今者女婿接来养活，岂不愿意，遂一心一计，帮趁着女儿女婿过活起来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因这年秋尽冬初，天气冷将上来，家中冬事未办，狗儿未免心中烦虑，吃了几杯闷酒，在家闲寻气恼，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">病此病人不少，请来看狗儿。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">贫苦人多有此等景象。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘氏也不敢顶撞。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">自“红楼梦”一回至此，则珍馐中之虀耳，好看煞！</span>
+            
+          
+            因此刘姥姥看不过，乃劝道：“姑爷，你别嗔着我多嘴。咱们村庄人，那一个不是老老诚诚的，守多大碗儿吃多大的饭。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">能两亩薄田度日，方说的出来。</span>
+            
+          
+            你皆因年小的时候，托着你那老的福，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">妙称，何肖之至！</span>
+            
+          
+            吃喝惯了，如今所以把持不住。有了钱就顾头不顾尾，没了钱就瞎生气，成个什么男子汉大丈夫呢！
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此口气自何处得来？</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">为纨绔下针，却先从此等小处写来。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">英雄失足千古同概，笑煞天下一切。</span>
+            
+          
+            如今咱们虽离城住着，终是天子脚下。这长安城中，遍地都是钱，只可惜没人会去拿去罢了。在家跳蹋会子也不中用。”狗儿听说，便急道：“你老只会炕头儿上混说，难道叫我打劫偷去不成？”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">古人有错用盗字之说，的是此句章本。</span>
+            
+          
+            刘姥姥道：“谁叫你偷去呢。也到底想法儿大家裁度，不然那银子钱自己跑到咱家来不成？”狗儿冷笑道：“有法儿还等到这会子呢。我又没有收税的亲戚，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">骂死。</span>
+            
+          
+            作官的朋友，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">骂死。</span>
+            
+          
+            有什么法子可想的？便有，也只怕他们未必来理我们呢！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥道：“这倒不然。谋事在人，成事在天。咱们谋到了，看菩萨的保佑，有些机会，也未可知。我倒替你们想出一个机会来。当日你们原是和金陵王家
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">四字便抵一篇世家传。</span>
+            
+          
+            连过宗的，二十年前，他们看承你们还好，如今自然是你们拉硬屎，不肯去亲近他，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">天下事无有不可为者。</span>
+            
+          
+            总因打不破，若打破时何事不能？请看刘姥姥一篇议论，便应解得些个才是。故疏远起来。想当初我和女儿还去过一遭。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">补前文之未到处。</span>
+            
+          
+            他们家的二小姐着实响快，会待人，倒不拿大。如今现是荣国府贾二老爷的夫人。听得说，如今上了年纪，越发怜贫恤老，最爱斋僧敬道，舍米舍钱的。如今王府虽升了边任，只怕这二姑太太还认得咱们。你何不去走动走动，或者他念旧，有些好处，也未可知。要是他发一点好心，拔一根寒毛比咱们的腰还粗呢。”刘氏一旁接口道：“你老虽说的是，但只你我这样个嘴脸，怎样好到他门上去的。先不先，他们那些门上的人也未必肯去通信。没的去打嘴现世。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">“打嘴现世”等字，误尽许多苍生，也能成全多少事体。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            谁知狗儿利名心最重，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">调侃语。</span>
+            
+          
+            听如此一说，心下便有些活动起来。又听他妻子这话，便笑接道：“姥姥既如此说，况且当年你又见过这姑太太一次，何不你老人家明日就走一趟，先试试风头再说。”刘姥姥道：“嗳呦呦！
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">口声如闻。</span>
+            
+          
+            可是说的，‘侯门深似海’，我是个什么东西，他家人又不认得我，我去了也是白去的。”狗儿笑道：“不妨，我教你老人家一个法子：你竟带了外孙子板儿，先去找陪房周瑞，若见了他，就有些意思了。这周瑞先时曾和我父亲交过一件事，我们极好的。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">欲赴豪门，必先交其仆。</span>
+            
+          
+            写来一叹。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">画出当日品行。</span>
+            
+          
+            刘姥姥道：“我也知道他的。只是许多时不走动，知道他如今是怎样。这也说不得了，你又是个男人，又这样个嘴脸，自然去不得，我们姑娘年轻媳妇子，也难卖头卖脚的，倒还是舍着我这付老脸去碰一碰。果然有些好处，大家都有益，便是没银子来，我也到那公府侯门见一见世面，也不枉我一生。”说毕，大家笑了一第 44 页回。当晚计议已定。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日天未明，刘姥姥便起来梳洗了，又将板儿教训了几句。那板儿才五六岁的孩子，一无所知，听见刘姥姥带他进城逛去，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">音光，去声。</span>
+            
+          
+            游也。出《谐声字笺》。便喜的无不应承。于是刘姥姥带他进城，找至宁荣街。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">街名。</span>
+            
+          
+            本地风光，妙！来至荣府大门石狮子前，只见簇簇轿马，刘姥姥便不敢过去，且掸了掸衣服，又教了板儿几句话，然后蹭
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“蹭”字神理。</span>
+            
+          
+            到角门前。只见几个挺胸叠肚指手画脚的人，坐在大板凳上，说东谈西呢。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">不知如何想来，又为侯门三等豪奴写照。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">世家奴仆个个皆然，形容逼真。</span>
+            
+          
+            刘姥姥只得蹭上来问：“太爷们纳福。”众人打量了他一会，便问“那里来的？”刘姥姥陪笑道：“我找太太的陪房周大爷的，烦那位太爷替我请他老出来。”那些人听了，都不瞅睬，半日方说道：“你远远的在那墙角下等着，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">故套。</span>
+            
+          
+            一会子他们家有人就出来的。”内中有一老年人说道：“不要误他的事，何苦耍他。”因向刘姥姥道：“那周大爷已往南边去了。他在后一带住着，他娘子却在家。你要找时，从这边绕到后街上后门上去问就是了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">有年纪人诚厚，亦是自然之理。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">转换法。</span>
+            
+          
+            写门上豪奴不能尽是规矩，故用转换法则不强硬，而笔气自顺。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥听了谢过，遂携了板儿，绕到后门上。只见门前歇着些生意担子，也有卖吃的，也有卖顽耍物件的，闹吵吵三二十个小孩子在那里厮闹。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">如何想来？</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            合眼如见。刘姥姥便拉住一个道：“我问哥儿一声，有个周大娘可在家么？”孩子们道：“那个周大娘？我们这里周大娘有三个呢，还有两个周奶奶，不知是那一行当的？”刘姥姥道：“是太太的陪房周瑞。”孩子道：“这个容易，你跟我来。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着，跳跳蹿蹿的引着刘姥姥进了后门，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">因女眷，又是后门，故容易引入。</span>
+            
+          
+            至一院墙边，指与刘姥姥道：“这就是他家。”又叫道：“周大娘，有个老奶奶来找你呢，我带了来了。”周瑞家的在内听说，忙迎了出来，问：“是那位？”刘姥姥忙迎上来问道：“好呀，周嫂子！”周瑞家的认了半日，方笑道：“刘姥姥，你好呀！你说说，能几年，我就忘了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">如此口角，从何处出来？</span>
+            
+          
+            请家里来坐罢。”刘姥姥一壁里走着，一壁笑说道：“你老是贵人多忘事，那里还记得我们呢。”说着，来至房中。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的命雇的小丫头倒上茶来吃着，周瑞家的又问板儿道：“你都长这么大了！”又问些别后闲话。又问刘姥姥：“今日还是路过，还是特来的？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">问的有情理。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">刘姥姥此是一团要紧事在心，有问不得不答，递转递进，不敢陟然看之，令人可怜。</span>
+            
+          
+            而大英雄亦有若此者，所谓“欲图大事，不拘小节。”刘姥姥便说：“原是特来瞧瞧嫂子你，二则也请请姑太太的安。若可以领我见一见更好，若不能，便借重嫂子转致意罢了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">刘婆亦善于权变应酬矣。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的听了，便已猜着几分来意。只因昔年他丈夫周瑞争买田地一事，其中多得狗儿之力，今见刘姥姥如此而来，心中难却其意，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">在今世，周瑞夫妇算是个怀情不忘的正人。</span>
+            
+          
+            二则也要显弄自己的体面。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">“也要显弄”句为后文作地步，也陪房本心本意实事。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">实有此等情理。</span>
+            
+          
+            听如此说，便笑说道：“姥姥你放心，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">自是有宠人声口。</span>
+            
+          
+            大远的诚心诚意来了，岂有个不教你见个真佛去的呢？
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">好口角。</span>
+            
+          
+            论理，人来客至回话，却不与我相干。我们这里都是各占一样儿：
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">略将荣府中带一带。</span>
+            
+          
+            我们男的只管春秋两季地租子，闲时只带着小爷们出门子就完了，我只管跟太太奶奶们出门的事。皆因你原是太太的亲戚，又拿我当个人，投奔了我来，我就破个例，给你通个信去。但只一件，姥姥有所不知，我们这里又不比五年前了。如今太太竟不大管事，都是琏二奶奶管家了。你道这琏二奶奶是谁？就是太太的内侄女，当日大舅老爷的女儿，小名凤哥的。”刘姥姥听了，罕问道：“原第 45 页来是他！怪道呢，我当日就说他不错呢。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">我亦说不错。</span>
+            
+          
+            这等说来，我今儿还得见他了。”周瑞家的道：“这自然的。如今太太事多心烦，有客来了，略可推得去的就推过去了，都是凤姑娘周旋迎待。今儿宁可不会太太，倒要见他一面，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">礼势必然。</span>
+            
+          
+            才不枉这里来一遭。”刘姥姥道：“阿弥陀佛！全仗嫂子方便了。”周瑞家的道：“说那里话。俗语说的：‘与人方便，自己方便。’不过用我说一句话罢了，害着我什么。”说着，便叫小丫头到倒厅上
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">一丝不乱。</span>
+            
+          
+            悄悄的打听打听，老太太屋里摆了饭了没有。小丫头去了。这里二人又说些闲话。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">急忙中偏不就进去，又添一番议论，从中又伏下多少线索，方见得大家势派，出入不易，方见得周瑞家的处事详细，即至后文，放笔写凤姐，亦不唐突，仍用冷子兴说荣、宁旧笔法。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥因说：“这凤姑娘今年大还不过二十岁罢了，就这等有本事，当这样的家，可是难得的。”周瑞家的听了道：“我的姥姥，告诉不得你呢。这位凤姑娘年纪虽小，行事却比世人都大呢。如今出挑的美人一样的模样儿，少说些有一万个心眼子。再要赌口齿，十个会说话的男人也说他不过。回来你见了就信了。就只一件，待下人未免太严些个。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">略点一句，伏下后文。</span>
+            
+          
+            说着，只见小丫头回来说：“老太太屋里已摆完了饭了，二奶奶在太太屋里呢。”周瑞家的听了，连忙起身，催着刘姥姥说：“快走，快走。这一下来他吃饭是个空子，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">非身临其境者不知。</span>
+            
+          
+            咱们先赶着去。若迟一步，回事的人也多了，难说话。再歇了中觉，越发没了时候了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">写出阿凤勤劳冗杂，并骄矜珍贵等事来。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">写阿凤勤劳等事，然却是虚笔，故于后文不犯。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">有曰：富贵不还乡，如衣锦夜行。</span>
+            
+          
+            今日周瑞家的得遇刘姥姥，实可谓锦衣不夜行者。说着一齐下了炕，打扫打扫衣服，又教了板儿几句话，随着周瑞家的，逶迤往贾琏的住处来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            先到了倒厅，周瑞家的将刘姥姥安插在那里略等一等。自己先过了影壁，进了院门，知凤姐未下来，先找着凤姐的一个心腹通房大丫头，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">着眼。</span>
+            
+          
+            这也是书中一要紧人。《红楼梦》曲内虽未见有名，想亦在副册内者也。名唤平儿的。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">名字真极，文雅则假。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">三等奴仆，第次不乱。</span>
+            
+          
+            周瑞家的先将刘姥姥起初来历说明，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">细！</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盖平儿原不知有此一人耳。又说：“今日大远的特来请安。当日太太是常会的，今日不可不见，所以我带了他进来了。等奶奶下来，我细细回明，奶奶想也不责备我莽撞的。”平儿听了，便作了主意：
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">各有各自的身分。</span>
+            
+          
+            “叫他们进来，先在这里坐着就是了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">暗透平儿身份。</span>
+            
+          
+            周瑞家的听了，方出去引他两个进入院来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上了正房台矶，小丫头打起猩红毡帘，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">是冬日。</span>
+            
+          
+            才入堂屋，只闻一阵香扑了脸来，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">是刘姥姥鼻中。</span>
+            
+          
+            竟不辨是何气味，身子如在云端里一般。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">是刘姥姥身子。</span>
+            
+          
+            满屋中之物都耀眼争光的，使人头悬目眩。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">是刘姥姥头目。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">是写府第奢华，还是写刘姥姥粗夯？</span>
+            
+          
+            大抵村舍人家见此等气象，未有不破胆惊心，迷魄醉魂者。刘姥姥此时惟点头咂嘴念佛而已。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">六字尽矣，如何想来。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">刘姥姥犹能念佛，已自出人头地矣。</span>
+            
+          
+            于是来至东边这间屋内，乃是贾琏的女儿大姐儿睡觉之所。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">记清。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">不知不觉先到大姐寝室，岂非有缘？</span>
+            
+          
+            平儿站在炕沿边，打量了刘姥姥两眼，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">写豪门侍儿。</span>
+            
+          
+            只得
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">字法。</span>
+            
+          
+            问个好让坐。刘姥姥见平儿遍身绫罗，插金带银，花容玉貌的，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">从刘姥姥心中目中略一写，非平儿正传。</span>
+            
+          
+            便当是凤姐儿了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">毕肖。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">的真有是情理。</span>
+            
+          
+            才要称姑奶奶，忽见周瑞家的称他是平姑娘，又见平儿赶着周瑞家的称周大嫂，方知不过是个有些体面的丫头了。于是让刘姥姥和板儿上了炕，平儿和周瑞家的对面坐在炕沿上，小丫头子斟了茶来吃茶。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥只听见“咯当”“咯当”的响声，大有似乎打打箩柜筛面的一般，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">从刘姥姥心中意中幻拟出奇怪文字。</span>
+            
+          
+            不免东瞧西望的。忽见堂屋中柱子上挂着一个匣子，底下又坠着一个秤砣般一物，却不住的乱幌。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">从刘姥姥心中目中设譬拟想，真是镜第 46 页花水月。</span>
+            
+          
+            刘姥姥心中想着：“这是什么爱物儿？有甚用呢？”正呆时，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">三字有劲。</span>
+            
+          
+            只听得“当”的一声，又若金钟铜磬一般，不防倒唬的一展眼。接着又是一连八九下。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写得出。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">细！</span>
+            
+          
+            是巳时。方欲问时，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">刘姥姥不认得，偏不令问明。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只见小丫头子们齐乱跑，说：“奶奶下来了。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">即以“奶奶下来了”之结局，是画云龙妙手。</span>
+            
+          
+            周瑞家的与平儿忙起身，命刘姥姥：“只管等着，是时候我们来请你。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着，都迎出去了。刘姥姥屏声侧耳默候。只听远远有人笑声，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写得侍仆妇。</span>
+            
+          
+            约有一二十妇人，衣裙窸窣，渐入堂屋，往那边屋内去了。又见两三个妇人，都捧着大漆捧盒，进这边来等候。听得那边说了声“摆饭”，渐渐的人才散出，只有伺候端菜的几个人。半日鸦雀不闻之后，忽见二人抬了一张炕桌来，放在这边炕上，桌上碗盘森列，仍是满满的鱼肉在内，不过略动了几样。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">白描入神。</span>
+            
+          
+            板儿一见了，便吵着要肉吃，刘姥姥一巴掌打了他去。忽见周瑞家的笑嘻嘻走过来，招手儿叫他。刘姥姥会意，于是带了板儿下炕，至堂屋中，周瑞家的又和他唧咕了一会，方过这边屋里来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只见门外錾铜钩上悬着大红撒花软帘，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">从门外写来。</span>
+            
+          
+            南窗下是炕，炕上大红毡条，靠东边板壁立着一个锁子锦靠背与一个引枕，铺着金心绿闪缎大坐褥，旁边有雕漆痰盒。那凤姐儿家常带着秋板貂鼠昭君套，围着攒珠勒子，穿着桃红撒花袄，石青刻丝灰鼠披风，大红洋绉银鼠皮裙，粉光脂艳，端端正正坐在那里，
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">一段阿凤房室起居器皿家常正传，奢侈珍贵好奇货注脚，写来真是好看。</span>
+            
+          
+            手内拿着小铜火箸儿拨手炉内的灰。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">至平，实至奇，稗官中未见此笔。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">这一句是天然地设，非别文杜撰妄拟者。</span>
+            
+          
+            平儿站在炕沿边，捧着小小的一个填漆茶盘，盘内一个小盖钟。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐也不接茶，也不抬头，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">神情宛肖。</span>
+            
+          
+            只管拨手炉内的灰，慢慢的问道：“怎么还不请进来？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此等笔墨，真可谓追魂摄魄。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">“还不请进来”五字，写尽天下富贵人待穷亲戚的态度。</span>
+            
+          
+            一面说，一面抬身要茶时，只见周瑞家的已带了两个人在地下站着呢。这才忙欲起身，犹未起身，满面春风的问好，又嗔周瑞家的不早说。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥在地下已是拜了数拜，“问姑奶奶安。”凤姐忙说：“周姐姐，快搀住不拜罢。请坐。我年轻，不大认得，可也不知是什么辈数，不敢称呼。”周瑞家的忙回道：“这就是我才回的那姥姥了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">凤姐云“不敢称呼”，周瑞家的云“那个姥姥”。</span>
+            
+          
+            凡三四句一气读下，方是凤姐声口。凤姐点头。刘姥姥已在炕沿上坐了，板儿便躲在背后，百般的哄他出来作揖，他死也不肯。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐儿笑
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">二笑。</span>
+            
+          
+            道：“亲戚们不大走动，都疏远了。知道的呢，说你们弃厌我们，不肯常来，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">阿凤真真可畏可恶。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">偏会如此写来，教人爱煞！</span>
+            
+          
+            不知道的那起小人，还只当我们眼里没人似的。”刘姥姥忙念佛
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">如闻。</span>
+            
+          
+            道：“我们家道艰难，走不起，来了这里，没的给姑奶奶打嘴，就是管家爷们看着也不象。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐儿笑
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">三笑。</span>
+            
+          
+            道：“这话没的叫人恶心。不过借赖着祖父虚名，作个穷官儿，谁家有什么，不过是个旧日的空架子。俗语说，‘朝廷还有三门子穷亲戚’呢，何况你我。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">点醒多少势利鬼。</span>
+            
+          
+            说着，又问周瑞家的回了太太了没有。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一笔不肯落空，的是阿凤。</span>
+            
+          
+            周瑞家的道：“如今等奶奶的示下。”凤姐道：“你去瞧瞧，要是有人有事就罢，得闲儿呢就回，看怎么说。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">“看”之一字细极。</span>
+            
+          
+            周瑞家的答应着去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里凤姐叫人抓些果子与板儿吃，刚问些闲话时，就有家下许多媳妇管事的来回话。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">不落空家务事，却不实写。</span>
+            
+          
+            妙极！妙极！平儿回了，凤姐道：“我这里陪客呢，晚上再来回。若有很要紧的，你就带进来现办。”平儿出去了，一会进来说：“我都问了，没什么紧事，我就叫他们散了。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">能事者故自不凡。</span>
+            
+          
+            凤姐点第 47 页头。只见周瑞家的回来，向凤姐道：“太太说了，今日不得闲，二奶奶陪着便是一样。多谢费心想着。白来逛逛呢便罢，若有甚说的，只管告诉二奶奶，都是一样。”刘姥姥道：“也没甚说的，不过是来瞧瞧姑太太，姑奶奶，也是亲戚们的情分。”周瑞家的道：“没甚说的便罢，若有话，只管回二奶奶，是和太太一样的。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">周妇系真心为老妪也，可谓得方便。</span>
+            
+          
+            一面说，一面递眼色与刘姥姥。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">何如？</span>
+            
+          
+            余批不谬。刘姥姥会意，未语先飞红的脸，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">开口告人难。</span>
+            
+          
+            欲待不说，今日又所为何来？只得忍耻
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">老妪有忍耻之心，故后有招大姐之事。</span>
+            
+          
+            作者并非泛写，且为求亲靠友下一棒喝。说道：“论理今儿初次见姑奶奶，却不该说，只是大远的奔了你老这里来，也少不的说了。”刚说到这里，只听二门上小厮们回说：“东府里的小大爷进来了。”凤姐忙止刘姥姥：“不必说了。”一面便问：“你蓉大爷在那里呢？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-甲" title="甲侧">惯用此等横云断山法。</span>
+            
+          
+            只听一路靴子脚响，进来了一个十七八岁的少年，面目清秀，身材夭娇，轻裘宝带，美服华冠。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">如纨绔写照。</span>
+            
+          
+            刘姥姥此时坐不是，立不是，藏没处藏。凤姐笑道：“你只管坐着，这是我侄儿。”刘姥姥方扭扭捏捏在炕沿上坐了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾蓉笑道：“我父亲打发我来求婶子，说上回老舅太太给婶子的那架玻璃炕屏，明日请一个要紧的客，借了略摆一摆就送过来的。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">夹写凤姐好奖誉。</span>
+            
+          
+            凤姐道：“说迟了一日，昨儿已经给了人了。”贾蓉听着，嘻嘻的笑着，在炕沿上半跪道：“婶子若不借，又说我不会说话了，又挨一顿好打呢。婶子只当可怜侄儿罢。”凤姐笑
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">又一笑，凡五。</span>
+            
+          
+            道：“也没见我们王家的东西都是好的不成？一般你们那里放着那些东西，只是看不见我的才罢。”贾蓉笑道：“那里有这个好呢！只求开恩罢。”凤姐道：“若碰一点儿，你可仔细你的皮！”因命平儿拿了楼房的钥匙，传几个妥当人抬去。贾蓉喜的眉开眼笑，说：“我亲自带了人拿去，别由他们乱碰。”说着便起身出去了。这里凤姐忽又想起一事来，便向窗外叫：“蓉哥回来。”外面几个人接声说：“蓉大爷快回来。”贾蓉忙复身转来，垂手侍立，听何指示。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">传神之笔，写阿凤跃跃纸上。</span>
+            
+          
+            那凤姐只管慢慢的吃茶，出了半日的神，又笑道：“罢了，你且去罢。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">试想“且去”以前的丰态，其心思用意，作者无一笔不巧，无一事不丽。</span>
+            
+          
+            晚饭后你来再说罢。这会子有人，我也没精神了。”贾蓉应了一声，方慢慢的退去。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">妙！</span>
+            
+          
+            却是从刘姥姥身边目中写来。度至下回。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里刘姥姥心神方定，才又说道：“今日我带了你侄儿来，也不为别的，只因他老子娘在家里，连吃的都没有。如今天又冷了，越想没个派头儿，只得带了你侄儿奔了你老来。”说着又推板儿道：“你那爹在家怎么教你来？打发咱们作煞事来？只顾吃果子咧。”凤姐早已明白了，听他不会说话，因笑止道：
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">又一笑，凡六。</span>
+            
+          
+            自刘姥姥来凡笑五次，写得阿凤乖滑伶俐，合眼如立在前。若会说话之人便听他说了，阿凤厉害处正在此。问看官常有将挪移借贷已说明白了，彼仍推聋装哑，这人为阿凤若何？呵呵，一叹！“不必说了，我知道了。”因问周瑞家的：“这姥姥不知可用了早饭没有？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥忙说道：“一早就往这里赶咧，那里还有吃饭的工夫咧。”凤姐听说，忙命快传饭来。一时周瑞家的传了一桌客饭来，摆在东边屋内，过来带了刘姥姥和板儿过去吃饭。凤姐说道：“周姐姐，好生让着些儿，我不能陪了。”于是过东边房里来。又叫过周瑞家的去，问他才回了太太，说了些什么？周瑞家的道：“太太说，他们家原不是一家子，不过因出一姓，当年又与太老爷在一处作官，偶然连了宗的。这几年来也不大走动。当时他们来一遭，却也没空了他们。今儿既来了瞧瞧我们，是他的好意思，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">穷亲戚来看是“好意思”，余又自《石头记》中见了，叹叹！</span>
+            
+          
+            也不可简慢了他。便是有什么说的，叫奶奶裁度着就是了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">王夫人数第 48 页语令余几哭出。</span>
+            
+          
+            凤姐听了说道：“我说呢，既是一家子，我如何连影儿也不知道。”说话时，刘姥姥已吃毕了饭，拉了板儿过来，舚舌咂嘴的道谢。凤姐笑道：“且请坐下，听我告诉你老人家。方才的意思，我已知道了。若论亲戚之间，原该不待上门来就该有照应才是。但如今家内杂事太烦，太太渐上了年纪，一时想不到也是有的。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">点“不待上门就该有照应”数语，此亦于《石头记》再见话头。</span>
+            
+          
+            况是我近来接着管些事，都不知道这些亲戚们。二则外头看着虽是烈烈轰轰的，殊不知大有大的艰难去处，说与人也未必信罢。今儿你既老远的来了，又是头一次见我张口，怎好叫你空回去呢。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">也是《石头记》再见了，叹叹！</span>
+            
+          
+            可巧昨儿太太给我的丫头们做衣裳的二十两银子，我还没动呢，你若不嫌少，就暂且先拿了去罢。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">凤姐能事，在能体王夫人的心，托故周全，无过不及之弊。</span>
+            
+          
+            那刘姥姥先听见告艰难，只当是没有，心里便突突的，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">可怜可叹！</span>
+            
+          
+            后来听见给他二十两，喜的又浑身发痒起来，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">可怜可叹！</span>
+            
+          
+            说道：“嗳，我也是知道艰难的。但俗语说的，‘瘦死的骆驼比马大’，凭他怎样，你老拔根寒毛比我们的腰还粗呢！”周瑞家的见他说的粗鄙，只管使眼色止他。凤姐看见，笑而不睬，只命平儿把昨儿那包银子拿来，再拿一吊钱来，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这样常例亦再见。</span>
+            
+          
+            都送到刘姥姥的跟前。凤姐乃道：“这是二十两银子，暂且给这孩子做件冬衣罢。若不拿着，就真是怪我了。这钱雇车坐罢。改日无事，只管来逛逛，方是亲戚们的意思。天也晚了，也不虚留你们了，到家里该问好的问个好儿罢。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">口角春风，如闻其声。</span>
+            
+          
+            一面说，一面就站了起来。刘姥姥只管千恩万谢，拿了银钱，随了周瑞家的来至外面。周瑞家的方道：“我的娘啊！你见了他怎么倒不会说话了？开口就是‘你侄儿’。我说句不怕你恼的话，便是亲侄儿，也要说和软些。那蓉大爷才是他的正经侄儿呢，他怎么又跑出这么个侄儿来了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">与前“眼色”针对，可见文章中无一个闲字。</span>
+            
+          
+            为财势一哭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">不自量者每每有之，而能不露圭角，形诸无事，凤姐亦可谓人豪矣。</span>
+            
+          
+            刘姥姥笑道：“我的嫂子，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">赧颜如见。</span>
+            
+          
+            我见了他，心眼儿里爱还爱不过来，那里还说的上话来呢。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二人说着，又到周瑞家坐了片时。刘姥姥便要留下一块银子与周瑞家孩子们买果子吃，周瑞家的如何放在眼里，执意不肯。刘姥姥感谢不尽，仍从后门去了。正是：得意浓时易接济，受恩深处胜亲朋。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            甲：一进荣府一回，曲折顿挫，笔如游龙，且将豪华举止令观者已得大概，想作者应是心花欲开之候。借刘妪入阿凤正文，“送宫花”写“金玉初聚”为引，作者真笔似游龙，变幻难测，非细究至再三再四不记数，那能领会也？叹叹！
+            
+          
+            <span class="ann-inline ann-戚" title="戚总评">梦里风流，醒后风流，试问何真何假？</span>
+            
+          
+            刘姆乞谋，蓉儿借求，多少颠倒相酬。英雄反正用机筹，不是死生看守。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 49 页
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第6回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾宝玉初试云雨情 刘姥姥一进荣国府</h3>
+        
+        
+        <p class="col-para">
+          
+            題曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            朝叩富兒門，富兒猶未足。雖無千金酬，嗟彼勝骨肉。卻說秦氏因聽見寶玉從夢中喚他的乳名，心中自是納悶，又不好細問。彼時寶玉迷迷惑惑，若有所失。眾人忙端上桂圓湯來，呷了兩口，遂起身整衣。襲人伸手與他系褲帶時，不覺伸手至大腿處，只覺冰涼一片沾濕，唬的忙退出手來，問是怎麼了。寶玉紅漲了臉，把他的手一捻。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            襲人本是個聰明女子，年紀本又比寶玉大兩歲，近來也漸通人事，今見寶玉如此光景，心中便覺察一半了，不覺也羞的紅漲了臉面，不敢再問。仍舊理好衣裳，遂至賈母處來，胡亂吃畢了晚飯，過這邊來。襲人忙趁眾奶娘丫鬟不在旁時，另取出一件中衣來與寶玉換上。寶玉含羞央告道：「好姐姐，千萬別告訴人。」襲人亦含羞笑問道：「你夢見什麼故事了？是那裏流出來的那些髒東西？」寶玉道：「一言難盡。」說著便把夢中之事細說與襲人聽了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            然後說至警幻所授雲雨之情，羞的襲人掩面伏身而笑。寶玉亦素喜襲人柔媚嬌俏，遂強襲人同領警幻所訓雲雨之事。襲人素知賈母已將自己與了寶玉的，今便如此，亦不為越禮，遂和寶玉偷試一番，幸得無人撞見。自此寶玉視襲人更比別個不同，襲人待寶玉更為盡心。暫且別無話說。按榮府中一宅人合算起來，人口雖不多，從上至下也有三四百丁，雖事不多，一天也有一二十件，竟如亂麻一般，并無個頭緒可作綱領。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正尋思從那一件事自那一個人寫起方妙，恰好忽從千里之外，芥荳之微，小小一個人家，因與榮府略有些瓜葛，這日正往榮府中來，因此便就此一家說來，倒還是頭緒。你道這一家姓甚名誰，又與榮府有甚瓜葛？諸公若嫌瑣碎粗鄙呢，則快擲下此書，另覓好書去醒目；若謂聊可破悶時，待蠢物逐細言來。方才所說的這小小之家，乃本地人氏，姓王，祖上曾作過小小的一個京官，昔年與鳳姐之祖王夫人之父認識。因貪王家的勢利，便連了宗認作侄兒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那時只有王夫人之大兄鳳姐之父與王夫人隨在京中的，知有此一門連宗之族，餘者皆不認識。目今其祖已故，只有一個兒子，名喚王成，因家業蕭條，仍搬出城外原鄉中住去了。王成新近亦因病故，只有其子，小名狗兒。狗兒亦生一子，小名板兒，嫡妻劉氏，又生一女，名喚青兒。一家四口，仍以務農為業。因狗兒白日間又作些生計，劉氏又操井臼等事，青板姊妹兩個無人看管，狗兒遂將岳母劉姥姥接來一處過活。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這劉姥姥乃是個積年的老寡婦，膝下又無兒女，只靠兩畝薄田度日。今者女婿接來養活，豈不願意，遂一心一計，幫趁著女兒女婿過活起來。因這年秋盡冬初，天氣冷將上來，家中冬事未辦，狗兒未免心中煩慮，吃了幾杯悶酒，在家閒尋氣惱，劉氏也不敢頂撞。因此劉姥姥看不過，乃勸道：「姑爺，你別嗔著我多嘴。咱們村庄人，那一個不是老老誠誠的，守多大碗兒吃多大的飯。你皆因年小的時候，托著你那老家之福，吃喝慣了，如今所以把持不住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有了錢就顧頭不顧尾，沒了錢就瞎生氣，成個什麼男子漢大丈夫呢！如今咱們雖離城住著，終是天子腳下。這長安城中，遍地都是錢，只可惜沒人會去拿去罷了。在家跳蹋會子也不中用。」狗兒聽說，便急道：「你老只會炕頭兒上混說，難道叫我打劫偷去不成？」劉姥姥道：「誰叫你偷去呢。也到底想法兒大家裁度，不然那銀子錢自己跑到咱家來不成？」狗兒冷笑道：「有法兒還等到這會子呢。我又沒有收稅的親戚，作官的朋友，有什麼法子可想的？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便有，也只怕他們未必來理我們呢！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥道：「這倒不然。謀事在人，成事在天。咱們謀到了，看菩薩的保佑，有些机會，也未可知。我倒替你們想出一個机會來。當日你們原是和金陵王家連過宗的，二十年前，他們看承你們還好，如今自然是你們拉硬屎，不肯去親近他，故疏遠起來。想當初我和女兒還去過一遭。他們家的二小姐著實響快，會待人，倒不拿大。如今現是榮國府賈二老爺的夫人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            聽得說，如今上了年紀，越發怜貧恤老，最愛齋僧敬道，舍米舍錢的。如今王府雖升了邊任，只怕這二姑太太還認得咱們。你何不去走動走動，或者他念舊，有些好處，也未可知。要是他發一點好心，拔一根寒毛比咱們的腰還粗呢。」劉氏一旁接口道：「你老雖說的是，但只你我這樣個嘴臉，怎樣好到他門上去的。先不先，他們那些門上的人也未必肯去通信。沒的去打嘴現世。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            誰知狗兒利名心最重，聽如此一說，心下便有些活動起來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又聽他妻子這話，便笑接道：「姥姥既如此說，況且當年你又見過這姑太太一次，何不你老人家明日就走一趟，先試試風頭再說。」劉姥姥道：「噯喲喲！可是說的，『侯門深似海』，我是個什麼東西，他家人又不認得我，我去了也是白去的。」狗兒笑道：「不妨，我教你老人家一個法子：你竟帶了外孫子板兒，先去找陪房周瑞，若見了他，就有些意思了。這周瑞先時曾和我父親交過一件事，我們极好的。」劉姥姥道：「我也知道他的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只是許多時不走動，知道他如今是怎樣。這也說不得了，你又是個男人，又這樣個嘴臉，自然去不得，我們姑娘年輕媳婦子，也難賣頭賣腳的，倒還是舍著我這付老臉去碰一碰。果然有些好處，大家都有益，便是沒銀子來，我也到那公府侯門見一見世面，也不枉我一生。」說畢，大家笑了一回。當晚計議已定。次日天未明，劉姥姥便起來梳洗了，又將板兒教訓了幾句。那板兒才五六歲的孩子，一無所知，聽見劉姥姥帶他進城逛去，便喜的無不應承。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            於是劉姥姥帶他進城，找至宁榮街。來至榮府大門石獅子前，只見簇簇轎馬，劉姥姥便不敢過去，且撣了撣衣服，又教了板兒幾句話，然後蹭到角門前。只見幾個挺胸疊肚指手畫腳的人，坐在大板凳上，說東談西呢。劉姥姥只得蹭上來問：「太爺們納福。」眾人打量了他一會，便問」那裏來的？」劉姥姥陪笑道：「我找太太的陪房周大爺的，煩那位太爺替我請他老出來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」那些人聽了，都不瞅睬，半日方說道：「你遠遠的在那牆角下等著，一會子他們家有人就出來的。」內中有一老年人說道：「不要誤他的事，何苦耍他。」因向劉姥姥道：「那周大爺已往南邊去了。他在後一帶住著，他娘子卻在家。你要找時，從這邊繞到後街上後門上去問就是了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥聽了謝過，遂攜了板兒，繞到後門上。只見門前歇著些生意擔子，也有賣吃的，也有賣頑耍物件的，鬧吵吵三二十個小孩子在那裏廝鬧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥便拉住一個道：「我問哥兒一聲，有個周大娘可在家么？」孩子們道：「那個周大娘？我們這裏周大娘有三個呢，還有兩個周奶奶，不知是那一行當的？」劉姥姥道：「是太太的陪房周瑞。」孩子道：「這個容易，你跟我來。」說著，跳躥躥的引著劉姥姥進了後門，至一院牆邊，指與劉姥姥道：「這就是他家。」又叫道：「周大娘，有個老奶奶來找你呢，我帶了來了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的在內聽說，忙迎了出來，問：「是那位？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」劉姥姥忙迎上來問道：「好呀，周嫂子！」周瑞家的認了半日，方笑道：「劉姥姥，你好呀！你說說，能幾年，我就忘了。請家裏來坐罷。」劉姥姥一壁裏走著，一壁笑說道：「你老是貴人多忘事，那裏還記得我們呢。」說著，來至房中。周瑞家的命雇的小丫頭倒上茶來吃著。周瑞家的又問板兒道：「你都長這們大了！」又問些別後閒話。又問劉姥姥：「今日還是路過，還是特來的？」劉姥姥便說：「原是特來瞧瞧嫂子你，二則也請請姑太太的安。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            若可以領我見一見更好，若不能，便借重嫂子轉致意罷了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的聽了，便已猜著幾分來意。只因昔年他丈夫周瑞爭買田地一事，其中多得狗兒之力，今見劉姥姥如此而來，心中難卻其意，二則也要顯弄自己的体面。聽如此說，便笑說道：「姥姥你放心。大遠的誠心誠意來了，豈有個不教你見個真佛去的呢。論理，人來客至回話，卻不與我相干。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我們這裏都是各占一樣兒：我們男的只管春秋兩季地租子，閒時只帶著小爺們出門子就完了，我只管跟太太奶奶們出門的事。皆因你原是太太的親戚，又拿我當個人，投奔了我來，我就破個例，給你通個信去。但只一件，姥姥有所不知，我們這裏又不比五年前了。如今太太竟不大管事，都是璉二奶奶管家了。你道這璉二奶奶是誰？就是太太的內侄女，當日大舅老爺的女兒，小名鳳哥的。」劉姥姥聽了，罕問道：「原來是他！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            怪道呢，我當日就說他不錯呢。這等說來，我今兒還得見他了。」周瑞家的道：「這自然的。如今太太事多心煩，有客來了，略可推得去的就推過去了，都是鳳姑娘周旋迎待。今兒宁可不會太太，倒要見他一面，才不枉這裏來一遭。」劉姥姥道：「阿彌陀佛！全仗嫂子方便了。」周瑞家的道：「說那裏話。俗語說的：『與人方便，自己方便。』不過用我說一句話罷了，害著我什麼。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」說著，便叫小丫頭到倒廳上悄悄的打聽打聽，老太太屋裏擺了飯了沒有。小丫頭去了。這裏二人又說些閒話。劉姥姥因說：「這鳳姑娘今年大還不過二十歲罷了，就這等有本事，當這樣的家，可是難得的。」周瑞家的聽了道：「我的姥姥，告訴不得你呢。這位鳳姑娘年紀雖小，行事卻比世人都大呢。如今出挑的美人一樣的模樣兒，少說些有一萬個心眼子。再要賭口齒，十個會說話的男人也說他不過。回头你見了就信了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            就只一件，待下人未免太嚴些個。」說著，只見小丫頭回來說：「老太太屋裏已擺完了飯了，二奶奶在太太屋裏呢。」周瑞家的聽了，連忙起身，催著劉姥姥說：「快走，快走。這一下來他吃飯是個空子，咱們先赶著去。若遲一步，回事的人也多了，難說話。再歇了中覺，越發沒了時候了。」說著一齊下了炕，打掃打掃衣服，又教了板兒幾句話，隨著周瑞家的，逶迤往賈璉的住處來。先到了倒廳，周瑞家的將劉姥姥安插在那裏略等一等。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自己先過了影壁，進了院門，知鳳姐未下來，先找著鳳姐的一個心腹通房大丫頭名喚平兒的。周瑞家的先將劉姥姥起初來歷說明，又說：「今日大遠的特來請安。當日太太是常會的，今日不可不見，所以我帶了他進來了。等奶奶下來，我細細回明，奶奶想也不責備我莽撞的。」平兒聽了，便作了主意：「叫他們進來，先在這裏坐著就是了。」周瑞家的聽了，方出去引他兩個進入院來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上了正房臺磯，小丫頭打起猩紅氈帘，才入堂屋，只聞一陣香扑了臉來，竟不辨是何氣味，身子如在雲端裏一般。滿屋中之物都耀眼爭光的，使人頭懸目眩。劉姥姥此時惟點頭咂嘴念佛而已。於是來至東邊這間屋內，乃是賈璉的女兒大姐兒睡覺之所。平兒站在炕沿邊，打量了劉姥姥兩眼，只得問個好讓坐。劉姥姥見平兒遍身綾羅，插金帶銀，花容玉貌的，便當是鳳姐兒了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才要稱姑奶奶，忽見周瑞家的稱他是平姑娘，又見平兒赶著周瑞家的稱周大娘，方知不過是個有些体面的丫頭了。於是讓劉姥姥和板兒上了炕，平兒和周瑞家的對面坐在炕沿上，小丫頭子斟了茶來吃茶。劉姥姥只聽見咯當咯當的響聲，大有似乎打籮柜篩面的一般，不免東瞧西望的。忽見堂屋中柱子上挂著一個匣子，底下又墜著一個秤砣般一物，卻不住的亂幌。劉姥姥心中想著：「這是什麼愛物兒？有甚用呢？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」正呆時，只聽得當的一聲，又若金鐘銅磬一般，不防倒唬的一展眼。接著又是一連八九下。方欲問時，只見小丫頭子們齊亂跑，說：「奶奶下來了。」周瑞家的與平兒忙起身，命劉姥姥「只管等著，是時候我們來請你。」說著，都迎出去了。劉姥姥屏聲側耳默候。只聽遠遠有人笑聲，約有一二十婦人，衣裙窸窣，漸入堂屋，往那邊屋內去了。又見兩三個婦人，都捧著大漆捧盒，進這邊來等候。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            聽得那邊說了聲」擺飯」，漸漸的人才散出，只有伺候端菜的幾個人。半日鴉雀不聞之後，忽見二人抬了一張炕桌來，放在這邊炕上，桌上碗盤森列，仍是滿滿的魚肉在內，不過略動了幾樣。板兒一見了，便吵著要肉吃，劉姥姥一巴掌打了他去。忽見周瑞家的笑嘻嘻走過來，招手兒叫他。劉姥姥會意，於是帶了板兒下炕，至堂屋中，周瑞家的又和他唧咕了一會，方過這邊屋裏來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只見門外鏨銅鉤上懸著大紅撒花軟帘，南窗下是炕，炕上大紅氈條，靠東邊板壁立著一個鎖子錦靠背與一個引枕，舖著金心綠閃緞大坐褥，旁邊有雕漆痰盒。那鳳姐兒家常帶著秋板貂鼠昭君套，圍著攢珠勒子，穿著桃紅撒花襖，石青刻絲灰鼠披風，大紅洋縐銀鼠皮裙，粉光脂艷，端端正正坐在那裏，手內拿著小銅火箸兒撥手爐內的灰。平兒站在炕沿邊，捧著小小的一個填漆茶盤，盤內一個小蓋鐘。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳳姐也不接茶，也不抬頭，只管撥手爐內的灰，慢慢的問道：「怎麼還不請進來？」一面說，一面抬身要茶時，只見周瑞家的已帶了兩個人在地下站著呢。這才忙欲起身，猶未起身時，滿面春風的問好，又嗔著周瑞家的怎麼不早說。劉姥姥在地下已是拜了數拜，問姑奶奶安。鳳姐忙說：「周姐姐，快攙起來，別拜罷，請坐。我年輕，不大認得，可也不知是什麼輩數，不敢稱呼。」周瑞家的忙回道：「這就是我才回的那姥姥了。」鳳姐點頭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥已在炕沿上坐了。板兒便躲在背後，百般的哄他出來作揖，他死也不肯。鳳姐兒笑道：「親戚們不大走動，都疏遠了。知道的呢，說你們棄厭我們，不肯常來，不知道的那起小人，還只當我們眼裏沒人似的。」劉姥姥忙念佛道：「我們家道艱難，走不起，來了這裏，沒的給姑奶奶打嘴，就是管家爺們看著也不象。」鳳姐兒笑道：「這話沒的叫人惡心。不過借賴著祖父虛名，作了窮官兒，誰家有什麼，不過是個舊日的空架子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            俗語說，『朝廷還有三門子窮親戚』呢，何況你我。」說著，又問周瑞家的回了太太了沒有。周瑞家的道：「如今等奶奶的示下。」鳳姐道：「你去瞧瞧，要是有人有事就罷，得閒兒呢就回，看怎麼說。」周瑞家的答應著去了。這裏鳳姐叫人抓些果子與板兒吃，剛問些閒話時，就有家下許多媳婦管事的來回話。平兒回了，鳳姐道：「我這裏陪客呢，晚上再來回。若有很要緊的，你就帶進來現辦。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」平兒出去了，一會進來說：「我都問了，沒什麼緊事，我就叫他們散了。」鳳姐點頭。只見周瑞家的回來，向鳳姐道：「太太說了，今日不得閒，二奶奶陪著便是一樣。多謝費心想著。白來逛逛呢便罷，若有甚說的，只管告訴二奶奶，都是一樣。」劉姥姥道：「也沒甚說的，不過是來瞧瞧姑太太，姑奶奶，也是親戚們的情分。」周瑞家的道：「沒甚說的便罷，若有話，只管回二奶奶，是和太太一樣的。」一面說，一面遞眼色與劉姥姥。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥會意，未語先飛紅的臉，欲待不說，今日又所為何來？只得忍恥說道：「論理今兒初次見姑奶奶，卻不該說，只是大遠的奔了你老這裏來，也少不的說了。」剛說到這裏，只聽二門上小廝們回說：「東府裏的小大爺進來了。」鳳姐忙止劉姥姥：「不必說了。」一面便問：「你蓉大爺在那裏呢？」只聽一路靴子腳響，進來了一個十七八歲的少年，面目清秀，身材俊俏，輕裘寶帶，美服華冠。劉姥姥此時坐不是，立不是，藏沒處藏。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳳姐笑道：「你只管坐著，這是我侄兒。」劉姥姥方扭扭捏捏在炕沿上坐了。賈蓉笑道：「我父親打發我來求嬸子，說上回老舅太太給嬸子的那架玻璃炕屏，明日請一個要緊的客，借了略擺一擺就送過來。」鳳姐道：「說遲了一日，昨兒已經給了人了。」賈蓉聽著，嘻嘻的笑著，在炕沿上半跪道：「嬸子若不借，又說我不會說話了，又挨一頓好打呢。嬸子只當可怜侄兒罷。」鳳姐笑道：「也沒見你們，王家的東西都是好的不成？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你們那裏放著那些好東西，只是看不見，偏我的就是好的。」賈蓉笑道：「那裏有這個好呢！只求開恩罷。」鳳姐道：「若碰一點兒，你可仔細你的皮！」因命平兒拿了樓房的鑰匙，傳幾個妥當人抬去。賈蓉喜的眉開眼笑，說：「我親自帶了人拿去，別由他們亂碰。」說著便起身出去了。這裏鳳姐忽又想起一事來，便向窗外叫：「蓉哥回來。」外面幾個人接聲說：「蓉大爺快回來。」賈蓉忙复身轉來，垂手侍立，聽何指示。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那鳳姐只管慢慢的吃茶，出了半日的神，又笑道：「罷了，你且去罷。晚飯後你來再說罷。這會子有人，我也沒精神了。」賈蓉應了一聲，方慢慢的退去。這裏劉姥姥心神方定，才又說道：「今日我帶了你侄兒來，也不為別的，只因他老子娘在家裏，連吃的都沒有。如今天又冷了，越想沒個派頭兒，只得帶了你侄兒奔了你老來。」說著又推板兒道：「你那爹在家怎麼教你來？打發咱們作煞事來？只顧吃果子咧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」鳳姐早已明白了，聽他不會說話，因笑止道：「不必說了，我知道了。」因問周瑞家的：「這姥姥不知可用了早飯沒有？」劉姥姥忙說道：「一早就往這裏赶咧，那裏還有吃飯的工夫咧。」鳳姐聽說，忙命快傳飯來。一時周瑞家的傳了一桌客飯來，擺在東邊屋內，過來帶了劉姥姥和板兒過去吃飯。鳳姐說道：「周姐姐，好生讓著些兒，我不能陪了。」於是過東邊房裏來。又叫過周瑞家的去，問他才回了太太，說了些什麼？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的道：「太太說，他們家原不是一家子，不過因出一姓，當年又與太老爺在一處作官，偶然連了宗的。這幾年來也不大走動。當時他們來一遭，卻也沒空了他們。今兒既來了瞧瞧我們，是他的好意思，也不可簡慢了他。便是有什麼說的，叫奶奶裁度著就是了。」鳳姐聽了說道：「我說呢，既是一家子，我如何連影兒也不知道。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說話時，劉姥姥已吃畢了飯，拉了板兒過來，抹舌咂嘴的道謝。鳳姐笑道：「且請坐下，聽我告訴你老人家。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方才的意思，我已知道了。若論親戚之間，原該不等上門來就該有照應才是。但如今家內雜事太煩，太太漸上了年紀，一時想不到也是有的。況是我近來接著管些事，都不知道這些親戚們。二則外頭看著雖是烈烈轟轟的，殊不知大有大的艱難去處，說與人也未必信罷。今兒你既老遠的來了，又是頭一次見我張口，怎好叫你空回去呢。可巧昨兒太太給我的丫頭們做衣裳的二十兩銀子，我還沒動呢，你若不嫌少，就暫且先拿了去罷。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那劉姥姥先聽見告艱難，只當是沒有，心裏便突突的，後來聽見給他二十兩，喜的又渾身發痒起來，說道：「噯，我也是知道艱難的。但俗語說的：『瘦死的駱駝比馬大』，憑他怎樣，你老拔根寒毛比我們的腰還粗呢！」周瑞家的見他說的粗鄙，只管使眼色止他。鳳姐看見，笑而不睬，只命平兒把昨兒那包銀子拿來，再拿一吊錢來，都送到劉姥姥的跟前。鳳姐乃道：「這是二十兩銀子，暫且給這孩子做件冬衣罷。若不拿著，就真是怪我了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這錢雇車坐罷。改日無事，只管來逛逛，方是親戚們的意思。天也晚了，也不虛留你們了，到家裏該問好的問個好兒罷。」一面說，一面就站了起來。劉姥姥只管千恩萬謝的，拿了銀子錢，隨了周瑞家的來至外面。周瑞家的道：「我的娘啊！你見了他怎麼倒不會說了？開口就是『你侄兒』。我說句不怕你惱的話，便是親侄兒，也要說和軟些。蓉大爺才是他的正經侄兒呢，他怎麼又跑出這麼一個侄兒來了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」劉姥姥笑道：「我的嫂子，我見了他，心眼兒裏愛還愛不過來，那裏還說的上話來呢。」二人說著，又到周瑞家坐了片時。劉姥姥便要留下一塊銀子與周瑞家孩子們買果子吃，周瑞家的如何放在眼裏，執意不肯。劉姥姥感謝不盡，仍從後門去了。正是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得意濃時易接濟，受恩深處胜親朋。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengjia">
+      <div class="compare-col-head">
+        <span class="badge">程甲本</span>
+        <span class="col-desc">程甲本（1791程伟元/高鹗活字本，120回）</span>
+        <span>第6回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾宝玉初试云雨情 刘姥姥一进荣国府</h3>
+        
+        
+        <p class="col-para">
+          
+            𨚫說秦氏因𦗟見寶玉在夢中喚他的乳名，心中自是納悶，又不好細問。彼時寶玉迷迷惑惑，若有所失，衆人忙端上桂圓湯來，喝了兩口，遂起身整衣，襲人伸手與他繫褲帶時，剛伸手至大腿處，只覺氷冷一片粘濕，唬的忙退出手來，問是怎麼了。寶玉紅漲了臉，把他的手一捻，襲人本是個聰明女子，年紀又比寶玉大兩歲，近來也漸省人事，今見寶玉如此光景，心中便覺察了一半，不覺羞得紅漲了臉靣，遂不敢再問。仍舊理好了衣裳，隨至賈母處來，胡亂吃過晚飯，過這邊來，襲人趂衆奶娘丫鬟不在旁時，另取出一件中衣，與寶玉換上。寶玉含羞央道：「好姐姐，千萬别告訴别人。」襲人含羞笑問道：「你夢見什麼故事了？是那裡流出來的那些𩪝東西？」寶玉道：「一言難盡。」便把夢中之事細說與襲人知了。說至警幻所授雲雨之情，羞的襲人掩面伏身而笑。寳玉亦素喜襲人柔媚姣俏，遂與襲人同領警幻所訓雲雨之事。襲人自知係賈母將他與了宝玉的，今便如此，亦不爲越理，遂和寶玉偷試了一畨，幸無人撞見。自此寳玉視襲人更與别個不同，襲人侍寳玉越發盡職。暫且别無話說。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            按榮府一宅中合筭起來，人口雖不多，從上至下，也有三百餘口。事雖不多，一天也有一二十件，竟如亂麻一般，並没有個頭緒可作綱領。正思從那一件事那一件人寫起方妙，𨚫好忽從千里之外，芥豆之㣲，小小一個人家，因與榮府畧有些瓜葛，這日正往榮府中來，因此便就這一家說起，到還是個頭緒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來這小小之家，姓王，乃本地人氏，祖上曾做過一個小小京官，昔年曾與鳯姐之祖王夫人之父認識。因貪王家的𫝑利，便連了宗，認作姪兒。那時只有王夫人之大兄鳯姐之父與王夫人隨在京的知有此一門遠族，餘者皆不知也。目今其祖早故，只有一個兒子，名喚王成，因家業蕭條，仍搬出城外原鄉中住了。王成亦相繼身故，有子小名狗兒，取妻劉氏，生子小名板兒。又生一女，名喚靑兒。一家四口，以務農爲業。因狗兒白日間又作些生計，劉氏又操井臼等事，靑板姊弟兩個，無人管着，狗兒遂將岳母劉老老接來，一處過活。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這劉老老乃是個久經世代的老寡婦，𰯌下又無子息，只靠兩𤱔薄田度日。如今女壻接了養活，豈不愿意，遂一心一計帮着女兒女壻過活起來。因這年秋盡冬初，天氣冷將上來，家中冬事未辦，狗兒未免心中煩慮，吃了幾杯悶酒，在家閒𡬶氣恼，劉氏不敢頂撞。因此劉老老看不過，乃勸道：「姑爺，你别嗔着我多嘴，偺們村庄人家，那一個不是老老誠誠守着多大碗兒吃多大的飯。你皆因年小時，托着那老的福，吃喝慣了，如今所以把持不定，有了錢就顧頭不顧尾，没了錢就瞎生氣，成了什麼男子漢大丈夫了！如今偺們雖離城住着，終是天子脚下。這長安城中，遍地皆是錢，只可惜没人會去拿罷了。在家跳蹋也没用。」狗兒聽了道：「你老只會在坑頭上坐着混說，難道呌我打刼去不成？」劉老老說道：「誰呌你打刼去呢？也到底大家想個方法兒纔好。不然，那銀子錢會自己跑到偺們家裡來不成？」狗兒冷笑道：「有法兒還等到這會子呢！我又没有收稅的親戚、做官的朋友，有什麼法子可想的？便有，也只怕他們未必來禮我們呢。」劉老老道：「這到也不然。『謀事在人，成事在天』，偺們謀到了，靠菩薩的保佑，有些機會，也未可知。我到替你們想出一個機會來。當日你們原是和金陵王家連過宗的，二十年前，他們看承你們還好，如今是你們拉硬屎，不肯去俯就他，故踈遠起來。想當初我和女兒還去過一遭，他家的二小姐，着實𤕤快會待人的，倒不拿大。如今現是榮國府賈二老爺的夫人，聽得他們說，如今上了年紀，越發憐貧恤老，最愛齋僧布施。如今王府雖陞了邉任，只怕二姑太太還認得偺們，你何不去走動走動？或者他還念舊，有些好處亦未可知。只要他發一㸃好心，㧞一根寒毛比偺們的腰還壯呢。」劉氏一旁接口道：「你老說得是，你我這樣嘴臉，怎麽好到他門上去？只怕他那門上人也不肯去通報，没的去打嘴現世。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            誰知狗兒利名心重，𦗟如此說，心下便有些活動起來。又𦗟他妻子這畨話，便笑接道：「老老旣如此說，况且當日你又見過這姑太太一次，何不你老人家明日就去走一遭，先試試風頭看。」劉老老道：「噯喲！可是說的，『侯門似海』，我是個什麽東西，他家人又不認得我，去了也是白去的。」狗兒道：「不妨，我教你個法兒：你竟帶了外孫小板兒先去找陪房周瑞，若見了他，就有些意思了。這周瑞先時曾和我父親交過一樁事，我們本極好的。」劉老老道：「我也知道。只是許多時不走動，知道他如今是怎樣？這說不得的了，你又是個男人，這樣個嘴臉，自然去不得。我們姑娘年輕媳婦，也難賣頭賣脚去，倒還是捨了我這付老臉去碰一碰。果然有些好處，也大家有益。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當晚計議已定。次日天未明時，劉老老便起來梳洗了，又將板兒教了幾句話。五六歲的孩子，𦗟見帶了他進城逛去，便喜的無不應承。於是劉老老帶了板兒，進城至寧榮街來。至榮府大門前石獅子旁，只見簇簇的轎馬。劉老老便不敢過去，且担担衣服，又教板兒幾句話，然後蹲在角門前，只見幾個挺胸凸肚，指手畫脚的人坐在大門上，說東談西的。劉老老只得挨上前來問：「太爺們納福。」衆人打量了他一會，便問：「是那裡來的？」劉老老陪笑道：「我找太太的陪房周大爺的，煩那位太爺替我請他出來。」那些人𦗟了，都不採他，半日，方說道：「你遠遠的那墻脚下等着，一會子他們家裡有人就出來的。」内中有一年老的說道：「不要悞了他的事，何苦耍他。」因向劉老老道：「那周大爺徃南邉去了。他在後一帶住着，他娘子却在家。你從這邉遶到後街門上找就是了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉老老謝了，遂携着板兒遶至後門上，只見門上歇着些生意擔子，也有賣吃的，也有賣頑耍的物件，閙吵吵三二十個孩子在那裡厮閙。劉老老便拉住一個道：「我問哥兒一聲，有個周大娘可在家麽？」孩子道：「那個周大娘？我們這周大娘有三個呢，還有兩位周奶奶，不知是那一行當上的？」劉老老道：「他是太太的陪房。」孩子道：「這個容易，你跟我來。」引着劉老老進了後院，至一院墻邊，指道：「這就是他家。」忙又呌道：「周大媽，有個老奶奶來找你呢。」周瑞家的在内忙𨒖了出來，問是那位。劉老老𨒖上來問了個：「好呀，周嫂子。」周瑞家的認了半日，方笑道：「劉老老，你好呀？你說，這幾年不見，我就忘了。請家裡坐。」劉老老一面走，一面笑說道：「你老是『貴人多忘事』了，那裡還記得我們？」說着，來至房中，周瑞家的命僱的小丫頭倒上茶來吃着。周瑞家的又問：「板兒倒長了這麼大了！」又問些别後閒話，又問劉老老：「今日還是路過，還是特來的？」劉老老便說：「原是特來瞧瞧你嫂子，二則也請請姑太太的安。若可以領我見一見更好，若不能，便借重嫂子轉致意罷了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的𦗟了，便已猜着幾分來意。只因他丈夫昔年争買田地一事，多得狗兒之力，今見劉老老如此，心中難𨚫其意；二則也要顯弄自己的體面，便笑說：「老老你放心。大遠的誠心誠意來了，豈有個不教你見個正佛去的？論理，人來客至，囘話却不與我相干。我們這裡都是各占一樣兒：我們男的只𬋩春秋兩季地租子，閒時帶着小爺們出門就完了；我只管跟太太奶奶們出門的事。皆因你老是太太的親戚，又拿我當個人，投奔了我來，我竟破個例與你通個信去。但只一件，老老有所不知，我們這裡不比五年前了，如今太太不大理事，都是璉二奶奶當家了。你道這璉二奶奶是誰？就是太太内姪女兒，當日大舅老爺的女兒，小名鳯哥的。」劉老老𦗟了，罕問道：「原來是他？怪道呢，我當日就說他不錯的。這等說來，我今兒還得見了他。」周瑞家的道：「這個自然的，如今有客來，都是這鳯姑娘周旋接待，今兒寧可不見太太，倒要見他一面，纔不枉走這一遭兒。」劉老老道：「阿彌陀佛！這全仗嫂子方便了。」周瑞家的說：「老老說那裡話來？俗語說的：『自已方便，與人方便。』不過用我一句話兒，那裡費了我什麼事。」說着，便喚小了頭到倒㕔上悄悄的打𦗟老太太屋裡擺了飯没有，小了頭去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這裡二人又說了些閒話。劉老老因說：「這位鳯姑娘，今年不過二十歲罷了，就這等有本事，當這樣的家，可是難得的。」周瑞家的𦗟了道：「嗐！我的老老，告訴不得你呢。這位鳯姑娘年紀雖小，行事却比是人都大呢。如今出跳得美人一般的模樣兒，少說些有一萬個心眼子，再要賭口齒，十個會說的男人也說不過他呢。囘來你見了就知道了。就只一件，待下人未免嚴了些。」說着，小了頭囘來說：「老太太屋裡已擺完了飯，二奶奶在太太屋裡呢。」周瑞家的𦗟了，連忙起身催着劉老老：「快走，這一下來他吃飯是空兒，偺們先等着去了。若遲一歩，囘事的人多了，就難說話。再歇了中覺，越發没了時候了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說着，一齊下了炕，整頓衣服，又教了板兒幾句話，隨着周瑞家，逶迤往賈璉的住宅來。先至倒廳，周瑞家的將劉老老安挿在那裡畧等一等，自己先過影壁，走進了院門，知鳳姐未出來，先找着了鳯姐的一個心腹通房大了頭名喚平兒的。周瑞家的先將劉老老起初來歴說明，又說：「今日大遠的來請安，當日太太是常會的，今兒不可不見，所以我帶了他進等奶奶下來，我細細囘明，諒奶奶也不責我奔撞的。」平兒𦗟了，便作了個主意：「呌他們進來，先在這裡坐着就是了。」周瑞家的方出去領了他們進來。上了正房台階，小丫頭打起了猩紅羶簾，纔入堂屋，只聞一陣香撲了臉來，竟不辯是何氣味，身子便似在雲端裡一般。滿屋中之物都是耀眼争光，使人頭暈目眩。劉老老此時㸃頭𪡄嘴念佛而已。於是引他到東邊這間屋裡，乃是賈璉的大女兒𪾶覺之所。平兒站在炕沿邉，打量了劉老老兩眼，只得問個好，讓了坐。劉老老見平兒遍身綾羅，挿金戴銀，花容月貌的，便當是鳯姐兒了，纔要稱「姑奶奶」，只見周瑞家的說：「他是平姑娘。」又見平兒趕着周瑞家的呌他「周大娘」，方知不過個是有體面的丫頭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            於是讓劉老老和板兒上了炕，平兒和周瑞家的對面坐在炕沿上，小丫頭們倒了茶來吃了。劉老老只𦗟見咯噹咯噹的响聲，大有似乎打羅櫃篩麵的一般，不免東瞧西望的，忽見堂屋中柱子上着掛一個匣子，底下又墜着一個秤鉈般一物，𨚫不住的亂晃，劉老老心中想着：「這是什麽東西？有煞用呢？」正獃時，陡聽得「噹」的一聲，又若金鐘銅磬一般，倒唬了一跳，展眼，接着又是一連八九下，於欲問時，只見小了頭們一齊亂跑，說：「奶奶下來了。」平兒與周瑞家的忙起身說：「劉老老只𬋩坐着，等是時候，我們來請你。」說着迎出去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉老老只屏聲側耳黙候，只𦗟遠遠有人笑聲，約有一二十個婦人，衣裙悉索，漸入堂屋，徃那邉屋内去了。又見三兩個婦人，都捧着大紅𣾰捧盒，進這邊來等候。聽得那邊說道「擺飯」，漸漸的人纔散出去，只有伺候端菜幾人。半日鴉雀不聞。忽見兩個人抬了一張炕桌來，放在這邊炕上，桌上碗盤擺列，仍是滿滿的魚肉在内，不過畧動了幾樣。板兒一見了便吵着要肉吃，劉老老一把掌打了開去。忽見周瑞家的笑嘻嘻走過來，招手兒呌他，劉老老會意，於是帶着板兒下炕，至堂屋中，周瑞家的又和他唧唧了一會，方蹭到這邉屋内。只見門外銅鈎上懸着大紅灑花軟簾，南𥦗下是炕，炕上大紅條羶，靠東邊板壁立着一個鎻子錦靠背與一個引枕，鋪着金心線閃縀大坐褥，傍邉有銀唾盒。那鳯姐家常帶着紫貂昭君套，圍着那攢珠勤子，穿着桃紅洒花袄，石青刻絲灰鼠披風，大紅洋縐銀鼠皮裙。粉光𮌖艷，端端正正坐在那裡，手内拿着小銅火箸兒撥手爐内的灰。平兒站在炕沿邊，捧着小小的一個填𣾰茶盤，盤内一個小蓋鍾。鳯姐也不接茶，也不抬頭，只管撥手爐的灰，慢慢的道：「怎麽還不請進來？」一面說，一面抬身要茶時，只見周瑞家的已帶了兩個人立在面前了，這纔忙欲起身，猶未起身，滿面春風的問好，又嗔周瑞家的：「怎麼不早說！」劉老老已是在地下拜了數拜，問姑奶奶安。鳯姐忙說：「周姐姐，攙着不拜罷。我年輕，不大認得，可也不知是甚麽輩數，不敢稱呼。」周瑞家的忙囘道：「這就是我纔囘的那個老老了。」鳯姐㸃頭，劉老老已在炕沿上坐下了。板兒便躱在他背後，百端的哄他出來作揖，他𭮀也不肯。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳯姐笑道：「親戚們不大走動，都踈遠了。知道的呢，說你們棄厭我你，不肯常來。不知道的那起小人，還只當我們眼裡没有人似的。」劉老老忙念佛道：「我們家道艱難，走不起，來了這裡，没的給姑奶奶打嘴，就是管家爺們看着也不像。」鳯姐笑道：「這話没的教人惡心，不過借賴着祖父虛名，作個窮官兒罷了，誰家有什麽？不過是個舊日的空架子。俗語說，朝廷𮟃有三門子窮親呢，何况你我。」說着，又問周瑞家的：「囬了太太了没有？」周瑞家的道：「如今等奶奶的示下。」鳯姐兒道：「你去瞧瞧，要是有人有事就罷。得閒呢就囬，看怎麽說。」周瑞家的答應去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這裡鳯姐呌人抓些菓子與板兒吃，剛問了幾句閒話時，就有家下許多媳婦兒管事的來囘話。平兒囘了，鳯姐道：「我這裡陪客呢，晚上再來囘。若有要𦂳的，你就帶進現辦。」平兒出去，一㑹進來說：「我問了，没什麽𦂳事，我就呌他們散了。」鳯姐㸃頭。只見周瑞家的囘來，向鳯姐道：「太太說了：今日不得閒，二奶奶陪着便一樣的，多謝費心想着。白來逛逛呢便罷。若有甚說的，只𬋩告訴二奶奶，都是一樣。」劉老老道：「也没甚的說，不過是來睄睄姑太太姑奶奶，也是親戚們惜分。」周瑞家的說道：「没有甚說的便罷。若有話，只管囘二奶奶，是和太太一樣的。」一面說，一面𨔛眼色與劉老老。劉老老㑹意，未語先飛紅的臉，欲待不說，今日又所爲何來？只得忍恥道：「論理今日初次見姑奶奶，𨚫不該說的。只是大遠的奔了你老這裡來，少不得說了……」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            剛說到這裡，只𦗟二門上小厮們囘說：「東府裡小大爺進來了。」鳯姐忙止道：「劉老老不必說了。」一靣便問：「你蓉大爺在那裡呢？」只聼一路靴子脚响，進來了一個十七八歲的少年，面目淸秀，身材夭嬌，輕裘寳帶，美服華冠。劉老老此時坐不是，立不是，藏没處藏。鳯姐笑道：「你只𬋩坐着，這是我姪兒。」劉老老方扭扭揑揑在炕沿上坐了。賈蓉笑道：「我父親打發我來求嬸子，說上囘老舅太太給嬸子的那架玻璃炕屏，明日請一個要𦂳的客，借去略擺一擺就送過來的。」鳯姐道：「遲了一日，昨兒已給了人了。」賈蓉𦗟說，便嘻嘻的笑着在炕沿子上下個半跪道：「嬸子若不借，我父親又說我不會說話了，又挨了一頓好打呢。嬸子，只當可憐姪兒罷。」鳯姐笑道：「也没見我們王家的東西都是好的？你們那裡也放着那些好東西，只是看不見我的東西纔罷，一見了就要想拿去。」賈蓉笑道：「只求開恩罷。」鳯姐道：「碰壞一㸃，你可仔細你的皮！」因命平兒拿了樓門上鑰匙，傳幾個妥當人來抬去。賈蓉喜的眉開眼笑，忙說：「我親自帶了人拿去，别由他們亂碰。」說着便起身出去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這鳯姐忽又想起一事來，便向牕外呌：「蓉兒囘來。」外面幾個人接聲說：「請蓉大爺快囬來。」賈蓉忙轉囬來，垂手侍立，聼何指示。那鳯姐只𬋩慢慢地吃茶，出了半日神，方笑道：「罷了，你且去罷。晚飯後你來再說罷。這㑹子有人，我也没精神了。」賈蓉方慢慢退去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這劉老老身心方安，便說道：「我今日帶了你姪兒，不爲别的，只因他爹娘在家裡連吃的也没有，天氣又冷了，只得帶了你姪兒奔了你老來。」說着，又推板兒道：「你爹在家裡怎麽教你的？打發偺們來作煞事的？只顧吃菓子呢。」鳯姐早已明白了，𦗟他不會說話，因笑止道：「必必說了，我知道了。」因問周瑞家的道：「這老老不知可用了早飯没有呢？」劉老老忙道：「一早就往這裡赶咧，那裡還有吃飯的工夫咧。」鳯姐忙命：「快傳飯來。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一時周瑞家的傳了一桌客饌來，擺在東邊屋裡，過來帶了劉老老和板兒過去吃飯，鳯姐說道：「周姐姐好生讓着些兒，我不能陪了。」於是過東邊房裡來，鳯姐又呌過周瑞家的去道：「方纔囘了太太，說了些什麽？」周瑞家的道：「太太說：他們原不是一家，是當年他們的祖與老太爺在一處做官，因連了宗的。這幾年不大走動。當時他們來了，𨚫也從没空過的。今來瞧瞧我們，也是他的好意，不可簡慢了他。便有什麽話說，呌二奶奶裁奪着就是了。」鳯姐𦗟了說道：「怪道，旣是一家子，我如何連影兒也不知道。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說話間，劉老老已吃完了飯，拉了板兒過來，舚唇咂嘴的道謝。鳯姐笑道：「且請坐下，聼我告訴你老人家，方纔的意思，我已知道了。論親戚之間，原該不待上門來就有照應纔是。但如今家中事情太多，太太上了年紀，一時想不到是有的。况我接着管事，都不大知道這些親戚們，一則外面看着，雖是烈烈轟轟，不知大有大的難處，說與人也未必信呢。今你旣大遠的來了，又是頭一次兒向我張口，怎好教你空手囘去。可巧昨兒太太給我的丫頭們作衣裳的二十兩銀子，還没動呢，你不嫌少，且先拿了去用罷。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那劉老老先聽見告艱苦，只當是没想頭了，又𦗟見給他二十兩銀子，喜得眉開眼笑道：「我們也知艱難的，但俗語道：『瘦𭮀的駱駝比馬還大些。』凴他怎樣，你老㧞一根寒毛比我們的腰還壯哩！」周瑞家的在旁聽見他說的粗鄙，只管使眼色止他。鳯姐笑而不採，呌平兒把昨兒那包銀子拿來，再拿一串錢來，都送至劉老老跟前。鳯姐道：「這是二十兩銀子，暫且給這孩子們作件冬衣罷。攺日無事，只管來逛逛，方是親戚們的意思。天也晚了，不虚留你們了，到家該問好的都問個好兒。」一面說，一面就站了起來了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉老老只是千恩萬謝的，拿了銀錢，隨周瑞家的走至外厢。周瑞家的道：「我的娘！你怎麼見了他到不會說了？開口就是『你姪兒』。我說句不怕你惱的話，便是親姪兒也要說和軟些。那蓉大爺纔是他的姪兒呢，他怎麽又跑出這樣姪兒來了。」劉老老笑道：「我的嫂子！我見了他，心眼兒愛還不愛過來，那裡還說上話兒來。」二人說着，又至周瑞家坐了片刻，劉老老要留下一塊銀與周家的孩子們買菓子吃，周瑞家的如何放在眼裡，執意不肯，劉老老感謝不盡，仍從後門去了。未知劉老老去後如何，且聼下囘分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本</span>
+        <span class="col-desc">程乙本（1792程伟元/高鹗重订本，120回）</span>
+        <span>第6回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾宝玉初试云雨情 刘姥姥一进荣国府</h3>
+        
+        
+        <p class="col-para">
+          
+            卻說秦氏因聽見寶玉夢中喚他的乳名，心中納悶，又不好細問。彼時寶玉迷迷惑惑，若有所失，遂起身，解懷整衣。襲人過來給他繫褲帶時，剛伸手至大腿處，只覺冰冷粘濕的一片，嚇的忙褪回手來，問：「是怎麼了？」寶玉紅了臉，把他的手一捻。襲人本是個聰明女子，年紀又比寶玉大兩歲，近來也漸省人事，今見寶玉如此光景，心中便覺察了一半，不覺把個粉臉羞的飛紅。遂不好再問，仍舊理好衣裳，隨至賈母處來。胡亂吃過晚飯，過這邊來，趁眾奶娘丫鬟不在旁時，另取出一件中衣，與寶玉換上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉含羞央告道：「好姐姐，千萬別告訴人。」襲人也含著羞悄悄的笑問道：「你為什麼－－」說到這裡，把眼又往四下裡瞧了瞧，纔又問道：「那是那裡流出來的？」寶玉只管紅著臉，不言語，襲人卻只瞅著他笑。遲了一會，寶玉纔把夢中之事細說與襲人聽。說到雲雨私情，羞的襲人掩面伏身而笑。寶玉亦素喜襲人柔媚姣俏，遂強拉襲人同領警幻所秘授之事。襲人自知賈母曾將他給了寶玉，也無可推託的，扭捏了半日，無奈何，只得和寶玉溫存了一番。自此，寶玉視襲人更自不同，襲人待寶玉也越發盡職了。這話暫且不提。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且說榮府中合算起來，從上至下也有三百餘口人，一天也有一二十件事，竟如亂麻一般，沒個頭緒可作綱領。正思從那一件事那一個人寫起方妙？恰好忽從千里之外芥豆之微小小一個人家，因與榮府略有些瓜葛，這日正往榮府中來，因此便就這一家說起，倒還是個頭緒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來這小小之家，姓王，乃本地人氏，祖上也做過一個小小京官，昔年曾與鳳姐之祖－－王夫人之父認識。因貪王家的勢利，便連了宗，認作姪兒。那時只有王夫人之大兄－－鳳姐之父－－與王夫人隨在京的知有此一門遠族，餘者也皆不知。目今其祖早故，只有一個兒子，名喚王成，因家業蕭條，仍搬出城外鄉村中住了。王成亦相繼身故，有子小名狗兒，娶妻劉氏，生子小名板兒，又生一女，名喚青兒：一家四口，以務農為業。因狗兒白日間自作些生計，劉氏又操井臼等事，青板姊弟兩個無人照管，狗兒遂將岳母劉姥姥接來一處過活。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這劉姥姥乃是個久經世代的老寡婦，膝下又無子息，只靠兩畝薄田度日。如今女婿接了養活，豈不願意呢？遂一心一計，幫著女兒女婿過活。因這年秋盡冬初，天氣冷將上來，家中冬事未辦，狗兒未免心中煩躁，吃了幾杯悶酒，在家裡閒尋氣惱，劉氏不敢頂撞。因此，劉姥姥看不過，便勸道：「姑爺，你別嗔著我多嘴。偺們村莊人家兒，那一個不是老老實實守著多大碗兒吃多大的飯呢？你皆因年小時候，託著老子娘的福，吃喝慣了，如今所以有了錢就顧頭不顧尾，沒了錢就瞎生氣，成了什麼男子漢大丈夫了！如今偺們雖離城住著，終是天子腳下。這『長安』城中，遍地皆是錢，只可惜沒人會去拿罷了！在家跳蹋也沒用。」狗兒聽了道：「你老只會在炕頭上坐著混說。難道叫我打劫去不成？」劉姥姥說道：「誰叫你去打劫呢？也到底大家想個方法兒纔好。不然，那銀子錢會自己跑到偺們家裡來不成？」狗兒冷笑道：「有法兒還等到這會子呢！我又沒有收稅的親戚、做官的朋友，有什麼法子可想的？就有也只怕他們未必來理我們呢。」劉姥姥道：「這倒也不然，『謀事在人，成事在天』，偺們謀到了，靠菩薩的保佑，有些機會，也未可知。我倒替你們想出一個機會來。當日你們原是和金陵王家連過宗的，二十年前，他們看承你們還好；如今是你們『拉硬屎』，不肯去就和他，纔疏遠起來。想當初我和女兒還去過一遭。他家的二小姐著實爽快，會待人的，倒不拿大，如今現是榮國府賈二老爺的夫人。聽見他們說，如今上了年紀，越發憐貧恤老的了，又愛齋僧布施。如今王府雖陞了官兒，只怕二姑太太還認得偺們。你為什麼不走動走動？或者他還念舊，有些好處，也未可知。只要他發點好心，拔根寒毛，比偺們的腰還壯呢！」劉氏接口道：「你老說的好！你我這樣嘴臉，怎麼好到他門上去？只怕他那門上人也不肯進去告訴。沒的白打嘴現世的！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            誰知狗兒利名心重，聽如此說，心下便有些活動，又聽他妻子這番話，便笑道：「姥姥既這麼說，況且當日你又見過這姑太太一次，為什麼不你老人家明日就去走一遭，先試試風頭兒去？」劉姥姥道：「噯喲！可是說的了：『侯門似海』，我是個什麼東西兒！他家人又不認得我，去了也是白跑。」狗兒道：「不妨，我教給你個法兒。你竟帶了小板兒先去找陪房周大爺，要見了他，就有些意思了。這周大爺先時和我父親交過一樁事，我們本極好的。」劉姥姥道：「我也知道。只是許多時不走動，知道他如今是怎樣？這也說不得了。你又是個男人，這麼個嘴臉，自然去不得；我們姑娘，年輕的媳婦兒，也難賣頭賣腳的；倒還是捨著我這副老臉去碰碰，果然有好處，大家也有益。」當晚計議已定。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日，天未明時，劉姥姥便起來梳洗了，又將板兒教了幾句話。五六歲的孩子，聽見帶了他進城逛去，歡喜的無不應承。於是劉姥姥帶了板兒進城，至寧榮街來。到了榮府大門前石獅子旁邊，只見滿門口的轎馬。劉姥姥不敢過去，撣撣衣服，又教了板兒幾句話，然後溜到角門前。只見幾個挺胸疊肚指手畫腳的人坐在大門上說東談西的。劉姥姥只得蹭上來問：「太爺們納福！」眾人打量了一會，便問：「是那裡來的？」劉姥姥陪笑道：「我找太太的陪房周大爺的，煩那位太爺替我請他出來。」那些人聽了，都不理他，半日，方說道：「你遠遠的那牆畸角兒等著，一會子，他們家裡就有人出來。」內中有個年老的，說道：「何苦誤他的事呢？」因向劉姥姥道：「周大爺往南邊去了。他在後一帶住著，他們奶奶兒倒在家呢。你打這邊繞到後街門上找就是了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥謝了，遂領著板兒繞至後門上。只見門上歇著些生意擔子，也有賣吃的，也有賣玩耍的，鬧吵吵，三二十個孩子在那裡。劉姥姥便拉住一個道：「我問哥兒一聲：有個周大娘，在家麼？」那孩子翻眼瞅著道：「那個周大娘？我們這裡周大娘有幾個呢，不知是那一個行當兒上的？」劉姥姥道：「他是太太的陪房。」那孩子道：「這個容易，你跟了我來。」引著劉姥姥進了後院，到一個院子牆邊，指道：「這就是他家。」又叫道：「周大媽，有個老奶奶子找你呢。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的在內忙迎出來，問：「是那位？」劉姥姥迎上來笑問道：「好啊？周嫂子。」周瑞家的認了半日，方笑道：「劉姥姥，你好？你說麼，這幾年不見，我就忘了。請家裡坐。」劉姥姥一面走，一面笑說道：「你老是貴人多忘事了，那裡還記得我們？」說著，來至房中。周瑞家的命僱的小丫頭倒上茶來吃著。周瑞家的又問道：「板兒長了這麼大了麼？」又問些別後閒話，又問劉姥姥今日還是路過，還是特來的。劉姥姥便說：「原是特來瞧瞧嫂子；二則也請請姑太太的安。若可以領我見一見，更好；若不能，就借重嫂子轉致意罷了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的聽了，便已猜著幾分來意。只因他丈夫昔年爭買田地一事多得狗兒他父親之力，今見劉姥姥如此，心中難卻其意；二則也要顯弄自己的體面。便笑說：「姥姥，你放心。大遠的誠心誠意來了，豈有個不叫你見個真佛兒去的呢？論理，人來客至，卻都不與我相干。我們這裡都是各一樣兒：我們男的只管春秋兩季地租子，閒了時帶著小爺們出門就完了；我只管跟太太奶奶們出門的事。皆因你是太太的親戚，又拿我當個人，投奔了我來，我竟破個例給你通個信兒去。但只一件，你還不知道呢，我們這裡不比五年前了，如今太太不理事，都是璉二奶奶當家。你打量璉二奶奶是誰？就是太太的內姪女兒，大舅老爺的女孩兒，小名兒叫鳳哥的。」劉姥姥聽了，忙問道：「原來是他？怪道呢！我當日就說他不錯。這麼說起來，我今兒還得見他了？」周瑞家的道：「這個自然，如今有客來，都是鳳姑娘周旋接待。今兒寧可不見太太，倒得見他一面，纔不枉走這一遭兒。」劉姥姥道：「阿彌陀佛！這全仗嫂子方便了。」周瑞家的說：「姥姥說那裡話？俗語說的好：『與人方便，自己方便。』不過用我一句話，又費不著我什麼事。」說著，便喚小丫頭到倒廳兒上悄悄的打聽老太太屋裡擺了飯了沒有。小丫頭去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這裡二人又說了些閒話。劉姥姥因說：「這位鳳姑娘，今年不過十八九歲罷了，就這等有本事，當這樣的家，可是難得的！」周瑞家的聽了道：「嗐！我的姥姥，告訴不得你了：這鳳姑娘年紀兒雖小，行事兒比是人都大呢。如今出挑的美人兒似的，少說著只怕有一萬心眼子，再要賭口齒，十個會說的男人也說不過他呢！回來你見了，就知道了。－－就只一件，待下人未免太嚴些兒。」說著，小丫頭回來說：「老太太屋裡擺完了飯了。二奶奶在太太屋裡呢。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的聽了，連忙起身催著劉姥姥：「快走！這一下來就只吃飯是個空兒，偺們先等著去。若遲了一步，回事的人多了，就難說了。再歇了中覺，越發沒時候了。」說著，一齊下了炕，整頓衣服，又教了板兒幾句話，跟著周瑞家的，逶迤往賈璉的住宅來。先至倒廳。周瑞家的將劉姥姥安插住等著，自己卻先過影壁，走進了院門。知鳳姐尚未出來，先找著鳳姐的一個心腹通房大丫頭名喚平兒的。周瑞家的先將劉姥姥起初來歷說明，又說：「今日大遠的來請安。當日太太是常會的，所以我帶了他過來。等著奶奶下來，我細細兒的回明了，想來奶奶也不至嗔著我莽撞的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            平兒聽了，便作了個主意，「叫他們進來，先在這裡坐著就是了。」周瑞家的纔出去領了他們進來。上了正房台階，小丫頭打起猩紅氈簾，纔入堂屋，只聞一陣香撲了臉來，竟不知是何氣味，身子就像在雲端裡一般。滿屋裡的東西都是耀眼爭光，使人頭暈目眩。劉姥姥此時只有點頭咂嘴念佛而已。於是走到東邊這間屋裡，乃是賈璉的女兒睡覺之所。平兒站在炕沿邊，打量了劉姥姥兩眼，只得問個好，讓了坐。劉姥姥見平兒遍身綾羅，插金戴銀，花容月貌，便當是鳳姐兒了，纔要稱「姑奶奶」，只見周瑞家的說：「他是平姑娘。」又見平兒趕著周瑞家的叫他「周大娘」，方知不過是個有體面的丫頭。於是讓劉姥姥和板兒上了炕，平兒和周瑞家的對面坐在炕沿上。小丫頭們倒了茶來吃了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥只聽見咯噹咯噹的響聲，大有打鑼櫃篩麵的一般，不免東瞧西望的。忽見堂屋中柱子上掛著一個匣子，底下又墜著一個秤砣似的，卻不住的亂晃。劉姥姥心中想著：「這是什麼東西？有煞用處呢？……」正發獃時，陡聽得「噹」的一聲，又若金鐘銅磬一般，倒嚇得不住的展眼兒。接著一連又是八九下。欲待問時，只見小丫頭們一齊亂跑，說：「奶奶下來了。」平兒和周瑞家的忙起身說：「姥姥只管坐著，等是時候兒，我們來請你。」說著，迎出去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥只屏聲側耳默候，只聽遠遠有人笑聲，約有一二十個婦人，衣裙窸窣，漸入堂屋，往那邊屋內去了。又見三兩個婦人都捧著大紅油漆盒，進這邊來等候。聽得那邊說道「擺飯」，漸漸的人纔散出去，只有伺候端菜的幾個人。半日鴉雀不聞。忽見兩個人抬了一張炕桌來放在這邊炕上，桌上碗盤擺列，仍是滿滿的魚肉，不過略動了幾樣。板兒一見就吵著要肉吃，劉姥姥打了他一巴掌。忽見周瑞家的笑嘻嘻走過來，點手兒叫他。劉姥姥會意，於是帶著板兒下炕，至堂屋中間。周瑞家的又和他咕唧了一會子，方蹭到這邊屋內。只見門外銅鉤上懸著大紅灑花軟簾，南窗下是炕，炕上大紅條氈；靠東邊板壁立著一個鎖子錦的靠背和一個引枕，鋪著金線閃的大坐褥，旁邊有銀唾盒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那鳳姐家常帶著紫貂昭君套，圍著那攢珠勒子，穿著桃紅灑花襖，石青刻絲灰鼠披風，大紅洋縐銀鼠皮裙，粉光脂豔，端端正正坐在那裡，手內拿著小銅火箸兒撥手爐內的灰。平兒站在炕沿邊，捧著小小的一個填漆茶盤，盤內一個小蓋鍾兒。鳳姐也不接茶，也不抬頭，只管撥那灰，慢慢的道：「怎麼還不請進來？」一面說，一面抬身要茶時，只見周瑞家的已帶了兩個人立在面前了，這纔忙欲起身。猶未起身，滿面春風的問好，又嗔著周瑞家的：「怎麼不早說！」劉姥姥已在地下拜了幾拜，問姑奶奶安。鳳姐忙說：「周姐姐，攙著不拜罷。我年輕，不大認得，可也不知是什麼輩數兒，不敢稱呼。」周瑞家的忙回道：「這就是我纔回的那個姥姥了。」鳳姐點頭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥已在炕沿上坐下了，板兒便躲在他背後。百般的哄他出來作揖，他死也不肯。鳳姐笑道：「親戚們不大走動，都疏遠了。知道的呢，說你們棄嫌我們，不肯常來；不知道的那起小人，還只當我們眼裡沒人似的。」劉姥姥忙念佛道：「我們家道艱難，走不起，來到這裡，沒的給姑奶奶打嘴，就是管家爺們瞧著也不像。」鳳姐笑道：「這話沒的叫人惡心。不過托賴著祖父的虛名，作個窮官兒罷咧。誰家有什麼？不過也是個空架子。俗語兒說的好，『朝廷還有三門子窮親呢』，何況你我？」說著，又問周瑞家的：「回了太太了沒有？」周瑞家的道：「等奶奶的示下。」鳳姐兒道：「你去瞧瞧。要是有人就罷；要得閒呢，就回了，看怎麼說。」周瑞家的答應去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這裡鳳姐叫人抓了些果子，給板兒吃，剛問了幾句閒話時，就有家下許多媳婦兒－－管事的－－來回話。平兒回了。鳳姐道：「我這裡陪客呢，晚上再來回；有要緊事，你就帶進來現辦。」平兒出去一會，進來說：「我問了，沒什麼要緊的，我叫他們散了。」鳳姐點頭。只見周瑞家的回來，向鳳姐道：「太太說：『今日不得閒兒。二奶奶陪著也是一樣。多謝費心想著。要是白來逛逛呢，便罷；有什麼說的，只管告訴二奶奶。』」劉姥姥道：「也沒甚說的，不過來瞧瞧姑太太姑奶奶，也是親戚們的情分。」周瑞家的道：「沒有什麼說的便罷；要有話，只管回二奶奶，和太太是一樣兒的。」一面說，一面遞了個眼色兒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥會意，未語先紅了臉，待要不說，今日所為何來，只得勉強說道：「論今日初次見，原不該說的；只是大遠的奔了你老這裡來，少不得說了。……」剛說到這裡，只聽二門上小廝們回說：「東府裡小大爺進來了。」鳳姐忙和劉姥姥擺手，道：「不必說了。」一面便問：「你蓉大爺在那裡呢？」只聽一路靴子響，進來了一個十七八歲的少年，面目清秀，身段苗條，美服華冠，輕裘寶帶。劉姥姥此時坐不是，站不是，藏沒處藏，躲沒處躲。鳳姐笑道：「你只管坐著罷，這是我姪兒。」劉姥姥纔扭扭捏捏的在炕沿兒上側身坐下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那賈蓉請了安，笑回道：「我父親打發來求嬸子。上回老舅太太給嬸子的那架玻璃炕屏，明兒請個要緊的客，略擺一擺就送來。」鳳姐道：「你來遲了。昨兒已經給了人了。」賈蓉聽說，便笑嘻嘻的在炕沿上下個半跪，道：「嬸子要不借，我父親又說我不會說話了，又要挨一頓好打。好嬸子，只當可憐我罷！」鳳姐笑道：「也沒見我們王家的東西都是好的？你們那裡放著那些好東西，只別看見我的東西纔罷，一見了就想拿了去。」賈蓉笑道：「只求嬸娘開恩罷！」鳳姐道：「碰壞一點兒，你可仔細你的皮！」因命平兒拿了樓門上鑰匙，叫幾個妥當人來抬去。賈蓉喜的眉開眼笑，忙說：「我親自帶人拿去，別叫他們亂碰。」說著，便起身出去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這鳳姐忽然想起一件事來，便向窗外叫：「蓉兒，回來。」外面幾個人接聲說：「請蓉大爺回來呢。」賈蓉忙回來，滿臉笑容的瞅著鳳姐，聽何指示。那鳳姐只管慢慢吃茶，出了半日神，忽然把臉一紅，笑道：「罷了，你先去罷。晚飯後，你來再說罷。這會子有人，我也沒精神了。」賈蓉答應個「是」，抿著嘴兒一笑，方慢慢退去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這劉姥姥方安頓了，便說道：「我今日帶了你姪兒，不為別的，因他爹娘連吃的沒有，天氣又冷，只得帶了你姪兒奔了你老來。」說著，又推板兒道：「你爹在家裡怎麼教你的？打發偺們來作煞事的？只顧吃果子！」鳳姐早已明白了，聽他不會說話，因笑道：「不必說了，我知道了。」因問周瑞家的道：「這姥姥不知用了早飯沒有呢？」劉姥姥忙道：「一早就望這裡趕咧，那裡還有吃飯的工夫咧。」鳳姐便命：「快傳飯來。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一時，周瑞家的傳了一桌客饌擺在東屋裡，過來帶了劉姥姥和板兒過去吃飯。鳳姐這裡道：「周姐姐，好生讓著些兒，我不能陪了。」一面又叫過周瑞家的來問道：「方纔回了太太，太太怎麼說了？」周瑞家的道：「太太說：『他們原不是一家子；當年他們的祖和太老爺在一處做官，因連了宗的。這幾年不大走動。當時他們來了，卻也從沒空過的；如今來瞧我們，也是他的好意，別簡慢了他。要有什麼話，叫二奶奶裁奪著就是了。』」鳳姐聽了說道：「怪道，既是一家子，我怎麼連影兒也不知道？」說話間，劉姥姥已吃完了飯，拉了板兒過來，舔唇咂嘴的道謝。鳳姐笑道：「且請坐下，聽我告訴你：方纔你的意思，我已經知道了。論起親戚來，原該不等上門就有照應纔是。但只如今家裡事情太多，太太上了年紀，一時想不到是有的。我如今接著管事，這些親戚們又都不大知道，況且外面看著雖是烈烈轟轟，不知大有大的難處，說給人也未必信。你既大遠的來了，又是頭一遭兒和我張個口，怎麼叫你空回去呢？可巧昨兒太太給我的丫頭們作衣裳的二十兩銀子還沒動呢，你不嫌少，先拿了去用罷。」那劉姥姥先聽見告艱苦，只當是沒想頭了；又聽見給他二十兩銀子，喜的眉開眼笑道：「我們也知道艱難的，但只俗語說的：『瘦死的駱駝比馬還大呢。』憑他怎樣，你老拔一根寒毛，比我們的腰還壯哩！」周瑞家的在旁聽見他說的粗鄙，只管使眼色止他。鳳姐笑而不睬，叫平兒把昨兒那包銀子拿來，再拿一串錢，都送至劉姥姥跟前。鳳姐道：「這是二十兩銀子，暫且給這孩子們作件冬衣罷。改日沒事，只管來逛逛，纔是親戚們的意思。天也晚了，不虛留你們了。到家，該問好的都問個好兒罷。」一面說，一面就站起來了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劉姥姥只是千恩萬謝的，拿了銀錢，跟著周瑞家的走到外邊。周瑞家的道：「我的娘！你怎麼見了他倒不會說話了呢？開口就是『你姪兒』。我說句不怕你惱的話：就是親姪兒也要說的和軟些兒。那蓉大爺纔是他的姪兒呢，他怎麼又跑出這麼個姪兒來了呢！」劉姥姥笑道：「我的嫂子，我見了他，心眼兒愛還愛不過來，那裡還說的上話來！」二人說著，又到周瑞家坐了片刻。劉姥姥要留下一塊銀子給周瑞家的孩子們買果子吃。周瑞家的那裡放在眼裡？執意不肯。劉姥姥感謝不盡，仍從後門去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未知去後如何，且聽下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi_ocr">
+      <div class="compare-col-head">
+        <span class="badge">程乙本OCR</span>
+        <span class="col-desc">程乙本OCR（欧阳健校注本PDF本地识别）</span>
+        <span>第6回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾宝玉初试云雨情 刘姥姥一进荣国府</h3>
+        
+        
+        <p class="col-para">
+          
+            贾宝玉初试云雨情 刘姥姥进荣国府[一]
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说秦氏因听见宝玉从梦中唤他的乳名，心中自是纳闷，又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不好细问。彼时宝玉迷迷惑惑，若有所失。众人忙端上桂圆汤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，呷了两口，遂起身整衣。袭人伸手与他系裤带时，不觉伸手
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            至大腿处，只觉冰凉片沾湿，嘘的忙退出手来，问是怎么了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉红涨了脸，把他的手捻。袭人本是个聪明女子，年纪本又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            比宝玉大两岁，近来也渐通人事，今见宝玉如此光景，心中便觉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            察-半了，不觉也羞的红涨了脸面，不敢再问。仍旧理好衣裳，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            遂至贾母处来，胡乱吃毕了晚饭，过这边来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            袭人忙趁众奶娘丫鬟不在旁时，另取出一件中衣①来与宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉换上。宝玉含羞央告道：“好姐姐，千万别告诉人。”袭人亦含
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            羞笑问道：“你梦见什么故事了？是那里流出来的那些脏东西？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉道：“一言难尽。”说着便把梦中之事细说与袭人听了。然后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说至警幻所授云雨之情，羞的袭人掩面伏身而笑。宝玉亦素喜·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            袭人柔媚娇俏，遂强袭人同领警幻所训云雨之事。袭人素知贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母已将自己与了宝玉的，今便如此，亦不为越礼，遂和宝玉偷试
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            -一番，幸得无人撞见。自此宝玉视袭人更比别个不同，袭人待宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉更为尽心。暂且别无话说。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①中衣→一贴身衬裤。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            .90
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾宝玉初试云雨情刘姥姥一一进荣国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            按荣府中一宅人合算起来，人口虽不多，从上至下也有三四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            百了；虽事不多，一天也有一二十件，竟如乱麻一般，并无个头绪
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可作纲领。正寻思从那一一件事自那一个人写起方妙，恰好忽从
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            千里之外，芥萱之微，小小一个人家，因与荣府略有些瓜葛，这日
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正往荣府中来，因此便就此一家说来，倒还是头绪。你道这一家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姓甚名谁，又与荣府有甚瓜葛？且听细讲[二]。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方才所说的这小小之家，乃本地人氏，姓王，祖上曾作过小
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            小的一个京官，昔年与凤姐之祖王夫人之父认识。因贪王家的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            势利，便连了宗①认作侄儿。那时只有王夫人之大兄凤姐之父
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            与王夫人随在京中的；知有此一门连宗之族，徐者皆不认识。目
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今其祖已故，只有一个儿子，名唤王成，因家业萧条，仍搬出城外
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ，原乡中住去了。·王成新近亦因病敌，只有其子，小名狗儿。狗儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亦生一子，小名板儿，嫡妻刘氏，又生一女，名唤青儿。一家四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            口，仍以务农为业。因狗儿白日间又作些生计，刘氏又操井并白等
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            事，青板姊妹两个无人看管，狗儿遂将岳母刘姥姥接来一处过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            活。这刘姥姥乃是个积年的老寡妇，膝下又无儿女，只靠两亩薄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            田度日。今者女婿接来养活，岂不愿意，遂一心一一计，帮趁着女
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿女婿过活起来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因这年秋尽冬初，天气冷将上来，家中冬事未办，狗儿未免
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心中烦虑，吃了几杯闷酒，在家闲寻气恼，刘氏也不敢顶撞。因
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此刘姥姥看不过，乃劝道：“姑爷，你别嗔着我多嘴。咱们村庄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人，那个不是老老诚诚的，守多大碗儿吃多大的饭。你皆因年
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①连了宗一一亦作“联宗”。旧时为拉关系把同姓而本非一个宗族的人认了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            本家，叫作“联宗”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 91
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 六
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            小的时候，托着你那老家之福，吃喝惯了，如今所以把持不住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有了钱就顾头不顾尾，没了钱就膳生气，成个什么男子汉大丈夫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            呢！如今咱们虽离城住着，终是天子脚下。这长安城①中，遍
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            地都是钱，只可惜没人会去拿去罢了。在家跳竭②会子也不中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            用。”狗儿听说，便急道：“你老只会炕头儿上混说，难道叫我打劫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            偷去不成？”刘姥姥道：“谁叫你偷去呢。也到底想法儿大家裁
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            还等到这会子呢。我又没有收税的亲戚，作官的朋友，有什么法
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子可想的？便有，也只怕他们未必来理我们呢！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥道：“这倒不然。谋事在人，成事在天。咱们谋到了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看菩萨的保佑，有些机会，也未可知。我倒替你们想出一个机会
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来。当日你们原是和金陵王家连过宗的，二十年前，他们看承你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            们还好；如今自然是你们拉硬屎③，不肯去亲近他，故疏远起来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            想当初我和女儿还去过一遭。他们家的二小姐着实响快，会待
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人，倒不拿大④。如今现是荣国府贾二老爷的夫人。听得说，如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今上了年纪，越发贫恤老，最爱斋僧敬道，舍米舍钱的。如今
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王府虽升了边任，只怕这二姑太太还认得咱们。你何不去走
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            动走动，或者他念旧，有些好处，也未可知。要是他发一点好心，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            拔一根寒毛比咱们的腰还粗呢。”刘氏一旁接口道“你老虽说的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是，但只你我这样个嘴脸，怎么好到他门上去的。先不先，他们
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①长安城一一在今陕西西安市西北。汉汶、唐等朝曾建都于此。这里借指京
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            都。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            跳竭一一也作“跳踏”。急得顿足。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            拉硬屎一装作硬气。俗谓瘦驴拉硬屎一遥能。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            拿大一摆架，不起人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            边任-—一防守边疆的重任。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            92 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾宝玉初试云雨情刘姥姥一进荣国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那些门上的人也未必肯去通信。没的去打嘴现世①。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            谁知狗儿利名心最重，听如此一说，心下便有些活动起来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又听他妻子这话，便笑接道：“姥姥既如此说，况且当年你又见过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这姑太太一次，何不你老人家明日就走一趟，先试试风头再说。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            东西，他家人又不认得我，我去了也是自去的。”狗儿笑道：“不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妨，我教你老人家一个法子：你竟带了外孙子板儿，先去找陪
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            房③周瑞，若见了他，就有些意思了。这周瑞先时曾和我父亲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            交过一件事，我们极好的。”刘姥姥道：“我也知道他的。只是许
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            多时不走动，知道他如今是怎样。这也说不得了，你文是个男
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人，文这样个嘴脸，自然去不得；我们姑娘年轻媳妇子，也难卖头
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卖脚的，倒还是舍着我这付老脸去碰一碰。果然有些好处，大家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            都有益；便是没银子来，我也到那公府侯门见一见世面，也不柱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我一生。说毕，大家笑了一回。当晚计议已定。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日天未明，刘姥姥便起来梳洗了，又将板儿教训了几句。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那板儿才五六岁的孩子，一无所知，听见带他进城逛去，便喜的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无不应承。于是刘姥姥带他进城，找至宁荣街。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来至荣府大门石狮子前，只见簇簇轿马，刘姥姥便不敢过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去，且掸了掸衣服，文教了板儿几句话，然后蹭④到角门前。只
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见儿个挺胸肚指手画脚的人，坐在大板凳上，说东谈西呢。刘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①打嘴现世一说嘴打嘴，现世现报。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②侯门深似海-一形容官僚贵族之家宅大院深、门禁森严，难以进入。语本
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            喻故友旧识因地位悬殊隔绝。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③陪房一一旧时富家女子的随嫁仆人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④蹭(ceng层去声)一一这里是行动缓慢、欲行又止的样子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 86
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第六
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姥姥只得蹭上来问：“太爷们纳福①。”众人打量了他一会，便问
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “那里来的？”刘姥姥陪笑道：“我找太太的陪房周大爷的，烦那位
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            太爷替我请他老出来。”那些人听了，都不瞅躲②，半日方说道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “你远远的在那墙角下等着，一一会子他们家有人就出来的。”内中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有一老年人说道：“不要误他的事，何苦耍他。”因向刘姥姥道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “那周大爷已往南边去了。他在后一带住着，他娘子却在家。你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要找时，从这边绕到后街上后门上去问就是了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥听了谢过，遂携了板儿，绕到后门上。只见门前歇着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            些生意担子，也有卖吃的，也有卖顽要物件的，闹吵吵三二十个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            小孩子在那里斯闹。刘姥姥便拉住一个道：“我问哥儿一声，有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个周大娘可在家么？”孩子们道：“那个周大娘？·我们这里周大娘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有三个呢，还有两个周奶奶，不知是那一行当③的？”刘姥姥道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “是太太的陪房周瑞。”孩子道：“这个容易，你跟我来。”说着，跳
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的引着刘姥姥进了后门，至一院墙边，指与刘姥姥道：“这就
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是他家。”又叫道：“周大娘，有个老奶奶来找你呢，我带了来了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的在内听说，忙迎了出来，问：“是那位？”刘姥姥忙迎
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上来问道：“好呀，周嫂子！”周瑞家的认了半日，方笑道：“刘姥
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姥，你好呀！你说说，能几年，我就忘了。请家里来坐罢。”刘姥
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姥一壁里走着，一壁笑说道：“你老是贵人多忘事，那里还记得我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            们呢。说着，来至房中。周瑞家的命雇的小丫头倒上茶来吃着。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的又问板儿道：“你都长这们大了！”又问些别后闲话。又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            问刘姥姥：“今日还是路过，还是特来的？”刘姥姥便说：“原是特
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            纳一一受福。拍时见面常用的客套话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瞅踩一一理躲。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            行（hang杭）当本指戏曲中角色的分类（见第81页注③）。这里指职务
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的类别。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贯宝玉初试云雨情刘姥姥一进荣国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来瞧瞧嫂子你，二则也请请姑太太的安。若可以领我见一见更
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好，若不能，便借重嫂子转致意罢了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的听了，便已猜着儿分来意。只因昔年他丈夫周瑞
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            争买由地一事，其中多得狗儿之力，今见刘姥姥如此而来，心中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            难却其意；二则也要显弄自已的体面。听如此说，便笑说道：“姥
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姥你放心。大远的诚心诚意来了，岂有个不教你见个真佛の去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的呢。论理，人来客至回话，却不与我相干。我们这里都是各占
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一样儿：我们男的只管春秋两季地租子，闲时只带着小们出门
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子就完了；我只管跟太太奶奶们出门的事。皆因你原是太太的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亲戚，又拿我当个人，投奔了我来，我就破个例，给你通个信去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            但只一件，姥姥有所不知，我们这里文不比五年前了。如今太太
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            竟不大管事，都是琏二奶奶管家了。你道这班二奶奶是谁？就
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是太太的内侄女，当日大舅老爷的女儿，小名凤哥的。”刘姥姥听
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，罕问道：“原来是他！怪道呢，我当日就说他不错呢。这等说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，我今儿还得见他了。”周瑞家的道：“这自然的。如今太太事
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            多心烦，有客来了，略可推得去的就推过去了，都是凤姑娘周旋
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            迎待。今儿宁可不会太太，倒要见他一面，才不枉这里来一遭”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥道：“阿弥陀佛！全仗嫂子方便了。”周瑞家的道：“说那里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话。俗语说的：“与人方便，自己方便。“不过用我说一句话罢了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            害着我什么。”说着，便叫小丫头到倒厅②，上悄悄的打听打听，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            老太太屋里摆了饭了没有。小丫头去了。这里二人又说些闲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①.真佛一佛教术语。佛教徒请佛有报、应、化三身，“报身佛”相对于“化身
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            佛”称为真佛，又名“无相之法身”，即难以见到之意。因此世俗借此喻难以见到的人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            物。这里指王熙凤。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②倒厅一—古代建筑，大厅多数是坐北向南，坐南向北的厅房以及大厅后面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            向后院开门的附属部分，均称“倒厅”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            95
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第六
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥因说：“这凤姑娘今年大还不过二十岁了，就这等
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有本事，当这样的家，可是难得的。”周瑞家的听了道：“我的姥
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姥，告诉不得你呢。这位凤姑娘年纪虽小，行事却比世人都大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            呢。如今出挑的美人一样的模样儿，少说些有一一万个心眼子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            再要赌口齿，十个会说话的男人也说他不过。回来你见了就信
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。就只一件，待下人未免太严些个。”说着，只见小丫头回来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说：“老太太屋里已摆完了饭了，二奶奶在太太屋里呢。”周瑞家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的听了，连忙起身，催着刘姥姥说：“快走，快走。这一下来他吃
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            饭是个空子，咱们先赶着去。若迟一步，回事的人也多了，难说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话。再歇了中觉，越发没了时候了。”说着一齐下了炕，打扫打扫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            衣服，又教了板儿几句话，随着周瑞家的，往贾琏的住处来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            先到了倒厅，周瑞家的将刘姥姥安插在那里略等一等。自
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            已先过了影壁，进了院门，知凤姐未下来，先找着凤姐的一一个心
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            腹通房大丫头①名唤平儿的。周瑞家的先将刘姥姥起初来历
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说明，又说“今日大远的特来请安。当日太太是常会的，今日不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可不见，所以我带了他进来了。等奶奶下来，我细细回明，奶奶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            想也不责备我葬撞的。”平儿听了，便作了主意：“叫他们进来，先
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            在这里坐着就是了。”周瑞家的听了，方出去引他两个进入院来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上了正房台矶，小丫头打起猩红毡帘，才入堂屋，只闻一阵
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            香扑了脸来，竟不辨是何气味，身子如在云端里一般。满屋中之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            物都耀眼争光的，使人头悬目眩。刘姥姥此时惟点头咂嘴念佛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            而已。于是来至东边这间屋内，乃是贾琏的女儿大姐儿睡觉之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①通房大丫头一一贴身侍婢收纳为妾，称“通房丫头”。其地位低于姨娘。通
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            房又称“收房”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            96
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾宝玉初试云雨情刘姥姥一进荣国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            所。平儿站在炕沿边，打量了刘姥姥两眼，只得问个好让坐。刘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姥姥见平儿遍身绫罗，插金带银，花容玉貌的，便当是凤姐儿了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才要称姑奶奶，忽见周瑞家的称他是平姑娘，又见平儿赶着周瑞
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            家的称周大娘，方知不过是个有些体面的丫头了。于是让刘姥
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姥和板儿上了炕，平儿和周瑞家的对面坐在炕沿上，小丫头子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了茶来吃茶。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥只听见咯当咯当的响声，大有似乎打箩柜筛面①的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一般，不免东瞧西望的。忽见堂屋中柱子上挂着一个匣子，底下
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又坠着一个秤蛇般一物，却不住的乱幌。刘姥姥心中想着：“这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是什么爱物儿②？有甚用呢？”正呆时，只听得当的一一声，文若金
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            钟铜磐一般，不防倒唬的一-展眼。接着又是一连八九下。方欲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            问时，只见小丫头子们齐乱跑，说：“奶奶下莱了。”周瑞家的与平
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿忙起身，命刘姥姥“只管等着，是时候我们来请你。”说着，都迎
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            出去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥屏声侧耳默候。只听远远有人笑声，约有一二十妇
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人，衣裙宰，渐入堂屋，往那边屋内去了：又见两三个妇
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人【四），都捧着大漆捧盒，进这边来等候。听得那边说了声“摆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            饭”渐渐的人才散出，只有伺候端菜的几个人。半日鸦雀不闻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之后，忽见二人了一张炕桌来，放在这边炕上，桌上碗盘森列，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            仍是满满的鱼肉在内，不过略动了几样。板儿一见了，便吵着要
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            肉吃，刘姥姥一巴掌打了他去。忽见周瑞家的笑嘻嘻走过来，招
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            手儿叫他。刘姥姥会意，于是带了板儿下炕，至堂屋中，周瑞家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①打梦柜筛面一一一萝柜：装有筛面箩的木柜。筛面时用脚不断踩踏机关，发
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            出“咯当咯当&#34;的声音。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②爱物儿—玩意儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            97
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第六
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的又和他唧咕了一会，方过这边屋里来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只见门外鑫铜钩上悬着大红撒花软帘，南窗下是炕，炕上大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            红毡条，靠东边板壁立着个锁子锦①靠背与一个引枕，铺着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            金心绿闪缎大坐褥，旁边有雕漆痰盒。那凤姐儿家常带着秋板
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            貂鼠昭君套②，围着珠勒子③，穿着桃红撒花袄；石青刻丝灰鼠
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            披风④，大红洋绝银鼠皮裙，粉光脂艳，端端正正坐在那里，手内
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            拿着小铜火箸儿拨手炉内的灰。平儿站在炕沿边，捧着小小的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一个填漆?茶盘，盘内一个小盖钟。凤姐也不接茶，也不抬头，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只管拨手炉内的灰，慢慢的问道：“怎么还不请进来？*一面说，一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面抬身要茶时，只见周瑞家的已带了两个人在地下站着呢。这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才忙欲起身；犹未起身时，满面春风的问好，文着周瑞家的怎
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            么不早说。刘姥姥在地下已是拜了数拜，问姑奶奶安。凤姐忙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说：“周姐姐，快换起来，别拜罢，请坐。我年轻，不大认得，可也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不知是什么辈数，不敢称呼。”周瑞家的忙回道：“这就是我才回
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的那姥姥了。”凤姐点头。刘姥姥已在炕沿上坐了。板儿便躲在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            锁子锦一用金色丝线织成锁链形图案的锦缎。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②秋板貂鼠昭君套一貂:鼬属的一种小型动物。貂皮是贵重的短毛细皮，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            以紫貂最贵。秋板貂是指秋季的绒毛尚未长全的貂鼠皮，文称“秋皮”。它比“夏皮”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            稍佳，但不如“正冬皮”。昭君套：没有顶的女用皮帽罩，因形同戏曲、绘画中昭君出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            塞所戴之罩，故名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③勒子帽箍，用珠玉穿缀或以绒缎做成，套于额上，掩及耳间。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ：①披风一一古称梢子。明代王圻（三才图会》：“子，即今之披风。《实录》
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日：“秦二世诏，朝服上加补子，其制袖短于衫，身与衫齐而大袖。宋又与裙齐雨袖才
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宽于衫。”宋代用作妇女常服，两腋下开长夜，多为直领。《明史·舆服志》：“四楼袄子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            即子。”子去半袖则成半臂，去全袖则成背心，与后世所谓披肩外衣之披风迥非
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一-物。清代妇女礼服外套多用披风，作用与男褂相似。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            填漆一一漆器工艺之一，即填彩漆。有“磨显填漆”和“镂嵌填漆”两种，前
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            者“先堆后填”，后者刻后再填”，都需磨平。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            98
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾宝玉初试云雨情刘姥姥一进荣国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            背后，百般的哄他出来作撑，他死也不肯。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐儿笑道：“亲戚们不大走动，都蔬远了。知道的呢，说你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            们弃厌我们，不背常来；不知道的那起小人，还只当我们眼里没
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人似的。”刘姥姥忙念佛道：“我们家道艰难，走不起，来了这里，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “这话没的叫人恶心。不过借赖着祖父虚名，作了穷官儿，谁家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有什么，不过是个旧日的空架子。·俗语说，‘朝廷还有三门子穷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亲戚”呢，何况你我。”说着，又问周瑞家的回了太太了没有。周
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有事就罢，得闲儿呢就回，看怎么说。”周瑞家的答应着去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里凤姐叫人抓些果子与板儿吃，刚问些闲话时，就有家下
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            许多媳妇管事的来回话。平儿回了，凤姐道：“我这里陪客呢，晚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上再来回。若有很要紧的，你就带进来现办。”平儿出去了，一会
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            进来说：“我都问了，没什么紧事，我就叫他们散了。”凤姐点头。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只见周瑞家的回来，向风姐道：“太太说了，今日不得闲，二奶奶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            陪着便是一样。多谢费心想着。白来逛逛呢便罢；若有甚说的，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瞧瞧姑太太、姑奶奶，也是亲戚们的情分。”周瑞家的道：“没甚说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的便罢；若有话，只管回一奶奶，是和太太一样的。”一面说，一面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            递眼色与刘姥姥。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥会意，未语先飞红的脸，欲待不说，今日又所为何来？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只得耻说道：“论理今儿初次见姑奶奶，却不该说，只是大远的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            奔了你老这里来，也少不的说了。”刚说到这里，只听二门上小厮
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。”面便问：“你蓉大爷【五}在那里呢？”只听一路靴子脚响，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            进来了一个十七八岁的少年，面目清秀，身材俊俏，轻裘宝带，美
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            66
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第銀六銀回
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            服华冠。刘姥姥此时坐不是，立不是，藏没处藏。凤姐笑道：“你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只管坐着，这是我侄儿。”刘姥姥方扭扭捏捏在炕沿上坐了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾蓉笑道：“我父亲打发我来求子，说上回老舅太太给婵
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子的那架玻璃炕屏①，明日请一个要紧的客，借了略摆一摆就送
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过来。”凤姐道：“说迟了一日，昨儿已经给了人了。”贾蓉听着，嘻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            嘻的笑着，在炕沿上半跪道：“嫌子若不借，又说我不会说话了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又挨一顿好打呢。子只当可怜侄儿罢。”凤姐笑道：“也没见你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            们，王家的东西都是好的不成？你们那里放着那些好东西，只是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看不见，偏我的就是好的。贾蓉笑道：“那里有这个好呢！只求
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            开恩罢。”风姐道：“若碰～点儿，你可仔细你的皮！”因命平儿拿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了楼房的钥匙，传几个妥当人抬去。贾蓉喜的眉开眼笑，说：“我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亲自带了人拿去，别由他们乱碰。”说着便起身出去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里凤姐忽又想起一事来，便向窗外：“叫蓉哥回来。”外面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            几个人接声说：“蓉大爷快回来。”贾蓉忙复身转来，垂手待立，听
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            阿凤指示[六]。那凤姐只管慢慢的吃茶，出了半日的神，又笑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“黑了，你且去罢。晚饭后你来再说罢。这会子有人，我也没
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            精神了。”贾蓉应了声，方慢慢的退去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里刘姥姥心神方定，才又说道：“今日我带了你侄儿来，也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不为别的，只因他老子娘在家里，连吃的都没有。如今天又冷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，越想没个派头儿②，只得带了你侄儿奔了你老来。”说着又推
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            板儿道：“你那爹在家怎么教你来？打发咱们作煞事③来？只
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            炕屏一一陈设在炕上的~一种小屏风。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            派头儿一一一这里是“盼头儿”的衍音。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            作然事一作啥事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            100
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾宝玉初试云雨情刘姥姥-一进荣国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有？”刘姥姥忙说道：“一早就往这里赶咳，那里还有吃饭的工夫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            。”凤姐听说，忙命快传饭来。一时周瑞家的传了一桌客饭来，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            摆在东边屋内，过来带了刘姥姥和板儿过去吃饭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐说道：“周姐姐，好生让着些儿，我不能陪了。”于是过东
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            边房里来。文叫过周瑞家的去，问他才回了太太，说了些什么？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            周瑞家的道：“太太说，他们家原不是一家子，不过因出一姓，当
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            年又与太老爷在一处作官，偶然连了宗的。这几年来也不大走
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            动。当时他们来一遭，却也没空了他们。今儿既来了瞧瞧我们，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是他的好意思，也不可简慢了他。便是有什么说的，叫奶奶裁度
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着就是广。”凤姐听广说道：“我说呢，既是一家子，我如何连影儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也不知道。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说话时，刘姥姥已吃毕了饭，拉了板儿过来，舌咂嘴的道
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            谢。凤姐笑道：“且请坐下，听我告诉你老人家。方才的意思，我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            已知道了。若论亲戚之间，原该不等上门来就该有照应才是。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            但如今家内杂事太烦，太太渐上了年纪，一时想不到也是有的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            况是我近来接着管些事，都不知道这些亲戚们。二则外头看着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            虽是烈烈轰轰的，殊不知天有大的艰难去处，说与人也未必信
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黑。今儿你既老远的来了，又是头一次见我张口，怎好叫你空回
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去呢。可巧昨儿太太给我的丫头们做衣裳的二十两银子，我还
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            没动呢，你若不嫌少，就暂且先拿了去罢。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那刘姥姥先听见告艰难，只当是没有，心里便突突的；后来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            听见给他二十两，喜的又浑身发痒起来，说道：“暖，我也是知道
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            艰难的。但俗语说的：“瘦死的骆驼比马大”，凭他怎样，你老拔
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            根寒毛比我们的腰还粗呢！”周瑞家的见他说的粗，只管使眼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            色止他。风姐看见，笑而不躲，只命平儿把昨儿那包银子拿来，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            101
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第六
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            再拿一吊钱来，都送到刘姥姥的跟前。凤姐乃道：“这是二十两
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            银子，暂且给这孩子做件冬衣罢。若不拿着，就真是怪我了。这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            钱雇车坐罢。改日无事，只管来逛逛，方是亲戚们的意思。天也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            晚了，也不虚留你们了，到家里该问好的问个好儿墨。”一面说，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面就站了起来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刘姥姥只管千恩万谢的，拿了银子钱，随了周瑞家的来至外
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面。周瑞家的道：“我的娘啊！·你见了他怎么倒不会说了？开口
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            就是“你侄儿，。我说句不怕你恼的话，便是亲侄儿，也要说和软
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            些。蓉大爷才是他的正经侄儿呢，他怎么又跑出这么一个侄儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来了。”刘姥姥笑道：“我的嫂子，我见了他，心眼儿里爱还爱不过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，那里还说的上话来呢。”二人说着，又到周瑞家坐了片时。刘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姥姥便要留下块银子与周瑞家孩子们买果子吃，周瑞家的如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            何放在眼里，执意不肯。刘姥姥感谢不尽，仍从后门去了。正
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得意浓时易接济，受恩深处胜亲朋。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            校记
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【一】此回已卯、梦稿、蒙府、戚序、舒序本有回前诗：“题日：朝邯富
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿门，富儿犹未足。虽无干金酬，彼胜骨肉。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            *且听细讲”，甲成、蒙府、戚序、舒序本作“诸公若嫌琐碎粗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            呢，则快掷下此书，另觅好书去醒目；若谓聊可破闷时，待物逐细言来”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [三] “可是说的”，原作&#34;是啊人云”，从各本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [四]
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            甲辰、舒序本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [五] “蓉大爷”，原作“荣大爷”，从甲戌、蒙府、戚序、甲辰、舒序本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [六】“听阿凤指示”，已卯、梦稿本同。甲戌、甲辰、舒序本作“听何
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            指示”。此语颇似脂批口气，疑为脂批在传抄中误入正文。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            102
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="fax_chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本影印</span>
+        <span class="col-desc">程乙本校注本影印页（贵州人民出版社PDF）</span>
+        <span>第6回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾宝玉初试云雨情 刘姥姥一进荣国府</h3>
+        
+        <div class="fax-view" data-fax="fax_chengyi">
+          <div class="fax-toolbar">
+            <button type="button" class="fax-prev" data-dir="-1">←</button>
+            <span class="fax-page-info">第<span class="fax-cur">1</span>页</span>
+            <button type="button" class="fax-next" data-dir="1">→</button>
+          </div>
+          <div class="fax-stage">
+            <img class="fax-img" alt="影印页">
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

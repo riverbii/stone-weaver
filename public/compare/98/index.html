@@ -1,0 +1,2380 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第98回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="98">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/97" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" >第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" >第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" >第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" >第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" >第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" >第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" >第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" >第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" selected>第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" >第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/99" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi_ocr" data-label="程乙本OCR" checked>
+          程乙本OCR
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/98">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第98回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</h3>
+        
+        
+        <p class="col-para">
+          
+            話說寶玉見了賈政，回至房中，更覺頭昏腦悶，懶待動彈，連飯也沒吃，便昏沉睡去。仍舊延醫診治，服藥不效，索性連人也認不明白了。大家扶著他坐起來，還是象個好人。一連鬧了幾天，那日恰是回九之期，若不過去，薛姨媽臉上過不去，若說去呢，寶玉這般光景。賈母明知是為黛玉而起，欲要告訴明白，又恐氣急生變。寶釵是新媳婦，又難勸慰，必得姨媽過來才好。若不回九，姨媽嗔怪。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便與王夫人鳳姐商議道：“我看寶玉竟是魂不守舍，起動是不怕的。用兩乘小轎叫人扶著從園里過去，應了回九的吉期，以後請姨媽過來安慰寶釵，咱們一心一意的調治寶玉，可不兩全？”王夫人答應了，即刻預備。幸虧寶釵是新媳婦，寶玉是個瘋傻的，由人掇弄過去了。寶釵也明知其事，心里只怨母親辦得糊涂，事已至此，不肯多言。獨有薛姨媽看見寶玉這般光景，心里懊悔，只得草草完事。到家，寶玉越加沉重，次日連起坐都不能了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日重一日，甚至湯水不進。薛姨媽等忙了手腳，各處遍請名醫，皆不識病源。只有城外破寺中住著個窮醫，姓畢，別號知庵的，診得病源是悲喜激射，冷暖失調，飲食失時，憂忿滯中，正氣壅閉：此內傷外感之症。于是度量用藥，至晚服了，二更後果然省些人事，便要水喝。賈母王夫人等才放了心，請了薛姨媽帶了寶釵都到賈母那里暫且歇息。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉片時清楚，自料難保，見諸人散後，房中只有襲人，因喚襲人至跟前，拉著手哭道：“我問你，寶姐姐怎麼來的？我記得老爺給我娶了林妹妹過來，怎麼被寶姐姐赶了去了？他為什麼霸占住在這里？我要說呢，又恐怕得罪了他。你們聽見林妹妹哭得怎麼樣了？”襲人不敢明說，只得說道：“林姑娘病著呢。”寶玉又道：“我瞧瞧他去。”說著，要起來。豈知連日飲食不進，身子那能動轉，便哭道：“我要死了！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我有一句心里的話，只求你回明老太太：橫豎林妹妹也是要死的，我如今也不能保。兩處兩個病人都要死的，死了越發難張羅。不如騰一處空房子，趁早將我同林妹妹兩個抬在那里，活著也好一處醫治伏侍，死了也好一處停放。你依我這話，不枉了幾年的情分。”襲人聽了這些話，便哭的哽嗓氣噎。寶釵恰好同了鶯兒過來，也聽見了，便說道：“你放著病不保養，何苦說這些不吉利的話。老太太才安慰了些，你又生出事來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            老太太一生疼你一個，如今八十多歲的人了，雖不圖你的封誥，將來你成了人，老太太也看著樂一天，也不枉了老人家的苦心。太太更是不必說了，一生的心血精神，撫養了你這一個兒子，若是半途死了，太太將來怎麼樣呢。我雖是命薄，也不至于此。据此三件看來，你便要死，那天也不容你死的，所以你是不得死的。只管安穩著，養個四五天後，風邪散了，太和正氣一足，自然這些邪病都沒有了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”寶玉聽了，竟是無言可答，半晌方才嘻嘻的笑道：“你是好些時不和我說話了，這會子說這些大道理的話給誰聽？”寶釵聽了這話，便又說道：“實告訴你說罷，那兩日你不知人事的時候，林妹妹已經亡故了。”寶玉忽然坐起來，大聲詫异道：“果真死了嗎？”寶釵道：“果真死了。豈有紅口白舌咒人死的呢。老太太，太太知道你姐妹和睦，你聽見他死了自然你也要死，所以不肯告訴你。”寶玉聽了，不禁放聲大哭，倒在床上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            忽然眼前漆黑，辨不出方向，心中正自恍惚，只見眼前好象有人走來，寶玉茫然問道：“借問此是何處？”那人道：“此陰司泉路。你壽未終，何故至此？”寶玉道：“适聞有一故人已死，遂尋訪至此，不覺迷途。”那人道：“故人是誰？”寶玉道：“姑蘇林黛玉。”那人冷笑道：“林黛玉生不同人，死不同鬼，無魂無魄，何處尋訪！凡人魂魄，聚而成形，散而為氣，生前聚之，死則散焉。常人尚無可尋訪，何況林黛玉呢。汝快回去罷。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”寶玉聽了，呆了半晌道：“既云死者散也，又如何有這個陰司呢？”那人冷笑道：“那陰司說有便有，說無就無。皆為世俗溺于生死之說，設言以警世，便道上天深怒愚人，或不守分安常，或生祿未終自行夭折，或嗜淫欲尚氣逞凶無故自隕者，特設此地獄，囚其魂魄，受無邊的苦，以償生前之罪。汝尋黛玉，是無故自陷也。且黛玉已歸太虛幻境，汝若有心尋訪，潛心修養，自然有時相見。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如不安生，即以自行夭折之罪囚禁陰司，除父母外，欲圖一見黛玉，終不能矣。”那人說畢，袖中取出一石，向寶玉心口擲來。寶玉聽了這話，又被這石子打著心窩，嚇的即欲回家，只恨迷了道路。正在躊躇，忽聽那邊有人喚他。回首看時，不是別人，正是賈母，王夫人，寶釵，襲人等圍繞哭泣叫著。自己仍舊躺在床上。見案上紅燈，窗前皓月，依然錦銹叢中，繁華世界。定神一想，原來竟是一場大夢。渾身冷汗，覺得心內清爽。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            仔細一想，真正無可奈何，不過長歎數聲而已。寶釵早知黛玉已死，因賈母等不許眾人告訴寶玉知道，恐添病難治。自己卻深知寶玉之病實因黛玉而起，失玉次之，故趁勢說明，使其一痛決絕，神魂歸一，庶可療治。賈母王夫人等不知寶釵的用意，深怪他造次。後來見寶玉醒了過來，方才放心。立即到外書房請了畢大夫進來診視。那大夫進來診了脈，便道：“奇怪，這回脈氣沉靜，神安郁散，明日進調理的藥，就可以望好了。”說著出去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眾人各自安心散去。襲人起初深怨寶釵不該告訴，惟是口中不好說出。鶯兒背地也說寶釵道：“姑娘忒性急了。”寶釵道：“你知道什麼！好歹橫豎有我呢。”那寶釵任人誹謗，並不介意，只窺察寶玉心病，暗下針砭。一日，寶玉漸覺神志安定，雖一時想起黛玉，尚有糊涂。更有襲人緩緩的將“老爺選定的寶姑娘為人和厚，嫌林姑娘秉性古怪，原恐早夭，老太太恐你不知好歹，病中著急，所以叫雪雁過來哄你”的話時常勸解。寶玉終是心酸落淚。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欲待尋死，又想著夢中之言，又恐老太太，太太生氣，又不能撩開。又想黛玉已死，寶釵又是第一等人物，方信金石姻緣有定，自己也解了好些。寶釵看來不妨大事，于是自己心也安了，只在賈母王夫人等前盡行過家庭之禮後，便設法以釋寶玉之憂。寶玉雖不能時常坐起，亦常見寶釵坐在床前，禁不住生來舊病。寶釵每以正言勸解，以”養身要緊，你我既為夫婦，豈在一時”之語安慰他。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那寶玉心里雖不順遂，無奈日里賈母王夫人及薛姨媽等輪流相伴，夜間寶釵獨去安寢，賈母又派人服侍，只得安心靜養。又見寶釵舉動溫柔，也就漸漸的將愛慕黛玉的心腸略移在寶釵身上，此是後話。卻說寶玉成家的那一日，黛玉白日已昏暈過去，卻心頭口中一絲微氣不斷，把個李紈和紫鵑哭的死去活來。到了晚間，黛玉去又緩過來了，微微睜開眼，似有要水要湯的光景。此時雪雁已去，只有紫鵑和李紈在旁。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            紫鵑便端了一盞桂圓湯和的梨汁，用小銀匙灌了兩三匙。黛玉閉著眼靜養了一會子，覺得心里似明似暗的。此時李紈見黛玉略緩，明知是回光反照的光景，卻料著還有一半天耐頭，自己回到稻香村料理了一回事情。這里黛玉睜開眼一看，只有紫鵑和奶媽并幾個小丫頭在那里，便一手攥了紫鵑的手，使著勁說道：“我是不中用的人了。你伏侍我幾年，我原指望咱們兩個總在一處。不想我。……”說著，又喘了一會子，閉了眼歇著。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            紫鵑見他攥著不肯松手，自己也不敢挪動，看他的光景比早半天好些，只當還可以回轉，聽了這話，又寒了半截。半天，黛玉又說道：“妹妹，我這里并沒親人。我的身子是乾淨的，你好歹叫他們送我回去。”說到這里又閉了眼不言語了。那手卻漸漸緊了，喘成一處，只是出氣大入氣小，已經促疾的很了。紫鵑忙了，連忙叫人請李紈，可巧探春來了。紫鵑見了，忙悄悄的說道：“三姑娘，瞧瞧林姑娘罷。”說著，淚如雨下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            探春過來，摸了摸黛玉的手已經涼了，連目光也都散了。探春紫鵑正哭著叫人端水來給黛玉擦洗，李紈赶忙進來了。三個人才見了，不及說話。剛擦著，猛聽黛玉直聲叫道：“寶玉，寶玉，你好……”說到“好”字，便渾身冷汗，不作聲了。紫鵑等急忙扶住，那汗愈出，身子便漸漸的冷了。探春李紈叫人亂著攏頭穿衣，只見黛玉兩眼一翻，嗚呼，香魂一縷隨風散，愁緒三更入夢遙！當時黛玉氣絕，正是寶玉娶寶釵的這個時辰。紫鵑等都大哭起來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李紈探春想他素日的可疼，今日更加可怜，也便傷心痛哭。因瀟湘館離新房子甚遠，所以那邊并沒聽見。一時大家痛哭了一陣，只聽得遠遠一陣音樂之聲，側耳一聽，卻又沒有了。探春李紈走出院外再聽時，惟有竹梢風動，月影移牆，好不凄涼冷淡！一時叫了林之孝家的過來，將黛玉停放畢，派人看守，等明早去回鳳姐。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳳姐因見賈母王夫人等忙亂，賈政起身，又為寶玉惛憒更甚，正在著急异常之時，若是又將黛玉的凶信一回，恐賈母王夫人愁苦交加，急出病來，只得親自到園。到了瀟湘館內，也不免哭了一場。見了李紈探春，知道諸事齊備，便說：“很好。只是剛才你們為什麼不言語，叫我著急？”探春道：“剛才送老爺，怎麼說呢。”鳳姐道：“還倒是你們兩個可怜他些。這麼著，我還得那邊去招呼那個冤家呢。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            但是這件事好累墜，若是今日不回，使不得，若回了，恐怕老太太擱不住。”李紈道：“你去見机行事，得回再回方好。”鳳姐點頭，忙忙的去了。鳳姐到了寶玉那里，聽見大夫說不妨事，賈母王夫人略覺放心，鳳姐便背了寶玉，緩緩的將黛玉的事回明了。賈母王夫人聽得都唬了一大跳。賈母眼淚交流說道：“是我弄坏了他了。但只是這個丫頭也忒傻氣！”說著，便要到園里去哭他一場，又惦記著寶玉，兩頭難顧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王夫人等含悲共勸賈母不必過去，“老太太身子要緊。”賈母無奈，只得叫王夫人自去。又說：“你替我告訴他的陰靈：‘并不是我忍心不來送你，只為有個親疏。你是我的外孫女兒，是親的了，若與寶玉比起來，可是寶玉比你更親些。倘寶玉有些不好，我怎麼見他父親呢。’”說著，又哭起來。王夫人勸道：“林姑娘是老太太最疼的，但只壽夭有定。如今已經死了，無可盡心，只是葬禮上要上等的發送。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一則可以少盡咱們的心，二則就是姑太太和外甥女兒的陰靈兒，也可以少安了。”賈母聽到這里，越發痛哭起來。鳳姐恐怕老人家傷感太過，明仗著寶玉心中不甚明白，便偷偷的使人來撒個謊兒哄老太太道：“寶玉那里找老太太呢。”賈母聽見，才止住淚問道：“不是又有什麼緣故？”鳳姐陪笑道：“沒什麼緣故，他大約是想老太太的意思。”賈母連忙扶了珍珠兒，鳳姐也跟著過來。走至半路，正遇王夫人過來，一一回明了賈母。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈母自然又是哀痛的，只因要到寶玉那邊，只得忍淚含悲的說道：“既這麼著，我也不過去了。由你們辦罷，我看著心里也難受，只別委屈了他就是了。”王夫人鳳姐一一答應了。賈母才過寶玉這邊來，見了寶玉，因問：“你做什麼找我？”寶玉笑道：“我昨日晚上看見林妹妹來了，他說要回南去。我想沒人留的住，還得老太太給我留一留他。”賈母聽著，說：“使得，只管放心罷。”襲人因扶寶玉躺下。賈母出來到寶釵這邊來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那時寶釵尚未回九，所以每每見了人倒有些含羞之意。這一天見賈母滿面淚痕，遞了茶，賈母叫他坐下。寶釵側身陪著坐了，才問道：“聽得林妹妹病了，不知他可好些了？”賈母聽了這話，那眼淚止不住流下來，因說道：“我的兒，我告訴你，你可別告訴寶玉。都是因你林妹妹，才叫你受了多少委屈。你如今作媳婦了，我才告訴你。這如今你林妹妹沒了兩三天了，就是娶你的那個時辰死的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如今寶玉這一番病還是為著這個，你們先都在園子里，自然也都是明白的。”寶釵把臉飛紅了，想到黛玉之死，又不免落下淚來。賈母又說了一回話去了。自此寶釵千回萬轉，想了一個主意，只不肯造次，所以過了回九才想出這個法子來。如今果然好些，然後大家說話才不至似前留神。獨是寶玉雖然病勢一天好似一天，他的痴心總不能解，必要親去哭他一場。賈母等知他病未除根，不許他胡思亂想，怎奈他郁悶難堪，病多反复。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倒是大夫看出心病，索性叫他開散了，再用藥調理，倒可好得快些。寶玉聽說，立刻要往瀟湘館來。賈母等只得叫人抬了竹椅子過來，扶寶玉坐上。賈母王夫人即便先行。到了瀟湘館內，一見黛玉靈柩，賈母已哭得淚乾氣絕。鳳姐等再三勸住。王夫人也哭了一場。李紈便請賈母王夫人在里間歇著，猶自落淚。寶玉一到，想起未病之先來到這里，今日屋在人亡，不禁嚎啕大哭。想起從前何等親密，今日死別，怎不更加傷感。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眾人原恐寶玉病後過哀，都來解勸，寶玉已經哭得死去活來，大家攙扶歇息。其餘隨來的，如寶釵，俱极痛哭。獨是寶玉必要叫紫鵑來見，問明姑娘臨死有何話說。紫鵑本來深恨寶玉，見如此，心里已回過來些，又見賈母王夫人都在這里，不敢灑落寶玉，便將林姑娘怎麼复病，怎麼燒毀帕子，焚化詩稿，并將臨死說的話，一一的都告訴了。寶玉又哭得氣噎喉乾。探春趁便又將黛玉臨終囑咐帶柩回南的話也說了一遍。賈母王夫人又哭起來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            多虧鳳姐能言勸慰，略略止些，便請賈母等回去。寶玉那里肯舍，無奈賈母逼著，只得勉強回房。賈母有了年紀的人，打從寶玉病起，日夜不宁，今又大痛一陣，已覺頭暈身熱。雖是不放心惦著寶玉，卻也掙扎不住，回到自己房中睡下。王夫人更加心痛難禁，也便回去，派了彩雲幫著襲人照應，并說：“寶玉若再悲戚，速來告訴我們。”寶釵是知寶玉一時必不能舍，也不相勸，只用諷刺的話說他。寶玉倒恐寶釵多心，也便飲泣收心。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            歇了一夜，倒也安穩。明日一早，眾人都來瞧他，但覺氣虛身弱，心病倒覺去了幾分。于是加意調養，漸漸的好起來。賈母幸不成病，惟是王夫人心痛未痊。那日薛姨媽過來探望，看見寶玉精神略好，也就放心，暫且住下。一日，賈母特請薛姨媽過去商量說：“寶玉的命都虧姨太太救的，如今想來不妨了，獨委屈了你的姑娘。如今寶玉調養百日，身体复舊，又過了姑娘的功服，正好圓房。要求姨太太作主，另擇個上好的吉日。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”薛姨媽便道：“老太太主意很好，何必問我。寶丫頭雖生的粗笨，心里卻還是极明白的。他的性情老太太素日是知道的。但願他們兩口兒言和意順，從此老太太也省好些心，我姐姐也安慰些，我也放了心了。老太太便定個日子。還通知親戚不用呢？”賈母道：“寶玉和你們姑娘生來第一件大事，況且費了多少周折，如今才得安逸，必要大家熱鬧幾天。親戚都要請的。一來酬願，二則咱們吃杯喜酒，也不枉我老人家操了好些心。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”薛姨媽聽說，自然也是喜歡的，便將要辦妝奩的話也說了一番。賈母道：“咱們親上做親，我想也不必這些。若說動用的，他屋里已經滿了。必定寶丫頭他心愛的要你幾件，姨太太就拿了來。我看寶丫頭也不是多心的人，不比的我那外孫女兒的脾氣，所以他不得長壽。”說著，連薛姨媽也便落淚。恰好鳳姐進來，笑道：“老太太姑媽又想著什麼了？”薛姨媽道：“我和老太太說起你林妹妹來，所以傷心。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”鳳姐笑道：“老太太和姑媽且別傷心，我剛才聽了個笑話兒來了，意思說給老太太和姑媽聽。”賈母拭了拭眼淚，微笑道：“你又不知要編派誰呢，你說來我和姨太太聽聽。說不笑我們可不依。”只見那鳳姐未從張口，先用兩只手比著，笑彎了腰了。未知他說出些什麼來，下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi_ocr">
+      <div class="compare-col-head">
+        <span class="badge">程乙本OCR</span>
+        <span class="col-desc">程乙本OCR（欧阳健校注本PDF本地识别）</span>
+        <span>第98回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</h3>
+        
+        
+        <p class="col-para">
+          
+            话说宝玉见了费政，回至房中，更觉头昏脑闷，懒待动弹，连饭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也没吃，便昏沉睡去。仍旧延医诊治，服药不效，索性连人也认不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            明白了。大家扶着他坐起来，还是像个好人。一连闹了几天。那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日恰是回九①之期，说是若不过去，薛姨妈脸上过不去；若说去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            呢，宝玉这般光景，贾母明知是为黛玉而起，欲要告诉明白，又恐气
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            急生变。宝钗是新媳妇，又难劝慰，必得姨妈过来才好。若不回
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            九，姨妈嗔怪。便与王夫人、凤姐商议道：“我看宝玉竟是魂不守
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            舍，起动是不怕的。用两乘小轿，叫人扶着从园里过去，应了回九
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的吉期，以后请姨妈过来安慰宝钗，咱们一心一计的调治宝玉，可
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不两全？”王夫人答应了，即刻预备。幸亏宝钗是新媳妇，宝玉是个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            疯傻的，由人弄过去了。宝钗也明知其事，心里只怨母亲办得糊
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            涂；事已至此，不肯多言。独有薛姨妈看见宝玉这般光景，心里噢
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            悔，只得草草完事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回家，宝玉越加沉重，次日连起坐都不能了。日重一日，甚至
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            汤水不进。薛姨妈等忙了手脚，各处遍请名医，皆不识病源。只有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            城外破寺中住着个穷医姓毕别号知庵的，诊得病源是悲喜激射，冷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            暖失调，饮食失时，忧念滞中，正气雍闭：此内伤外感之症。於是度
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            量用药，至晚服了，二更后果然省些人事，便要喝水。贾母、王夫人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等才放了心，请了薛姨妈带了宝钗，都到贾母那里，暂且歇息。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉片时清楚，自料难保，见诸人散后，房中只有袭人，因唤袭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①回九一一新娘婚后三天回娘家叫回门，九天再回娘家叫回九。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中国古典文学名药
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人至跟前，拉着手哭道：“我问你，宝姐姐怎么来的？我记得老爷给
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我娶了林妹妹过来，怎么叫宝姐姐赶出去了？他为什么赖占住在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里？我要说呢，又恐怕得罪了他。你们听见林妹妹哭的怎么样
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了？”袭人不敢明说，只得说道：“林姑娘病着呢。&#34;宝玉又道：“我瞧
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瞧他去。”说着，要起来，那知连日饮食不进，身子岂能动转？便哭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“我要死了！我有一句心里的话，只求你回明老太太：横竖林妹
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妹也是要死的，我如今也不能保，两处两个病人，都要死的，死了越
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            发难张罗。不如腾一处空房子，趁早把我和林妹妹两个抬在那里，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            活着也好一处医治伏侍，死了也好一处停放。你依我这话，不枉了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            几年的情分！”袭人听了这些话，又急，又笑，又痛。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝钗恰好同了莺儿过来，也听见了，便说道：“你放着病不保
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            养，何苦说这些不吉利的话呢？老太太才安慰了些，你又生出事
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来。老太太一生疼你一个，如今八十多岁的人了，虽不图你的封
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            造，将来你成了人，老太太也看着乐天，也不枉了老人家的苦心。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            太太更是不必说了，一生的心血精神抚养了你这一个儿子，若是半
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            途死了，太太将来怎么样呢！我虽是薄命，也不至於此。据此三件
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看来，你就要死，那天也不容你死的，所以你是不能死的。只管安
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            稳着，养个四五天后，风邪散了，太和正气一足，自然这些邪病都没
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有了。”宝玉听了，竟是无言可答，半响方才嘻嘻的笑道：“你是好些
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            时不和我说话了，这会子说这些大道理的话给谁听？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝钗听了这话，便又说道：“实告诉你说罢：那两日你不知人事
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的时候，林妹妹已经亡故了。”宝玉忽然坐起，大声异道：“果真死
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了吗？&#34;宝钗道：“果真死了。岂有红口白舌咒人死的呢！老太太、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            太太知道你姐妹和睦，你听见他死了，自然你也要死，所以不肯告
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            诉你。”宝玉听了，不禁放声大哭，倒在床上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            忽然眼前漆黑，辨不出方向，心中正自您，只见眼前好像有 PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人走来。宝玉范然问道：“借问此是何处？&#34;那人道：“此是阴泉路。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你寿未终，何故至此？”宝玉道：“适闻有一故人已死，遂寻访至此，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不觉迷途。那人道：“故人是谁？”宝玉道：“姑苏林黛玉。&#34;那人冷笑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“林黛玉生不同人，死不同鬼，无魂无魄，何处寻访？凡人魂魄，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            聚而成形，散而为气；生前聚之，死则散為。常人尚无可寻访，何况
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林黛玉呢？汝快回去罢。”宝玉听了，呆了半响，道：“既云死者散
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也，又如何有这个“阴司”呢？”那人冷笑道：“那“阴司”说有便有，说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无就无。皆为世俗溺於生死之说，设言以警世，便道上天深怒惠
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人，或不守分安常；或生禄未终，自行关折；或嗜欲，尚气遥凶，无
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            故自陨者。特设此地狱，囚其魂魄，受无边的苦，以偿生前之罪。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            汝寻黛玉，是无故自陷也。且黛玉已归太虚幻境，汝若有心寻访，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            潜心修养，自然有时相见；如不安生，即以自行天折之罪，囚禁阴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            司，除父母之外，图一见黛玉，终不能。”那人说毕，袖中取出一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            石，向宝玉心口掷来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉听了这话，又被这石子打着心窝，吓的即欲回家，只恨迷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了道路。正在踏，忽听那边有人唤他。回首看时，不是别人，正
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是贾母、王夫人、宝钗、袭人等，围绕哭泣叫着，自已仍旧躺在床上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见案上红灯，窗前皓月，依然锦绣丛中，繁华世界。定神一想，原来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            竟是一场大梦。浑身冷汗，觉得心内清爽。仔细一想，真正无可奈
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            何，不过长叹数声。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            起初宝钗卓知黛玉已死，因贾母等不许众人告诉宝玉知道，恐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            添病难治；自己却深知宝玉之病，实因黛玉而起，失玉次之，故趁势
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说明，使其一痛决绝，神魂归一，庶可疗治。费母、王夫人等不知宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的用意，深怪他造次；后来见宝玉醒了过来，方才放心，立刻到外
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书房请了毕大夫进来诊视。那大夫进来诊了脉，便道：“奇怪！这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回脉气沉静，神安郁散，明日进调理的药，就可以望好了。说着出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去。众人各自安心散去。袭人起初深怨宝钗不该告诉，惟是口中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道什么！好横竖有我呢。”那宝钗任人诽谤，并不介意，只窥察宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中国古典文学名茗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉心病，暗下针砭①。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一日，宝玉渐觉神志安定，虽一时想起黛玉，尚有糊涂，更有袭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人缓缓的将“老爷选定的宝姑娘为人和厚，嫌林姑娘秉性古怪，原
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恐早天，老太太恐你不知好万，病中着急，所以叫雪雁过来哄你”的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话时常劝解，宝玉终是心酸落泪。欲待寻死，又想着梦中之言，又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恐老太太、太太生气，又不得擦开。又想黛玉已死，宝钗又是第一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等人物，方信“金玉姻缘”有定，自已也解了好些。宝钗看来不妨大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            事，於是自已心也安了，只在贾母、王夫人等前尽行过家庭之礼后，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便设法以释宝玉之忧。宝玉虽不能时常坐起，亦常见宝坐在床
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            前，禁不住生来旧病。宝钗每以正言劝解，以“养身要紧，你我既为
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            夫妇，岂在一时”之语安慰他。那宝玉心里虽不顺遂，无奈日里贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母、王夫人及薛姨妈等轮流相伴，夜间宝钗独去安寝，贾母又派人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            伏侍，只得安心静养。又见宝钗举动温柔，就也渐渐的将爱慕黛玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的心肠，略移在宝钗身上。此是后话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说宝玉成家的那一日，黛玉白日已经昏晕过去，却心头口中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一丝微气不断，把个李纹和紫鹃哭的死去活来。到了晚间，黛玉却
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又缓过来了，微微开眼，似有要水要汤的光景。此时雪雁已去，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只有紫和季绒在旁。紫鹃便端了一盏桂元汤和的梨汁，用小银
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            匙灌了两三匙。黛玉闭着眼，静养了一会子，觉得心里似明似暗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的。此时李执见黛玉略缓，明知是回光返照的光景，却料着还有一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            半天耐头②，自已回到稻香村，料理了一回事情。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里黛玉静开眼一看，只有紫鹃和奶妈并几个小丫头在那里，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便一手擦了紫的手，使着劲说道：“我是不中用的人了！你伏侍
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我几年，我原指望咱们两个总在一处，不想我…….”说着，又喘了一 PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            针砭一—本为治病的方法，此处指规劝。 一可延换的时光。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            会子，闭了眼歇着。紫鹃见他操着不肯松手，自已也不敢挪动。看
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他的光景，比早半天好些，只当还可以回转；听了这话，又寒了半
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            截。半天，黛玉又说道：“妹妹，我这里并没亲人，我的身子是干净
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的，你好岁叫他们送我回去。”说到这里，又闭了眼，不言语了。那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            手却渐渐紧了，喘成一处，只是出气大，人气小，已经促疾的很了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            紫鹃慌了，连忙叫人请李执。可巧探春来了，紫鹃见了，忙悄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            悄的说道：“三姑娘，瞧瞧林姑娘罢！”说着，泪如雨下。探春过来，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            摸了摸黛玉的手，已经凉了，连自光也都散了。探春、紫鹃正哭着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            叫人端水来给黛玉擦洗。李执赶忙进来了。三个人才见了，不及
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说话。刚擦着，猛听黛玉直声叫道：“宝玉，宝玉！你好一一”说到
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “好”字，便浑身冷汗，不作声了。紫鹃等急忙扶住，那汗愈出，身子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便渐渐的冷了。探春、李纹叫人乱着拢头穿衣，只见黛玉两眼一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            翻，鸣呼一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            香魂一缕随风散，愁绪三更入梦遥！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当时黛玉气绝，正是宝玉娶宝钗的这个时辰，紫鹃等都大哭起
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来。李执、探春想他素日的可疼，今日更加可怜，便也伤心痛哭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因潇湘馆离新房子甚远，所以那边并没听见。一时大家痛哭了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            阵，只听得远远一阵音乐之声；侧耳一听，却又没有了。探春、季绒
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            走出院外再听时，惟有竹梢风动，月影移墙，好不凄凉冷淡。一时
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            叫了林之孝家的过来，将黛玉停放毕，派人看守，等明早去回凤姐。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐因见贾母、王夫人等忙乱，贾政起身，又为宝玉昏惯更甚，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正在着急异常之时，若是又将黛玉的凶信回了，恐贾母、王夫人愁
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            苦交加，急出病来，只得亲自到园。到了潇湘馆内，也不免哭了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            场。见了季、探春，知道诸事齐备，就说：“很好。只是刚才你们
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            为什么不言语，叫我着急？探春道：“刚才送老爷，怎么说呢？”凤姐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“这倒是你们两个可他些。这么着，我还得那边去招呼那个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            冤家呢。但是这件事好累赞，若是今日不回，使不得；若回了，恐怕
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            老太太搁不住。”李纹道：“你去见机行事，得回再回方好。”凤姐点
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中国古典文学名容
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            头，忙忙的去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐到了宝玉那里，听见大夫说不妨事，贾母、王夫人略觉放
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心，凤姐便背了宝玉，缓缓的将黛玉的事回明了。贾母、王夫人听
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得，都唬了一跳。贾母眼泪交流，说道：“是我弄坏了他了！但只是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这个丫头也傻气。”说着，便要到园里去哭他-一场；又记着宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉，两头难顾。主夫人等含悲共劝费母：“不必过去，老太太身子要
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            紧。”贾母无奈，只得叫主夫人自去。文说：“你替我告诉他的阴灵：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            并不是我忍心不来送你，只为有个亲蔬。你是我的外孙女儿，是亲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的了；若与宝玉比起来，可是宝玉比你更亲些。倘宝玉有些不好，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我怎么见他父亲呢？”说着，又哭起来。王夫人劝道：“林姑娘是老
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            太太最疼的，但只寿关有定；如今已经死了，无可尽心，只是葬礼上
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要上等的发送。一则可以少尽咱们的心，二则就是姑太太和外
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            女儿的阴灵儿也可以少安了。&#34;贾母听到这里，越发痛哭起来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐恐怕老人家伤感太过，明仗着宝玉心中不甚明白，便偷偷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的使人来撒个谎儿，哄老太太道：“宝玉那里找老太太呢。”贾母听
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见，才止住泪问道：“不是又有什么缘故？&#34;凤姐陪笑道：“没什么缘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            故，他大约是想老太太的意思。贾母连忙扶了珍珠儿，凤姐也跟着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过来。走至半路，正遇王夫人过来，一一回明了贾母。贾母自然又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是哀痛的，只因要到宝玉那边，只得忍泪含悲的说道：“既这么着，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我也不过去了，由你们办罢。我看着心里也难受，只别委屈了他就
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是了！”王夫人、凤姐一一答应了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母才过宝玉这边来，见了宝玉，因问：“你做什么找我？”宝玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笑道：“我昨日晚上看见林妹妹来了，他说要回南去，我想没人留的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            住，还得老太太给我留一留他。”贾母听着，说：“使得，只管放心
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            罢。袭人因扶宝玉躺下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母出来，到宝钗这边来。那时宝钗尚未回九，所以每每见了 PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人，倒有些含羞之意。这一天见贾母满面泪痕，递了茶，贾母叫他
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            坐下。宝钗侧身陪着坐了，才问道：“听得林妹妹病了，不知他可好
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            些了？”贾母听了这话，那眼泪止不住流下来，因说道：“我的儿，我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            告诉你，你可别告诉宝玉。都是因你林妹妹，才叫你受了多少委
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            屈。你如今作媳妇了，我才告诉你：这如今你妹妹没了两三天了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            就是娶你的那个时辰死的。如今宝玉这一番病，还是为着这个。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你们先都在园子里，自然也都是明白的。”宝钗把脸飞红了，想到黛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉之死，又不免落下泪来。贾母又说了一回话，去了。自此宝钗于
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回万转，想了一个主意，只不肯造次；所以过了回九，才想出这个法
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子来。如今果然好些，然后大家说话才不至似前留神。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            独是宝玉虽然病势一天好似一天，他的痴心总不能解，必要亲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去哭他一场。贾母等知他病未除根，不许他胡思乱想，怎奈他郁闷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            难堪，病多反覆。倒是大夫看出心病，索性叫他开散了，再用药调
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            理，倒可好得快些。宝玉听说，立刻要往潇湘馆来。贾母等只得叫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人抬了竹椅子过来，扶宝玉坐上。贾费母、主夫人即便先行到了潇湘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            馆内，一见黛玉灵枢，贾母已哭得泪干气绝，凤姐等再三劝住。王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            夫人也哭了一场。李纹便请贾母、王夫人在里间歇着，犹自落泪。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉一到，想起未病之先，来到这里，今日屋在人亡，不禁哟
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大哭。想起从前何等亲密，今日死别，怎不更加伤感。众人原恐宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉病后过衰，都来解劝。宝玉已经哭得死去活来。大家换扶歇息。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            其余随来的，如宝钗，俱极痛哭。独是宝玉，必要叫紫鹃来见，问明
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姑娘临死有何话说。紫鹃本来深恨宝玉，见如此，心里已回过来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            些；又有贾母、王夫人都在这里，不敢洒落①宝玉，便将林姑娘怎
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            么复病，怎么烧毁帕子，焚化诗稿，并将临死说的话，一一的都告诉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。宝玉又哭得气壹喉干。探春趁便又将黛玉临终骚吋带枢回南
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的话，也说了一遍。贾母、王夫人又哭起来。多亏凤姐能言劝慰，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            略略止些，便请贾母等回去。宝玉那里肯舍，无奈贾母逼着，只得
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            勉强回房。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①酒落数落、资备。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中国吉典文学名落
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母有了年纪的人，打从宝玉病起，日夜不宁，今又大痛一阵，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            已觉头晕身热，虽是不放心惦着宝玉，却也扎挣不住，回到自已房
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中睡下。王夫人更加心痛难禁，也便回去，派了彩云帮着袭人照
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            应，并说：“宝玉若再悲戚，速来告诉我们。”宝钗知是宝玉一时必不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            能舍，也不相劝，只用讽刺的话说他。宝玉倒忍宝钗多心，也便饮
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            泣收心，歇了一夜，倒也安稳。明日一早，众人都来瞧他，但觉气虚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            身弱，心病倒觉去了几分。于是加意调养，渐渐的好起来。贾母幸
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不成病，惟是王夫人心痛未痊。那日姨妈过来探望，看见宝玉精神
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            略好，也就放心，暂且住下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一日，贾母特请薛姨妈过去商量，说：“宝玉的命，都亏姨太太
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            救的。如今想来不妨了，独委了你的姑娘。如今宝玉调养百日，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            身体复旧，又过了娘娘的功服，正好圆房。要求姨太太作主，另择
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个上好的吉日。”薛姨妈便道：“老太太主意很好，何必问我。宝丫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            头虽生的粗笨，心里却还是极明白的。他的性情，老太太素日是知
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道的。但愿他们两口儿言和意顺，从此老太太也省好些心，我姐姐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也安慰些，我也放了心了。老太太就定个日子，还通知亲戚不用
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            呢？”贾母道：“宝玉和你们姑娘生来第一件大事，况且费了多少周
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            折，如今才得安逸，必要大家热闹几天。亲戚都要请的。一来酬
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            愿，二则咱们吃杯喜酒，也不枉我老人家操了好些心。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            薛姨妈听着，自然也是喜欢的，便将要办妆的话也说了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            番。贾母道：“咱们亲上做亲，我想也不必这么。若说动用的，他屋
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里已经满了。必定宝丫头他心爱的要你几件，姨太太就拿了来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我看宝丫头也不是多心的人，不比的我那外孙女儿的脾气，所以他
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不得长寿。说着，连薛姨妈也便落泪。恰好凤姐进来，笑道：“老太
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            太和姑妈又想着什么了？”薛姨妈道：“我和老太太说起你林妹妹
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，所以伤心。”凤姐笑道：“老太太和姑妈且别伤心，我刚才听了个 PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            1124
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笑话儿来了。意思①说给老太太和姑妈听。”贾母拭了拭眼泪，微
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笑道：“你又不知要编派谁呢！你说来，我和姨太太听听。说不笑，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我们可不依。”只见那凤姐未从张口，先用两只手比着，笑弯了腰
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未知他说出些什么来，下回分解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            PDG
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            意思一正想，打算。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

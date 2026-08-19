@@ -1,0 +1,7347 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第12回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="12">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/11" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" >第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" >第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" >第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" >第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" selected>第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" >第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" >第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" >第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" >第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" >第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/13" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="gong" data-label="脂评汇校" checked>
+          脂评汇校
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi" data-label="程乙本" checked>
+          程乙本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi_ocr" data-label="程乙本OCR" checked>
+          程乙本OCR
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="fax_chengyi" data-label="程乙本影印" checked>
+          程乙本影印
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/12">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="gong">
+      <div class="compare-col-head">
+        <span class="badge">脂评汇校</span>
+        <span class="col-desc">脂评汇校本（庚辰本系为主，参校诸脂本，含脂批）</span>
+        <span>第12回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">王熙凤毒设相思局 贾天祥正照风月鉴</h3>
+        
+        
+        <p class="col-para">
+          
+            反正从来总一心，镜光至意两相寻。有朝敲破蒙头瓮，绿水青山任好春。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话说凤姐正与平儿说话，只见有人回说：“瑞大爷来了。”凤姐急命：
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">立意追命。</span>
+            
+          
+            “快请进来。”贾瑞见往里让，心中喜出望外，急忙进来，见了凤姐，满面陪笑，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">如蛇。</span>
+            
+          
+            连连问好。凤姐儿也假意殷勤，让坐让茶。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞见凤姐如此打扮，益发酥倒，因饧了眼问道：“二哥哥怎么还不回来？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐道：“不知什么原故。”贾瑞笑道：“别是路上有人绊住了脚了，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">旁敲远引。</span>
+            
+          
+            舍不得回来也未可知？”凤姐道：“也未可知。男人家见一个爱一个也是有的。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">这是钩。</span>
+            
+          
+            贾瑞笑道：己夹：如闻其声。“嫂子这话错了，我就不这样。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            己夹：渐渐入港。凤姐笑道：“象你这样的人能有几个呢，十个里也挑不出一个来。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-庚" title="庚眉">勿作正面看为幸。</span>
+            
+          
+            畸笏。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">游鱼虽有入瓮之志，无钩不能上岸；一上钩来，欲去亦不可得。</span>
+            
+          
+            贾瑞听了，喜的抓耳挠腮，又道：“嫂子天天也闷的很？”凤姐道：“正是呢，只盼个人来说话解解闷儿。”贾瑞笑道：“我倒天天闲着，天天过来替嫂子解解闲闷可好不好？”凤姐笑道：“你哄我呢，你那里肯往我这里来？”贾瑞道：“我嫂子跟前，若有一点谎话，天打雷劈！只因素人闻得人说，嫂子是个利害人，在你跟前一点也错不得，所以唬住了我。如今见嫂子最是个有说有笑极疼人的，己夹：奇妙！我怎么不来，——死了也愿意！”
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">这倒不假。</span>
+            
+          
+            凤姐笑道：“果然你是个明白人，比贾蓉两个强远了。我看他那样清秀，只当他们心里明白，谁知竟是两个糊涂虫，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">反文着眼。</span>
+            
+          
+            一点不知人心。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞听这话，越发撞在心坎儿上，由不得又往前凑了一凑，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">写呆人痴性活现。</span>
+            
+          
+            觑着眼看凤姐带的荷包，然后又问戴着什么戒指。凤姐悄悄道：“放尊重着，别叫丫头们看了笑话。”贾瑞如听纶音佛语一般，忙往后退。凤姐笑道：“你该去了。”己夹：叫“去”，正是叫“来”也。贾瑞道：“我再坐一坐儿。好狠心的嫂子！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐又悄悄的道：“大天白日，人来人往，你就在这里也不方便。你且去，等着晚上起了更你来，悄悄的在西边穿堂儿等我。”
+            
+          
+            <span class="ann-inline ann-庚" title="庚眉">先写穿堂，只知房舍之大，岂料有许多用处。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">凡人在平静时，物来言至，无不照见。</span>
+            
+          
+            若迷于一事一物，虽风雷交作，有所不闻。即“穿堂尔等”之一语，府第非比凡常，关门户，必要查看，且更夫仆妇，势必往来，岂容人藏过于其间？只因色迷，闻声联诺，不能有回思之暇，信可悲夫！贾瑞听了，如得珍宝，忙问道：“你别哄我。但只那里人过的多，怎么好躲的？”凤姐道：“你只放心。我把上夜的小厮们都放了假，两边门一关，再没别人了。”贾瑞听了，喜之不尽，忙忙的告辞而去，心内以为得手。
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">未必。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盼到晚上，果然黑地里摸入荣府，趁掩门时，钻入穿堂。果见漆黑无人，往贾母那边去的门户已锁，倒只有向东的门未关。贾瑞侧耳听着，半日不见人来，忽听咯登一声，东边的门也倒关了。
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">平平略施小计。</span>
+            
+          
+            贾瑞急的也不敢则声，只得悄悄的出来，将门撼了撼，关得铁桶一般。此时要求出去，亦不能够。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">此大抵是凤姐调遣。</span>
+            
+          
+            不先为点明者，可以少许多事故，又可以藏拙。南北皆是大房墙，要跳亦无攀援。这屋内又是过门风，空落落；现是腊月天气，夜又长，朔风凛凛，侵肌裂骨，一夜几乎不曾冻死。
+            
+          
+            <span class="ann-inline ann-庚" title="庚眉">可为偷情一戒。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">教导之法、慈悲之心尽矣，无奈迷径不悟何！</span>
+            
+          
+            好容易盼到早晨，只见一个老婆子先将东门开了，进去叫西门。贾瑞瞅第 80 页他背着脸，一溜烟抱着肩跑了出来，幸而天气尚早，人都未起，从后门一径跑回家去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来贾瑞父母早亡，只有他祖父代儒教养。那代儒素日教训最严，
+            
+          
+            <span class="ann-inline ann-庚" title="庚眉">教训最严，奈其心何！</span>
+            
+          
+            一叹。不许贾瑞多走一步，生怕他在外吃酒赌钱，有误学业。今忽见他一夜不归，只料定他在外非饮即赌，嫖娼宿妓，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">辗转灵活，一人不放，一笔不肖。</span>
+            
+          
+            那里想到这段公案，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">世人万万想不到，况老学究乎！</span>
+            
+          
+            因此气了一夜。贾瑞也捻着一把汗，少不得回来撒慌，只说：“往舅舅家去了，天黑了，留我住了一夜。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            代儒道：“自来出门，非禀我不敢擅出，如何昨日私自去了？据此亦该打，何况是撒谎！”
+            
+          
+            <span class="ann-inline ann-庚" title="庚眉">处处点父母痴心、子孙不肖。</span>
+            
+          
+            此书系自愧而成。因此，发狠到底打了三四十板，不许吃饭，令他跪在院内读文章，定要补出十天工课来方罢。贾瑞直冻了一夜，今又遭了苦打，且饿着肚子跪在风地里念文章，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">教令何尝不好，孽种故此不同。</span>
+            
+          
+            其苦万状。己夹：祸福无门，唯人自招。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此时贾瑞前心犹是未改，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">四字是寻死之根。</span>
+            
+          
+            <span class="ann-inline ann-庚" title="庚眉">苦海无边，回头是岸。</span>
+            
+          
+            若个能回头也？叹叹！壬午春。畸笏。再想不到是凤姐捉弄他。过后两日，得了空，便仍来找凤姐。凤姐故意抱怨他失信，贾瑞急的赌身发誓。凤姐因见他自投罗网，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">可谓因人而使。</span>
+            
+          
+            少不得再寻别计令他知改，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">四字是作者明阿凤身份，勿得轻轻看过。</span>
+            
+          
+            故又约他道：“今日晚上，你别在那里了。你在我这房后小过道子里那间空屋里等我，可别冒撞了。”己夹：伏的妙！贾瑞道：“果真？”凤姐道：“谁可哄你，你不信就别来。”
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">紧一句。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">大士心肠。</span>
+            
+          
+            贾瑞道：“来，来，来。死也要来！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            己夹：不差。凤姐道：“这会子你先去罢。”贾瑞料定晚间必妥，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">未必。</span>
+            
+          
+            此时先去了。凤姐在这里便点兵派将，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">四字用得新，必有新文字好看。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">新文，最妙！</span>
+            
+          
+            设下圈套。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那贾瑞只盼不到夜上，偏生家里有亲戚又来了，己夹：专能忙中写闲，狡猾之甚！直等吃了晚饭才去，那天已有掌灯时候。又等他祖父安歇了，方溜进荣府，直往那夹道中屋子里来等着，热锅上的蚂蚁一般，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">有心人记着，其实苦恼。</span>
+            
+          
+            只是干转。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            左等不见人影，右听也没声音，心下自思：“别是又不来了，又冻我一夜不成？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">似醒非醒语。</span>
+            
+          
+            正自胡猜，只见黑魆魆的来了一个人，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">真到了。</span>
+            
+          
+            贾瑞便意定是凤姐，不管皂白，饿虎一般，等那人刚至门前，便如猫儿捕鼠的一般，抱住叫道：“亲嫂子，等死我了。”说着，抱到屋里炕上就亲嘴扯裤子，满口里“亲娘”“亲爹”的乱叫起来。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">丑态可笑。</span>
+            
+          
+            那人只不做声，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">好极！</span>
+            
+          
+            贾瑞拉了自己裤子，硬帮帮的就想顶入。
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">将到矣。</span>
+            
+          
+            忽然灯光一闪，只见贾蔷举着个捻子照道：“谁在屋里？”只见炕上那人笑道：“瑞大叔要臊我呢。”贾瑞一见，却是贾蓉，己夹：奇绝！真臊的无地可入，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">亦未必真。</span>
+            
+          
+            不知要怎么样才好，回身就要跑，被贾蔷一把揪住道：“别走！如今琏二婶已经告到太太跟前，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">好题目。</span>
+            
+          
+            说你无故调戏他。
+            
+          
+            <span class="ann-inline ann-庚" title="庚眉">调戏还有“有故”？</span>
+            
+          
+            一笑。他暂用了个脱身计，哄你在这边等着，太太气死过去，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">好大题目。</span>
+            
+          
+            因此叫我来拿你。刚才你又拦住他，没的说，跟我去见太太！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞听了，魂不附体，只说：“好侄儿，只说没有见我，明日我重重的谢你。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾蔷道：“你若谢我，放你不值什么，只不知你谢我多少？况且口说无凭，写一文契来。”贾瑞道：“这如何落纸呢？”
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">也知写不得。</span>
+            
+          
+            一叹！贾蔷道：“这也不妨，写一个赌钱输了外人账目，借头家银若干两便罢。”贾瑞道：“这也容易。只是此时无纸笔。”贾蔷道：“这也容易。”说罢，翻身出来，纸笔现成，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">二字妙！</span>
+            
+          
+            拿来命贾瑞写。他两作好作歹，只写了五十两银，然后画了押，贾蔷收起来。然后撕罗贾蓉。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">可怜至此！</span>
+            
+          
+            好事者当自度。贾蓉先咬定牙不依，只说：“明第 81 页日告诉族中的人评评理。”贾瑞急的至于叩头。贾蔷做好做歹的，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">此是加一倍法。</span>
+            
+          
+            也写了一张五十两欠契才罢。贾蔷又道：“如今要放你，我就担着不是。己夹：又生波澜。老太太那边的门早已关了，老爷正在厅上看南京的东西，那一条路定难过去，如今只好走后门。若这一走，倘或遇见了人，连我也完了。等我们先去哨探哨探，再来领你。这屋你还藏不得，少时就来堆东西。等我寻个地方。”说毕，拉着贾瑞，仍熄了灯，己夹：细。出至院外，摸着大台矶底下，说道：“这窝儿里好，你只蹲着，别哼一声，等我们来再动。”
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">未必如此收场。</span>
+            
+          
+            说毕，二人去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞此时身不由己，只得蹲在那里。心下正盘算，只听头顶上一声响，哗拉拉一净桶尿粪从上面直泼下来，可巧浇了他一头一身，贾瑞撑不住嗳哟了一声，忙又掩住口，己夹：更奇。不敢声张，满头满脸浑身皆是尿屎，冰冷打战。
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">余料必有新奇解恨文字收场，方是《石头记》笔力。</span>
+            
+          
+            <span class="ann-inline ann-庚" title="庚眉">瑞奴实当如是报之。</span>
+            
+          
+            此一节可入《西厢记》批评内十大快中。畸笏。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">这也未必不是预为埋伏者。</span>
+            
+          
+            总是慈悲设教，遇难教者，不得不现三头六臂，并吃人心、喝人血之相，以警戒之耳。只见贾蔷跑来叫：“快走，快走！”贾瑞如得了命，三步两步从后门跑到家里，天已三更，只得叫门。开门人见他这般光景，问是怎的。少不得撒谎说：“黑了，失脚掉在茅厕里了。”一面到自己房中更衣洗濯，心下方想到是凤姐顽他，因此发一回恨；再想想凤姐的模样儿，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">欲根未断。</span>
+            
+          
+            又恨不得一时搂在怀，一夜竟不曾合眼。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自此满心想凤姐，
+            
+          
+            <span class="ann-inline ann-庚" title="庚眉">此刻还不回头，真自寻死路矣。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">孙行者非有紧箍儿，虽老君之炉、五行之山，何尝屈其一二？</span>
+            
+          
+            只不敢往荣府去了。贾蓉两个常常的来索银子，他又怕祖父知道，正是相思尚且难禁，更又添了债务；日间工课又紧，他二十来岁之人，尚未娶亲，迩来想着凤姐，未免有那指头告了消乏等事；更兼两回冻恼奔波，己夹：写得历历病源，如何不死？因此三五下里夹攻，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">所谓步步紧。</span>
+            
+          
+            不觉就得了一病：心内发膨胀，口内无滋味，脚下如绵，眼中似醋，黑夜作烧，白昼常倦，下溺连精，嗽痰带血。诸如此症，不上一年，都添全了。
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">简洁之至！</span>
+            
+          
+            于是不能支持，一头睡倒，合上眼还只梦魂颠倒，满口乱说胡话，惊怖异常。百般请医治疗，诸如肉桂、附子、鳖甲、麦冬、玉竹等药，吃了有几十斤下去，也不见个动静。己夹：说得有趣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倏又腊尽春回，这病更又沉重。代儒也着了忙，各处请医疗治，皆不见效。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因后来吃“独参汤”，代儒如何有这力量，只得往荣府来寻。王夫人命凤姐秤二两给他，己夹：王夫人之慈若是。凤姐回说：“前儿新近都替老太太配了药，那整的太太又说留着送杨提督的太太配药，偏生昨儿我已送了去了。”王夫人道：“就是咱们这边没了，你打发个人往你婆婆那边问问，或是你珍大哥哥那府里再寻些来，凑着给人家。吃好了，救人一命，也是你的好处。”己夹：夹写王夫人。凤姐听了，也不遣人去寻，只得将些渣末泡须凑了几钱，命人送去，只说：
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">“只说”。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “太太送来的，再也没了。”然后回王夫人说：“都寻了来，共凑了有二两多送去。”己夹：然便有二两独参汤，贾瑞固亦不能微好，又岂能望好，但凤姐之毒何如是？终是瑞之自失也。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那贾瑞此时要命心胜，无药不吃，只是白花钱，不见效。忽然这日有个跛足道人己夹：自甄士隐随君一去，别来无恙否？来化斋，口称专治冤业之症。贾瑞偏生在内就听见了，直着声叫喊己夹：如闻其声，吾不忍听也。说：“快请进那位菩萨来救我！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面叫，一面在枕上叩首。己夹：如见其形，吾不忍看也。众人只得带了那道士进来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞一把拉住，连叫：“菩萨救我！”己夹：人之将死，其言也哀，作者如何下笔？那道士叹道：“你这病非药可医！我有个宝贝与你，你天天看时，此命可保矣。”说毕，从褡裢中己夹：妙极！此褡裢犹是士隐所抢背者乎？取出一面镜子来己夹：凡看书人从第 82 页此细心体贴，方许你看，否则此书哭矣。——两面皆可照人，己夹：此书表里皆有喻也。镜把上面錾着“风月宝鉴”四字己夹：明点。——递与贾瑞道：“这物出自太虚幻境空灵殿上，警幻仙子所制，己夹：言此书原系空虚幻设。
+            
+          
+            <span class="ann-inline ann-庚" title="庚眉">与“红楼梦”呼应。</span>
+            
+          
+            专治邪思妄动之症，己夹：毕真。有济世保生之功。己夹：毕真。所以带他到世上，单与那些聪明俊杰、风雅王孙等看照。己夹：所谓无能纨绔是也。千万不可照正面，
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">谁人识得此句！</span>
+            
+          
+            己夹：观者记之，不要看这书正面，方是会看。只照他的背面，己夹：记之。要紧，要紧！三日后吾来收取，管叫你好了。”说毕，佯常而去，众人苦留不住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞收了镜子，想道：“这道士倒有些意思，我何不照一照试试。”想毕，拿起“风月鉴”来，向反面一照，只见一个骷髅立在里面，己夹：所谓“好知青冢骷髅骨，就是红楼掩面人”是也。作者好苦心思。唬得贾瑞连忙掩了，骂：“道士混账，如何吓我！我倒再照照正面是什么。”想着，又将正面一照，只见凤姐站在里面招手
+            
+          
+            <span class="ann-inline ann-庚" title="庚侧">可怕是“招手”二字。</span>
+            
+          
+            叫他。己夹：奇绝！贾瑞心中一喜，荡悠悠的觉得进了镜子，己夹：写得奇峭，真好笔墨。与凤姐云雨一番，凤姐仍送他出来。到了床上，“嗳哟”了一声，一睁眼，镜子从手里掉过来，仍是反面立着一个骷髅。贾瑞自觉汗津津的，底下已遗了一滩精。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">此一句力如龙象，意谓：正面你方才已自领略了，你也当思想反面才是。</span>
+            
+          
+            心中到底不足，又翻过正面来，只见凤姐还招手叫他，他又进去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如此三四次。到了这次，刚要出镜子来，只见两个人走来，拿铁锁把他套住，拉了就走。己夹：所谓醉生梦死也。贾瑞叫道：“让我拿了镜子再走！”己夹：可怜！大众齐来看此。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">这是作书者之立意，要写情种，故于此试一深写之。</span>
+            
+          
+            在贾瑞则是求仁而得仁，未尝不含笑九泉，虽死亦不解脱者，悲矣！——只说了这句，就再不能说话了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            旁边伏侍的贾瑞的众人，只见他先还拿着镜子照，落下来，仍睁开眼拾在手内，末后镜子落下来便不动了。众人上来看看，已没了气，身子底下冰凉渍湿一大滩精，这才忙着穿衣抬床。代儒夫妇哭的死去活来，大骂道士，“是何妖镜！己夹：此书不免腐儒一谤。若不早毁此物，己夹：凡野史俱可毁，独此书不可毁。遗害于世不小。”己夹：腐儒。遂命架火来烧，只听镜内哭道：“谁叫你们瞧正面了！你们自己以假为真，何苦来烧我？”己夹：观者记之。正哭着，只见那跛足道人从外跑来，喊道：“谁毁‘风月鉴’，吾来救也！”说着，直入中堂，抢入手内，飘然去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当下，代儒料理丧事，各处去报丧。三日起经，七日发引，寄灵于铁槛寺，己夹：所谓“铁门限”事业。先安一开路道之人，以备秦氏仙柩有方也。日后带回原籍。当下贾家众人齐来吊问，荣府贾赦赠银二十两，贾政亦是二十两，宁国府贾珍亦有二十两，别者族中人贫富不等，或三两五两，不可胜数。另有各同窗家分资，也凑了二三十两。代儒家道虽然淡薄，倒也丰丰富富完了此事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            谁知这年五月底（kolistan 按：“五月底”，各本均作“冬底”，与上下文时间不衔接。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            据林冠夫说改。），林如海的书信寄来，却为身染重疾，写书特来接林黛玉回去。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">须要林黛玉长住，偏要暂离。</span>
+            
+          
+            贾母听了，未免又加忧闷，只得忙忙的打点黛玉起身。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉大不自在，争奈父女之情，也不好拦劝。于是贾母定要贾琏送他去，仍叫带回来。一应土仪盘缠，不消烦说，自然要妥贴。作速择了日期，贾琏与林黛玉辞别了贾母等，带领仆从，登舟往扬州去了。要知端的，且听下回分解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此回忽遣黛玉去者，正为下回可儿之文也。若不遣去，只写可儿、阿凤等人，却置黛玉于荣府，成何文哉？故必遣去，方好放笔写秦，方不脱节。况黛玉乃书中正人，秦为陪客，岂因陪而失正耶？后大观园方是宝玉、宝钗、黛玉等正经文字，前皆系陪衬之文也。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-戚" title="戚总评">儒家正心，道者炼心，释辈戒心。</span>
+            
+          
+            可见此心无有不到，无不能入者，独畏其入于邪而不反，故用心炼戒以缚之。请看贾瑞一起念，及至于死，专诚不二，虽经两次警教，毫无反悔，第 83 页可谓痴子，可谓愚情。相乃可思，不能相而独欲思，岂逃倾颓？作者以此作一新样情种，以助解者生笑，以为痴者设一棒喝耳！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 84 页
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第12回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">王熙凤毒设相思局 贾天祥正照风月鉴</h3>
+        
+        
+        <p class="col-para">
+          
+            話說鳳姐正與平兒說話，只見有人回說：「瑞大爺來了。」鳳姐急命「快請進來。」賈瑞見往裡讓，心中喜出望外，急忙進來，見了鳳姐，滿面陪笑，連連問好。鳳姐兒也假意殷勤，讓茶讓坐。賈瑞見鳳姐如此打扮，亦發酥倒，因餳了眼問道：「二哥哥怎麼還不回來？」鳳姐道：「不知什麼原故。」賈瑞笑道：「別是路上有人絆住了腳了，舍不得回來也未可知？」鳳姐道：「也未可知。男人家見一個愛一個也是有的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」賈瑞笑道：「嫂子這話說錯了，我就不這樣。」鳳姐笑道：「象你這樣的人能有幾個呢，十個裡也挑不出一個來。」賈瑞聽了喜的抓耳撓腮，又道：「嫂子天天也悶的很。」鳳姐道：「正是呢，只盼個人來說話解解悶兒。」賈瑞笑道：「我倒天天閒著，天天過來替嫂子解解閒悶可好不好？」鳳姐笑道：「你哄我呢，你那裡肯往我這裡來。」賈瑞道：「我在嫂子跟前，若有一點謊話，天打雷劈！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只因素日聞得人說，嫂子是個利害人，在你跟前一點也錯不得，所以唬住了我。如今見嫂子最是個有說有笑极疼人的，我怎麼不來，死了也願意！」鳳姐笑道：「果然你是個明白人，比賈蓉兩個強遠了。我看他那樣清秀，只當他們心裡明白，誰知竟是兩個胡涂虫，一點不知人心。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞聽了這話，越發撞在心坎兒上，由不得又往前湊了一湊，覷著眼看鳳姐帶的荷包，然後又問帶著什麼戒指。鳳姐悄悄道：「放尊重著，別叫丫頭們看了笑話。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」賈瑞如聽綸音佛語一般，忙往後退。鳳姐笑道：「你該走了。」賈瑞說：「我再坐一坐兒。——好狠心的嫂子。」鳳姐又悄悄的道：「大天白日，人來人往，你就在這裡也不方便。你且去，等著晚上起了更你來，悄悄的在西邊穿堂兒等我。」賈瑞聽了，如得珍寶，忙問道：「你別哄我。但只那裡人過的多，怎麼好躲的？」鳳姐道：「你只放心。我把上夜的小廝們都放了假，兩邊門一關，再沒別人了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」賈瑞聽了，喜之不盡，忙忙的告辭而去，心內以為得手。盼到晚上，果然黑地裡摸入榮府，趁掩門時，鑽入穿堂。果見漆黑無一人，往賈母那邊去的門戶已倒鎖，只有向東的門未關。賈瑞側耳聽著，半日不見人來，忽聽咯登一聲，東邊的門也倒關了。賈瑞急的也不敢則聲，只得悄悄的出來，將門撼了撼，關的鐵桶一般。此時要求出去亦不能夠，南北皆是大房牆，要跳亦無攀援。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這屋內又是過門風，空落落，現是腊月天氣，夜又長，朔風凜凜，侵肌裂骨，一夜幾乎不曾凍死。好容易盼到早晨，只見一個老婆子先將東門開了，進去叫西門。賈瑞瞅他背著臉，一溜煙抱著肩跑了出來，幸而天氣尚早，人都未起，從後門一徑跑回家去。原來賈瑞父母早亡，只有他祖父代儒教養。那代儒素日教訓最嚴，不許賈瑞多走一步，生怕他在外吃酒賭錢，有誤學業。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今忽見他一夜不歸，只料定他在外非飲即賭，嫖娼宿妓，那裡想到這段公案，因此氣了一夜。賈瑞也捻著一把汗，少不得回來撒謊，只說：「往舅舅家去了，天黑了，留我住了一夜。」代儒道：「自來出門，非稟我不敢擅出，如何昨日私自去了？据此亦該打，何況是撒謊。」因此，發狠到底打了三四十扳，不許吃飯，令他跪在院內讀文章，定要補出十天的工課來方罷。賈瑞直凍了一夜，今又遭了苦打，且餓著肚子，跪著在風地裡讀文章，其苦萬狀。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此時賈瑞前心猶是未改，再想不到是鳳姐捉弄他。過後兩日，得了空，便仍來找鳳姐。鳳姐故意抱怨他失信，賈瑞急的賭身發誓。鳳姐因見他自投羅网，少不得再尋別計令他知改，故又約他道：「今日晚上，你別在那裡了。你在我這房後小過道子裡那間空屋裡等我，可別冒撞了。」賈瑞道：「果真？」鳳姐道：「誰可哄你，你不信就別來。」賈瑞道：「來，來，來。死也要來！」鳳姐道：「這會子你先去罷。」賈瑞料定晚間必妥，此時先去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳳姐在這裡便點兵派將，設下圈套。那賈瑞只盼不到晚上，偏生家裡親戚又來了，直等吃了晚飯才去，那天已有掌燈時候。又等他祖父安歇了，方溜進榮府，直往那夾道中屋子裡來等著，熱鍋上的螞蟻一般，只是乾轉。左等不見人影，右聽也沒聲響，心下自思：「別是又不來了，又凍我一夜不成？」正自胡猜，只見黑魆魆的來了一個人，賈瑞便意定是鳳姐，不管皂白，餓虎一般，等那人剛至門前，便如貓捕鼠的一般，抱住叫道：「親嫂子，等死我了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」說著，抱到屋裡炕上就親嘴扯褲子，滿口裡「親娘」「親爹」的亂叫起來。那人只不作聲。賈瑞拉了自己褲子，硬幫幫的就想頂入。忽見燈光一閃，只見賈薔舉著個捻子照道：「誰在屋裡？」只見炕上那人笑道：「瑞大叔要肏我呢。」賈瑞一見，卻是賈蓉，真臊的無地可入，不知要怎麼樣才好，回身就要跑，被賈薔一把揪住道：「別走！如今璉二嫂已經告到太太跟前，說你無故調戲他。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他暫用了個脫身計，哄你在這邊等著，太太氣死過去，因此叫我來拿你。剛才你又攔住他，沒的說，跟我去見太太！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞聽了，魂不附体，只說：「好侄兒，只說沒有見我，明日我重重的謝你。」賈薔道：「你若謝我，放你不值什麼，只不知你謝我多少？況且口說無憑，寫一文契來。」賈瑞道：「這如何落紙呢？」賈薔道：「這也不妨，寫一個賭錢輸了外人帳目，借頭家銀若干兩便罷。」賈瑞道：「這也容易。只是此時無紙筆。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」賈薔道：「這也容易。」說罷翻身出來，紙筆現成，拿來命賈瑞寫。他兩作好作歹，只寫了五十兩，然後畫了押，賈薔收起來。然後撕邏賈蓉。賈蓉先咬定牙不依，只說：「明日告訴族中的人評評理。」賈瑞急的至于叩頭。賈薔作好作歹的，也寫了一張五十兩欠契才罷。賈薔又道：「如今要放你，我就擔著不是。老太太那邊的門早已關了，老爺正在廳上看南京的東西，那一條路定難過去，如今只好走後門。若這一走，倘或遇見了人，連我也完了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等我們先去哨探哨探，再來領你。這屋你還藏不得，少時就來堆東西。等我尋個地方。」說畢，拉著賈瑞，仍熄了燈，出至院外，摸著大臺磯底下，說道：「這窩兒裡好，你只蹲著，別哼一聲，等我們來再動。」說畢，二人去了。賈瑞此時身不由己，只得蹲在那裡。心下正盤算，只聽頭頂上一聲響，嘩拉拉一淨桶尿糞從上面直潑下來，可巧澆了他一身一頭。賈瑞掌不住噯喲了一聲，忙又掩住口，不敢聲張，滿頭滿臉渾身皆是尿屎，冰冷打戰。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只見賈薔跑來叫：「快走，快走！」賈瑞如得了命，三步兩步從後門跑到家裡，天已三更，只得叫門。開門人見他這般景況，問是怎的。少不得扯謊說：「黑了，失腳掉在茅廁裡了。」一面到了自己房中更衣洗濯，心下方想到是鳳姐頑他，因此發一回恨，再想想鳳姐的模樣兒，又恨不得一時摟在怀內，一夜竟不曾合眼。自此滿心想鳳姐，只不敢往榮府去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈蓉兩個又常常的來索銀子，他又怕祖父知道，正是相思尚且難禁，更又添了債務，日間工課又緊，他二十來歲人，尚未娶親，邇來想著鳳姐，未免有那指頭告了消乏等事，更兼兩回凍惱奔波，因此三五下裡夾攻，不覺就得了一病：心內發膨脹，口中無滋味，腳下如綿，眼中似醋，黑夜作燒，白晝常倦，下溺連精，嗽痰帶血。諸如此症，不上一年都添全了。于是不能支持，一頭睡倒，合上眼還只夢魂顛倒，滿口亂說胡話，驚怖异常。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            百般請醫療治，諸如肉桂，附子，鱉甲，麥冬，玉竹等藥，吃了有幾十斤下去，也不見個動靜。倏又腊盡春回，這病更又沉重。代儒也著了忙，各處請醫療治，皆不見效。因後來吃「獨參湯」，代儒如何有這力量，只得往榮府來尋。王夫人命鳳姐秤二兩給他，鳳姐回說：「前兒新近都替老太太配了藥，那整的太太又說留著送楊提督的太太配藥，偏生昨兒我已送了去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」王夫人道：「就是咱們這邊沒了，你打發個人往你婆婆那邊問問，或是你珍大哥哥那府裡再尋些來，湊著給人家。吃好了，救人一命，也是你的好處。」鳳姐聽了，也不遣人去尋，只得將些渣末泡須湊了幾錢，命人送去，只說：「太太送來的，再也沒了。」然後回王夫人，只說：「都尋了來，共湊了有二兩送去。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那賈瑞此時要命心甚切，無藥不吃，只是白花錢，不見效。忽然這日有個跛足道人來化齋，口稱專治冤業之症。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞偏生在內就聽見了，直著聲叫喊說：「快請進那位菩薩來救我！」一面叫，一面在枕上叩首。眾人只得帶了那道士進來。賈瑞一把拉住，連叫「菩薩救我！」那道士歎道：「你這病非藥可醫。我有個寶貝與你，你天天看時，此命可保矣。」說畢，從褡褳中取出一面鏡子來——兩面皆可照人，鏡把上面鏨著「風月寶鑒」四字——遞與賈瑞道：「這物出自太虛幻境空靈殿上，警幻仙子所制，專治邪思妄動之症，有濟世保生之功。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            所以帶他到世上，單與那些聰明杰俊，風雅王孫等看照。千萬不可照正面，只照他的背面，要緊，要緊！三日後吾來收取，管叫你好了。」說畢，佯常而去，眾人苦留不住。賈瑞收了鏡子，想道：「這道士倒有意思，我何不照一照試試。」想畢，拿起風月鑒來，向反面一照，只見一個骷髏立在裡面，唬得賈瑞連忙掩了，罵：「道士混帳，如何嚇我！我倒再照照正面是什麼。」想著，又將正面一照，只見鳳姐站在裡面招手叫他。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞心中一喜，蕩悠悠的覺得進了鏡子，與鳳姐雲雨一番，鳳姐仍送他出來。到了床上，哎喲了一聲，一睜眼，鏡子從手裡掉過來，仍是反面立著一個骷髏。賈瑞自覺汗津津的，底下已遺了一灘精。心中到底不足，又翻過正面來，只見鳳姐還招手叫他，他又進去。如此三四次。到了這次，剛要出鏡子來，只見兩個人走來，拿鐵鎖把他套住，拉了就走。賈瑞叫道：「讓我拿了鏡子再走。」只說了這句，就再不能說話了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            旁邊伏侍賈瑞的眾人，只見他先還拿著鏡子照，落下來，仍睜開眼拾在手內，末後鏡子落下來便不動了。眾人上來看看，已沒了氣。身子底下冰涼漬濕一大灘精，這才忙著穿衣抬床。代儒夫婦哭的死去活來，大罵道士，「是何妖鏡！若不早毀此物，遺害于世不小。」遂命架火來燒，只聽鏡內哭道：「誰叫你們瞧正面了！你們自己以假為真，何苦來燒我？」正哭著，只見那跛足道人從外面跑來，喊道：「誰毀『風月鑒』，吾來救也！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」說著，直入中堂，搶入手內，飄然去了。當下，代儒料理喪事，各處去報喪。三日起經，七日發引，寄靈于鐵檻寺，日後帶回原籍。當下賈家眾人齊來吊問，榮國府賈赦贈銀二十兩，賈政亦是二十兩，宁國府賈珍亦有二十兩，別者族中貧富不等，或三兩五兩，不可胜數。另有各同窗家分資，也湊了二三十兩。代儒家道雖然淡薄，倒也丰丰富富完了此事。誰知這年冬底，林如海的書信寄來，卻為身染重疾，寫書特來接林黛玉回去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈母聽了，未免又加憂悶，只得忙忙的打點黛玉起身。寶玉大不自在，爭奈父女之情，也不好攔勸。于是賈母定要賈璉送他去，仍叫帶回來。一應土儀盤纏，不消煩說，自然要妥貼。作速擇了日期，賈璉與林黛玉辭別了賈母等，帶領仆從，登舟往揚州去了。要知端的，且聽下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本</span>
+        <span class="col-desc">程乙本（1792程伟元/高鹗重订本，120回）</span>
+        <span>第12回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">王熙凤毒设相思局 贾天祥正照风月鉴</h3>
+        
+        
+        <p class="col-para">
+          
+            話說鳳姐正與平兒說話，只見有人回說：「瑞大爺來了。」鳳姐命：「請進來罷。」賈瑞見請，心中暗喜，見了鳳姐，滿面陪笑，連連問好。鳳姐兒也假意殷勤，讓坐讓茶。賈瑞見鳳姐如此打扮，越發酥倒，因餳了眼問道：「二哥哥怎麼還不回來？」鳳姐道：「不知什麼緣故。」賈瑞笑道：「別是路上有人絆住了腳，捨不得回來了罷？」鳳姐道：「可知男人家見一個愛一個，也是有的。」賈瑞笑道：「嫂子這話錯了，我就不是這樣人。」鳳姐笑道：「像你這樣的人，能有幾個呢？十個裡也挑不出一個來！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞聽了，喜的抓耳撓腮。又道：「嫂子天天也悶的很？」鳳姐道：「正是呢，只盼個人來說話解解悶兒。」賈瑞笑道：「我倒天天閒著，若天天過來替嫂子解解悶兒，可好麼？」鳳姐笑道：「你哄我呢，你那裡肯往我這裡來？」賈瑞道：「我在嫂子面前，若有一句謊話，天打雷劈！只因素日聞得人說，嫂子是個利害人，在你跟前一點也錯不得，所以唬住我了。我如今見嫂子是個有說有笑極疼人的，我怎麼不來？－－死了也情願！」鳳姐笑道：「果然你是個明白人，比蓉兒兄弟兩個強遠了！我看他那樣清秀，只當他們心裡明白，誰知竟是兩個糊塗蟲，一點不知人心！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞聽這話，越發撞在心坎上，由不得又往前湊一湊，覷著眼，看鳳姐的荷包。又問：「戴著什麼戒指？」鳳姐悄悄的道：「放尊重些！別叫丫頭們看見了。」賈瑞如聽「綸音佛語」一般，忙往後退。鳳姐笑道：「你該去了。」賈瑞道：「我再坐一坐兒。－－好狠心的嫂子！」鳳姐兒又悄悄的道：「大天白日，人來人往，你就在這裡，也不方便。你且去。等到晚上起了更，你來，悄悄的在西邊穿堂兒等我。」賈瑞聽了，如得珍寶，忙問道：「你別哄我。但是那裡人過的多，怎麼好躲呢？」鳳姐道：「你只放心。我把上夜的小廝們都放了假，兩邊門一關，再沒別人了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞聽了，喜之不盡，忙忙的告辭而去，心內以為得手。盼到晚上，果然黑地裡摸入榮府，趁掩門時鑽入穿堂，果見漆黑，無一人來往。賈母那邊去的門已倒鎖了，只有向東的門未關。賈瑞側耳聽著，半日不見人來，忽聽咯噔一聲，東邊的門也關上了。賈瑞急的也不敢則聲，只得悄悄出來，將門撼了撼，關得鐵桶一般。此時要出去亦不能了，南北俱是大牆，要跳也無攀援。這屋內又是過堂風，空落落的。現是臘月天氣，夜又長，朔風凜凜，侵肌裂骨，一夜幾乎不曾凍死。好容易盼到早晨，只見一個老婆子先將東門開了，進來去叫西門。賈瑞瞅他背著臉，一溜煙抱了肩跑出來。幸而天氣尚早，人都未起，從後門一徑跑回家去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來賈瑞父母早亡，只有他祖父代儒教養。那代儒素日教訓最嚴，不許賈瑞多走一步，生怕他在外吃酒賭錢，有誤學業。今忽見他一夜不歸，只料定他在外非飲即賭，嫖娼宿妓，那裡想到這段公案？因此也氣了一夜。賈瑞也捻著一把汗，少不得回來撒謊，只說：「往舅舅家去了，天黑了，留我住了一夜。」代儒道：「自來出門非稟我不敢擅出，如何昨日私自去了？據此也該打，何況是撒謊！」因此，發狠按倒打了三四十板，還不許他吃飯，叫他跪在院內讀文章，定要補出十天功課來方罷。賈瑞先凍了一夜，又挨了打，又餓著肚子跪在風地裡念文章，其苦萬狀。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此時賈瑞邪心未改，再不想到鳳姐捉弄他。過了兩日，得了空兒，仍來找尋鳳姐。鳳姐故意抱怨他失信，賈瑞急的起誓。鳳姐因他自投羅網，少不的再尋別計，令他知改，故又約他道：「今日晚上，你別在那裡了，你在我這房後小過道兒裡頭那間空屋子裡等我。可別冒撞了！」賈瑞道：「果真麼？」鳳姐道：「你不信，就別來！」賈瑞道：「必來，必來。死也要來的！」鳳姐道：「這會子你先去罷。」賈瑞料定晚間必妥，此時先去了。鳳姐在這裡便點兵派將，設下圈套。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那賈瑞只盼不到晚，偏偏家裡親戚又來了，吃了晚飯纔去。那天已有掌燈時候，又等他祖父安歇，方溜進榮府，往那夾道中屋子裡來等著，熱鍋上螞蟻一般。只是左等不見人影，右聽也沒聲響，心中害怕，不住猜疑道：「別是不來了，又凍我一夜不成？……」正自胡猜，只見黑魆魆的進來一個人。賈瑞便打定是鳳姐，不管青紅皂白，那人剛到面前，便如餓虎撲食，貓兒捕鼠的一般，抱住叫道：「親嫂子！等死我了！」說著，抱到屋裡炕上就親嘴扯褲子，滿口裡「親爹」「親娘」的亂叫起來。那人只不做聲。賈瑞便扯下自己的褲子來，硬幫幫就想頂入。忽然燈光一閃，只見賈薔舉著個蠟台照道：「誰在這屋裡呢？」只見炕上那人笑道：「瑞大叔要肏我呢！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞不看則已，看了時真臊的無地可入。你道是誰？卻是賈蓉。賈瑞回身要跑，被賈薔一把揪住，道：「別走！如今璉二嬸子已經告到太太跟前，說你調戲他，他暫時穩住你在這裡。太太聽見，氣死過去了，這會子叫我來拿你。快跟我走罷！」賈瑞聽了，魂不附體，只說：「好姪兒！你只說沒有我！我明日重重的謝你！」賈薔道：「放你不值什麼，只不知你謝我多少？況且口說無憑，寫一張文契纔算。」賈瑞道：「這怎麼落紙呢？」賈薔道：「這也不妨，寫個賭錢輸了，借銀若干兩，就完了。」賈瑞道：「這也容易。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈薔翻身出來，紙筆現成，拿來叫賈瑞寫。他兩個做好做歹，只寫了五十兩銀子，然後畫了押。賈薔收起來，然後撕擄賈蓉。賈蓉先咬定牙不依，只說：「明日告訴族中的人評評理！」賈瑞急的至於磕頭。賈薔做好做歹的，也寫了一張五十兩欠契纔罷。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈薔又道：「如今要放你，我就擔著不是。老太太那邊的門早已關了，老爺正在廳上看南京來的東西，那一條路定難過去。如今只好走後門。要這一走，倘或遇見了人，連我也不好。等我先去探探，再來領你。這屋裡你還藏不住，少時就來堆東西。等我尋個地方。」說畢，拉著賈瑞，仍息了燈，出至院外，摸著大台階底下，說道：「這窩兒裡好。只蹲著，別哼一聲，等我來再走。」說畢，二人去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞此時身不由己，只得蹲在那台階下。正要盤算，只聽頭頂上一聲響，嘩喇喇，一淨桶尿糞從上面直潑下來，可巧澆了他一身一頭。賈瑞掌不住「噯喲」一聲，忙又掩住口，不敢聲張，滿頭滿臉皆是尿屎，渾身冰冷打戰。只見賈薔跑來叫：「快走，快走！」賈瑞方得了命，三步兩步從後門跑到家中，天已三更，只得叫開了門。家人見他這般光景，問：「是怎麼了？」少不得撒謊，說：「天黑了，失腳掉在茅廁裡了。」一面即到自己房中更衣洗濯。心下方想到鳳姐玩他，因此，發一回狠；再想想鳳姐的模樣兒標致，又恨不得一時摟在懷裡。胡思亂想，一夜也不曾合眼。自此雖想鳳姐，只不敢往榮府去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈蓉等兩個常常來要銀子，他又怕祖父知道，正是相思尚且難禁，況又添了債務；日間工課又緊；他二十來歲的人，尚未娶親，想著鳳姐，不得到手，自不免有些「指頭兒告了消乏」；更兼兩回凍惱奔波：因此，三五下裡夾攻，不覺就得了一病。心內發膨脹，口內無滋味；腳下如綿，眼中似醋；黑夜作燒，白日常倦；下溺遺精，嗽痰帶血……諸如此症，不上一年，都添全了。於是不能支持，一頭躺倒，合上眼還只夢魂顛倒，滿口胡話，驚怖異常。百般請醫療治，諸如肉桂、附子、鱉甲、麥冬、玉竹等藥，吃了有幾十斤下去，也不見個動靜。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倏又臘盡春回，這病更加沉重。代儒也著了忙，各處請醫療治，皆不見效。因後來吃獨參湯，代儒如何有這力量，只得往榮府裡來尋。王夫人命鳳姐秤二兩給他。鳳姐回說：「前兒新近替老太太配了藥；那整的，太太又說留著送楊提督的太太配藥，偏偏昨兒我已經叫人送去了。」王夫人道：「就是偺們這邊沒了，你叫個人往你婆婆那裡問問，或是你珍大哥哥那裡有，尋些來湊著，給人家吃好了，救人一命，也是你們的好處。」鳳姐應了，也不遣人去尋，只將些渣末湊了幾錢，命人送去，只說太太叫送來的，再也沒了。然後向王夫人說：「都尋了來了，共湊了二兩多送去了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那賈瑞此時要命心急，無藥不吃，只是白花錢，不見效。忽然這日有個跛足道人來化齋，口稱專治冤孽之症。賈瑞偏偏在內聽見了，直著聲叫喊，說：「快去請進那位菩薩來救命！」一面在枕頭上磕頭。眾人只得帶進那道士來。賈瑞一把拉住，連叫：「菩薩救我！」那道士嘆道：「你這病非藥可醫！我有個寶貝與你，你天天看時，此命可保矣。」說畢，從搭褳中取出個正面反面皆可照人的鏡子來－－背上鏨著「風月寶鑒」四字，－－遞與賈瑞，道：「這物出自太虛幻境空靈殿上，警幻仙子所製，專治邪思妄動之症，有濟世保生之功。所以帶他到世上來，單與那些聰明俊秀、風雅王孫等照看。千萬不可照正面，只照背面。要緊，要緊！三日後，我來收取，管叫你病好。」說畢，揚長而去，眾人苦留不住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈瑞接了鏡子，想道：「這道士倒有意思。我何不照一照試試？」想畢，拿起那「寶鑒」來向反面一照，只見一個骷髏兒立在裡面。賈瑞忙掩了，罵那道士：「混帳！如何嚇我！我倒再照照正面是什麼。」想著，便將正面一照，只見鳳姐站在裡面，點手兒叫他。賈瑞心中一喜，蕩悠悠覺得進了鏡子，與鳳姐雲雨一番，鳳姐仍送他出來。到了床上，「噯喲」了一聲，一睜眼，鏡子從新又掉過來，仍是反面立著一個骷髏。賈瑞自覺汗津津的，底下已遺了一灘精。心中到底不足，又翻過正面來，只見鳳姐還招手叫他，他又進去。如此三四次。到了這次，剛要出鏡子來，只見兩個人走來，拿鐵鎖把他套住，拉了就走。賈瑞叫道：「讓我拿了鏡子再走！……」只說這句，就再不能說話了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            旁邊伏侍的人，只見他先還拿著鏡子照，落下來，仍睜開眼拾在手內，末後鏡子掉下來便不動了。眾人上來看時，已經嚈了氣了，身子底下，冰涼粘濕，遺下了一大灘精，這纔忙著穿衣抬床，代儒夫婦哭的死去活來，大罵道士：「是何妖道！」遂命人架起火來燒那鏡子。只聽空中叫道：「誰叫他自己照了正面呢！你們自己以假為真，為何燒我此鏡？」忽見那鏡從房中飛出。代儒出門看時，卻還是那個跛足道人，喊道：「還我的『風月寶鑒』來！」說著，搶了鏡子，眼看著他飄然去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當下代儒沒法，只得料理喪事，各處去報，三日起經，七日發引，寄靈鐵檻寺後。一時，賈家眾人齊來弔問。榮府賈赦贈銀二十兩，賈政也是二十兩，寧府賈珍亦有二十兩；其餘族中人，貧富不一，或一二兩、三四兩不等；外又有各同窗家中分資，也湊了二三十兩。代儒家道雖然淡薄，得此幫助，倒也豐豐富富完了此事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            誰知這年冬底，林如海因為身染重疾，寫書來特接黛玉回去。賈母聽了，未免又加憂悶，只得忙忙的打點黛玉起身。寶玉大不自在，爭奈父女之情，也不好攔阻。於是賈母定要賈璉送他去，仍叫帶回來。一應土儀盤費，不消絮說，自然要妥貼的。作速擇了日期，賈璉同著黛玉辭別了眾人，帶領僕從，登舟往揚州去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要知端的，且聽下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi_ocr">
+      <div class="compare-col-head">
+        <span class="badge">程乙本OCR</span>
+        <span class="col-desc">程乙本OCR（欧阳健校注本PDF本地识别）</span>
+        <span>第12回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">王熙凤毒设相思局 贾天祥正照风月鉴</h3>
+        
+        
+        <p class="col-para">
+          
+            王熙凤毒设相思局·贾天祥正照风月鉴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话说凤姐正与平儿说话，只见有人回说：“瑞大爷来了。”凤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐急命“快请进来。”贾瑞见往里让，心中喜出望外，急忙进来，见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了凤姐，满面陪笑，连连问好。凤姐儿也假意般勤，让茶让坐。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞见凤姐如此打扮，亦发酥倒，因场了眼问道：“二哥哥怎
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            么还不回来？”凤姐道：“不知什么原故。”贾瑞笑道：“别是路上有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ，人住了脚了，舍不得回来也未可知？”凤姐道：“也未可知。男
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人家见一个爱一个也是有的。”贾瑞笑道：“嫂子这话说错了，我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            就不这样。”凤姐笑道：“像你这样的人能有几个呢，十个里也挑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不出一个来。”贾瑞听了，喜的抓耳腮，又道：“嫂子天天也闷的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            很。”凤姐道：“正是呢，只盼个人来说话解解闷儿。”贾瑞笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “我倒天天闲着，天天过来替嫂子解解闲闷可好不好？”凤姐笑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“你哄我呢，你那里肯往我这里来。”贾瑞道：“我在嫂子跟前，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            若有一点谎话，天打雷劈！只因素日闻得人说，嫂子是个利害
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人，在你跟前一点也错不得，所以住了我。今见嫂子最是个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有说有笑极疼人的，我怎么不来，一一死了也愿意！”凤姐笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “果然你是个明白人，比贾蓉两个强远了。我看他那样清秀，只
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当他们心里明白，谁知竟是两个胡涂虫，一点不知人心。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞听了这话，越发撞在心坎儿上，由不得又往前凑了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凑，觀着眼看凤姐带的荷包，然后又问带着什么戒指。凤姐悄悄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 161
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“放尊重着，别叫丫头们看了笑话。”贾瑞如听纶音①佛语一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            般，忙往后退。凤姐笑道：“你该走了。”贾瑞说：“我再坐一坐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿。一一好狠心的嫂子。”凤姐又悄悄的道：“大天白日，人来人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            往，你就在这里也不方便。你且去，等着晚上起了更你来，悄悄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的在西边穿堂儿等我。”贾瑞听了，如得珍宝，忙问道：“你别哄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我。但只那里人过的多，怎么好躲的？”凤姐道：“你只放心。我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            把上夜的小厮们都放了假，两边门一关，再没别人了。”贾瑞听
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，喜之不尽【}，忙忙的告辞而去，心内以为得手。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盼到晚上，果然黑地里摸入荣府，趁掩门时，钻入穿堂。果
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见漆黑无一人，往贾母那边去的门户已倒锁，只有向东的门未
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            关。贾瑞侧耳听着，半日不见人来，忽听略一声，东边的门也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倒关了。贾瑞急的也不敢则声，只得悄悄的出来，将门撼了撼，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            关的铁桶一一般。此时要求出去亦不能够，南北皆是大房墙，要跳
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亦无攀援。这屋内文是过门风{二]，空落落；现是腊月天气，夜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又长，朔风凛凛，侵肌裂骨，一夜几乎不曾冻死。好容易盼到早
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            晨，只见一个老婆子先将东门开了，进去叫西门{三)。贾瑞瞅他
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            背着脸，一溜烟抱着肩跑了出来，幸而天气尚早，人都未起，从后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            门一径跑回家去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来贾瑞父母早亡，只有他祖父代儒教养。那代儒素日教
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            训最严，不许贾瑞多走一步，生怕他在外吃酒赌钱，有误学业。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今忽见他一夜不归，只料定他在外非饮即赌，婚宿妓，那重想
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到这段公案，因此气了一夜。贾瑞也捻着一把汗，少不得回来撤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①纶（lin伦）音一皇帝的命令。《礼记·缩衣》：“王言如丝，其出如纶；王言
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如纶，其出如练（fo弗）。”意思是帝王出言影响重大。后常以“纶音”代指“圣旨”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            纶：古代缚印玺或椎幕用的带子。练：粗绳。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            162 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王熙凤毒设相思局贾天祥正照风月鉴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            谎，只说：“往舅舅家去了，天黑了，留我住了一夜。”代儒道：“自
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来出门，非慕我不敢擅出，如何昨私自去了？据此亦该打，何
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            况是撒谎。”因此，发狠到底打了三四十板，不许吃饭，令他跪在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            院内读文章，定要补出十天的工课来方罢。贾瑞直冻了一夜，今
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又遭了苦打，且饿着肚子，跪着在风地里读文章，其苦万状。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此时贾瑞前心犹是未改，再想不到是凤姐捉弄他。过后两
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日，得了空，便仍来找凤姐。凤姐故意抱怨他失信，贾瑞急的赌
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            身发誓。凤姐因见他自投罗网，少不得再寻别计令他知改，故又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            约他道：“今日晚上，你别在那里了。你在我这房后小过道子里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那间空屋里等我，可别冒撞了。”贾瑞道：“果真？”凤姐道：“谁可
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            哄你，你不信就别来。”贾瑞道：“来，来，来。死也要来！”凤姐道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “这会子你先去罢。”贾瑞料定晚间必妥，此时先去了。凤姐在这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里便点兵派将，设下圈套。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那贾瑞只盼不到晚上，偏生家里亲戚又来了，直等吃了晚饭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才去，那天已有掌灯时候。又等他祖父安歇了，方溜进荣府，直
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            往那夹道中屋子里来等着，热锅上的蚂蚁一般，只是干转。左等
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不见人影，右听也没声响，心下自思：“别是又不来了，文冻我一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            夜不成？”正自胡猜，只见黑的来了一一个人，贾瑞便意定是凤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐，不管皂白，饿虎一般，等那人刚至门前，便如猫捕鼠的一般，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抱住叫道：“亲嫂子，等死我了。”说着，抱到屋里炕上就亲嘴挺裤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子，满口里“亲娘”“亲参”的乱甜起来。那人只不作声。贾瑞拉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了自已裤子，硬帮帮的就想顶入。忽见灯光一闪，只见贾蔷举着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个子①照道：“谁在屋里？”只见炕上那人笑道：“瑞大叔要臊
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我呢。”费瑞一见，却是费蓉，真臊的无地可入，不知要怎么样才
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①捻（nian碾）子一这里指引火用的纸卷儿。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 16.3
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好，回身就要跑，被贾蘑一把住道：“别走！如今琏二已经告
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到太太跟前，说你无故调戏他。他暂用了个脱身计，哄你在这边
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等着，太太气死过去，因此叫我来拿你。刚才你又拦住他，没的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说，跟我去见太太！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞听了，魂不附体，只说：“好侄儿，只说没有见我，明日我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            重重的谢你。”贾替道：“你若谢我，放你不值什么，只不知你谢我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            多少？况且口说无凭，写一文契来。”贾瑞道：“这如何落纸呢？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾道：“这也不妨，写一个赌钱输了外人帐目，借头家银若干两
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便罢。”贾瑞道：“这也容易。只是此时无纸笔。”贾蕃道：“这也容
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            易。说罢，翻身出来，纸笔现成，拿来命贾瑞写。他俩作好作友，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只写了五十两，然后画了押，贾蘑收起来。然后撕逻贾蓉。贾蓉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            先咬定牙不依，只说：“明日告诉族中的人评评理。”贾瑞急的至
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            于叩头。贾蕃作好作歹的，也写了一张五两欠契才罢。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾蕃又道：“如今要放你，我就担着不是。老太太那边的门
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            早已关了，老爷正在厅上看南京的东西，那一条路定难过去，如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今只好走后门。若这一走，倘或遇见了人，连我也完了。等我们
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            先去哨探哨探，再来领你。这屋你还藏不得，少时就来堆东西。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等我寻个地方。”说毕，拉着贾瑞，仍熄了灯，出至院外，摸着大台
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            矶底下，说道：“这窝儿里好，你只着，别哼一声，等我们来[四]
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            再动。”说毕，二人去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞此时身不由已，只得在那里。心下正盘算，只听头顶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上一声响，啃拉拉一净桶尿粪从上面直泼下来，可巧浇了他一身
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一头。贾瑞掌不住暖哟了一声，忙文掩住口，不敢声张，满头满
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            脸浑身皆是尿屎，冰冷打战。只见贾蔷跑来叫：“快走，快走！”贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瑞如得了命，三步两步从后门跑到家里，天已三更，只得叫门。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            开门人见他这般景况，问是怎的。少不得扯谎说：“黑了，失脚掉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            164 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王熙凤毒设相思局贾天祥正照风月鉴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            在茅厕里了。”一面到了自已房中更衣洗灌，心下方想到是凤姐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            顽他，因此发一回恨；再想想凤姐的模样儿，又恨不得一时楼在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            怀内，夜竟不曾合眼。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自此满心想凤姐，只不敢往荣府去了。贾馨两个文常常的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来索银子，他文怕祖父知道，正是相思尚且难禁，更又添了债务；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日间工课又紧，他二十来岁人，尚未娶亲，迩来想着凤姐，未免有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那指头告了消乏①等事；更兼两回冻恼奔波，因此三五下里夹
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            攻，不觉就得了一病。心内发膨胀，口中无滋味，脚下如绵，眼中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            似醋，黑夜作烧，白昼常倦，下溺连精，嗽痰带血：诸如此症，不上
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一年都添全了。于是不能支持，一头睡倒，合上眼还只梦魂颠
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倒，满口乱说胡话，惊怖异常。百般请医疗治，诸如肉桂、附子、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            甲、麦冬、玉竹等药，吃了有几十斤下去，也不见个动静。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又腊尽春回，这病更又沉重。代儒也着了忙，各处请医疗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            治，皆不见效。因后来吃独参汤”②，代儒如何有这力量，只得
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            往荣府来寻。王夫人命凤姐秤二两给他，凤姐回说：“前儿新近
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            都替老太太配了药，那整的太太又说留着送杨提督的太太配药，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            偏生昨儿我已送了去了。”王夫人道：“就是咱们这边没了，你打
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            发个人往你婆婆那边问问，或是你珍大哥哥那府里再寻些来，凑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着给人家。吃好了，救人一命，也是你的好处。”凤姐听了，也不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            遭人去寻，只得将些渣未泡须凑了几钱，命人送去，只说“太太
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            送来的，再也没了。”然后回王夫人，只说：“都寻了来，共凑了有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二两送去。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①指头告了消乏—手淫。“了”音 liao。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②独参汤一一中医方剂名。治元气大亏、阳气暴脱的危症。在一般方剂中，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            各种药配伍，人参用量不过数钱，独参汤独用人参一味，重或一、二两，取其功专而力
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大。方剂见葛乾孙（十药神书）。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 165
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那贾瑞此时要命心甚切，无药不吃，只是白花钱，不见效。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            忽然这日有个跛足道人来化斋，口称专治冤业之症①。贾瑞偏
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            生在内就听见了，直着声叫喊说：“快请进那位菩萨来救我！”-
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面叫[五)，一面在枕上叩首。众人只得带了那道士进来。贾瑞
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一把拉住，连叫“菩萨救我！”那道士叹道：“你这病非药可医。我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有个宝贝与你，你天天看时，此命可保矣。”说毕，从搭链中取出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面镜子来一两面皆可照人，镜把上面着“风月宝鉴”四字
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一递与贾瑞道：“这物出自太虚幻境空灵殿上，警幻仙子所制
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            专治邪思妄动之症，有济世保生之功。所以带他到世上，单与那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            些聪明杰俊、风雅王孙等看照。千万不可照正面，只照他的背
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面，要紧，要紧！三日后吾来收敢，管叫你好了。”说毕，伴常而
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去②，众人苦留不住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾瑞收了镜子，想道：“这道士倒有意思，我何不照一照试
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            试。”想毕，拿起“风月鉴”来向反面一照，只见一个髓立在里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面，唬得贾瑞连忙掩了，骂：“道士混帐，如何吓我！一一我倒再
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            照正面是什么。”想着，又将正面一照，只见凤姐站在里面招手叫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他。贾瑞心中一喜，荡悠悠的觉得进了镜子，与凤姐云雨一番，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐仍送他出来。到了床上，暖哟了一声，一静眼，镜子从手里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            掉过来，仍是反面立着一个。贾瑞自觉汗津津的，底下已遗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了一滩精。心中到底不足，又翻过正面来，只见凤姐还招手叫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他，他又进去。如此三四次。到了这次，刚要出镜子来，只见两
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个人走来，拿铁锁把他套住，拉了就走。贾瑞叫道：“让我拿了镜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①冤业之症一一谜信说法，由于“结冤造薬”而得的病症。业；同“麟”，罪过、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            邪恶的意思。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②祥（ying羊）常去一-一大模大样地离去。伴常：同“扬长&#34;。或谓伴常亦作
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “常伴”、“倘伴”，意为排、盘旋，自由自在地往来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            166
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王熙凤毒设相思局贾天祥正照风月鉴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子再走。”一一只说了这句，就再不能说话了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            旁边伏侍贾瑞的众人，只见他先还拿着镜子照，落下来，仍
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            静开眼拾在手内，未后镜子落下来便不动了。众人上来看看，已
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            没了气，身子底下冰凉渍湿[六]一大滩精，这才忙着穿衣抬床。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            代儒夫妇哭的死去活来，大骂道士，“是何妖镜！若不早毁此物，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            遗害于世不小。”遂命架火来烧，只听镜内哭道：“谁叫你们熊正
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面了！你们自己以假为真，何苦来烧我？”正哭着，只见那跛足道
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人从外面跑来，喊道：“谁毁“风月鉴，吾来救也！”说着，直入中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            堂，抢入手内，飘然去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当下，代儒料理丧事，各处去报丧。三日起经①，七日发
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            引②，寄灵于铁槛寺，日后带回原籍。当下贾家众人齐来吊问，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            荣国府贾赦赠银二十两，贾政亦是二十两，宁国府贾珍亦有二十
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            两，别者族中贫富不等，或三两五两，不可胜数。另有各同窗家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            分资，也凑了二三十两。代儒家道虽然淡薄，倒也丰丰富富完了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            谁知这年冬底，林如海{七)的书信寄来，却为身染重疾，写
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书特来接林黛玉回去。贾母听了，未免又加忧闷，只得忙忙的打
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            点黛玉起身。宝玉大不自在，争奈父女之情，也不好拦劝。于是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母定要贾送他去，仍叫带回来。一应土仪盘缠③，不消烦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①起经一一旧俗，人死后第三天，开始请和尚道士念经，叫起经。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②发引一一出殡时，送丧人牵着引索作前导，把灵枢从停放的地方运出，叫发
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            引。引：牵引灵枢的索子。《礼记·檀弓下》：“吊于丧者必执引。”也绑，《礼记·曲礼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上》：“助丧必执绨。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③土仪盘缠一一用土产作为赠人的礼物叫土仪。仪：礼物。盘缠：即盘川，旅
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            费。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            167
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说，自然要妥贴。作速择了日期，贾班与林黛玉辞别了贾母
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等[八}，带领仆从，登舟往扬州去了。要知端的，且听下回分解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            校记
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [一] “喜之不尽”，原“尽”为“禁”点改，从改文。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “过门风”，各本同。原作“过门风”，又添改为“过堂儿风又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大&#34;。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            稿、蒙府、甲辰本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “等我们来”，原无“等”字，从梦稿、蒙府、戚序、舒序、甲辰本
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面叫”，原无，从各本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [六]
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “冰凉渍湿”，从梦稿、蒙府、戚序、甲辰本。底本原作“冰溃渍
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湿”，“冰”点改为“水”，后一“渍字为旁添，“湿”字点去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [七] “林如海”，原作“林儒海”，从各本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【八」“贾母等”,原作“同人”，从梦稿本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            168
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦可卿死封龙禁尉① 王熙凤协理宁国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话说风姐儿自贾琏送黛玉往扬州去后，心中实在无趣，每到
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            晚间，不过和平儿说笑一回，就胡乱睡了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ，这日夜间，正和平儿灯下拥炉倦绣，草命浓薰绣被，二人睡
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            下，屈指算行程该到何处，不知不觉已交三鼓。平儿已睡熟了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐方觉星眼微朦，恍憾只见秦氏从外走来，含笑说道：“子好
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            睡！我今日回去，你也不送我一程。因娘儿们素日相好，我舍不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得婵子，故来别你一别。还有一件心愿未了，非告诉姊子，别人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未必中用。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐听了，恍憾问道：“有何心愿？你只管托我就是了。”秦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            氏道：“，你是个脂粉队里的英雄，连那些束带顶冠的男子也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不能过你，你如何连两句俗语也不晓得？常言“月满则亏，水满
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            则溢；又道是登高必跌重，。如今我们家赫赫扬扬，已将百载，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一日倘或乐极悲生，若应了那句“树倒瑚貅散”的俗语，巴不虚称
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了一世的诗书阳族了！”凤姐听了此话，心胸天快，十分敬畏，忙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “姊子好痴也。否极泰来②，荣厚自古周而复始，岂人力能可保
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            龙禁尉一一一作者虚拟的皇帝侍卫官名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            否（p痞）极泰来一一意思是情况坏到极点，就会往好的方面转化。否、泰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            《周易》中的两个卦名。“否”，表示沸塞、坏运气、凶险；“泰”，表示亨通、好运气、吉利。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 169
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            常的。但如今能于荣时筹画下将来衰时的世业，亦可谓常保永
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            全了。即如今日诸事都妥，只有两件未妥，若把此事如此一行，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            则后日可保永全了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐便问何事。秦氏道：“目今[一]祖莹虽四时祭祀，只是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无一定的钱粮；第二，家塾虽立，无定的供给。依我想来，如今
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盛时固不缺祭祀供给，但将来败落之时，此二项有何出处？莫若
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            依我定见，趁今日富贵，将祖莹附近多置田庄房舍地亩，以备祭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            供给之费皆出自此处，将家塾亦设于此。合同族中长幼，大家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            定了厕例，日后按房掌管这一年的地亩、钱粮、祭祀、供给之事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如此周流，又无争竞，亦不有典卖诸弊。便是有了罪，凡物可人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            官，这祭祀产业连官也不入的。便败落下来，子孙回家读书务
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            农，也有个退步，祭祀又可永继。若目今以为荣华不绝，不思后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日，终非长策。眼见不日又有一件非常喜事，真是烈火烹油、鲜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            花着锦之盛。要知道，也不过是瞬息的繁华，一时的欢乐，万不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可忘了那‘盛必散二)’的俗语。此时若不早为后虑，临期只
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恐后悔无益了。”凤姐忙问：“有何喜事？”秦氏道：“天机不可泄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            漏。只是我与子好了一场，临别赠你两句话，须要记着。”因念
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            三春去后诸芳尽，各自须寻各自门。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐还欲问时，只听二门上传事云板连即四下①，将凤姐惊醒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人回：“东府蓉大奶奶没了。”凤姐闻听，吓了一身冷汗，出了一回
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            神，只得忙忙的穿衣，往王夫人处来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            彼时合家皆知，无不纳罕，都有些疑心。那长辈的想他素
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①云板连即四下一一报凶丧大事的讯号。旧俗吉事常用三数，凶事常用四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            数，有“神三鬼四”之说。云板：见第59页注②。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            170 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦可卿死封龙禁尉王熙凤协理宁国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日孝顺，平一辈的想他素日和睦亲密，下一辈的想他素日慈爱，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            以及家中仆从老小想他素日冷贫惜贱、慈老爱幼之恩，莫不悲喙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            痛哭者。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            闲言少叙，却说宝玉因近日林黛玉回去，剩得自己孤，也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不和人顽耍，每到晚间便索然睡了。如今从梦中听见说秦氏死
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，连忙翻身爬起来，只觉心中似戳了一刀的不忍，哇的一声，直
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            奔出一口血来。袭人等慌慌忙忙上来擢扶(三)①,间是怎么样,
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又要回贾母来请大夫。宝玉笑道：“不用忙，不相干，这是急火攻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心，血不归经②。”说着便爬起来，要衣服换了，来见贾母，即时要
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过去。袭人见他如此，心中虽放不下，又不敢拦，只是由他罢了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母见他要去，因说：“才喉气的人，那里不干净；二则夜里风大，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等明早再去不迟。”宝玉那里肯依。贾母命人备车，多派跟随人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            役，拥护前来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一直到了宁国府前，只见府门洞开，两边灯笼照如白叠，乱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            烘烘人来人往，里面哭声摇山振岳。宝玉下了车，忙忙奔至停灵
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之室，痛哭一番。然后见过尤氏。谁知尤氏正犯了胃疼旧疾，睡
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            在床上。然后又出来见贾珍。彼时贾代儒、代修[四]、贾敕、贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            效、贾敦、贾、贾政、贾琮、贾、贾珩、贾班、贾琛、贾琼、贾、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾蔷、贾菖、贾菱、贾芸、贾芹、贾、贾萍、贾藻、贾、贾芬、贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芳、贾兰、贾菌、贾芝等都来了。贾珍哭的泪人一一般，正和贾代儒
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等说道：“合家大小，远近亲友，谁不知我这媳妇比儿子还强十
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            播（chou抽）扶一意近换扶。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②急火攻心，血不归经一一中医病症名。中医认为人的情绪受到突如其来的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            刺，可以引起情志之火内发，而使心火肝火亢盛，干扰正常营血，通血妄行，就会出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            现吐血、出鼻血等症状。但这只是一时的现象，与虚劳损伤引起的吐血不同。所以
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉说“不用忙，不相干”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 171
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倍。如今伸腿去了，可见这长房内绝灭无人了。”说着又哭越来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人忙劝：“人已辞世，哭也无益，且商议如何料理要紧。”贾珍拍
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            手道：“如何料理，不过尽我所有罢了！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正说着，只见秦业(五)、秦钟并尤氏的几个眷属尤氏姊妹也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            都来了。贾珍便命贾琼、贾琛、贾、贾四个人去陪客，一面吩
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去请钦天监阴阳司①来择日，择准停灵七七四十九日，三日
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后开丧送让闻。这四十九日，单请一百单八众禅僧在大厅上拜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大悲杆②，超度前亡后化诸魂，以免亡者之罪；另设一坛于天香
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            楼上，是九十九位全真道士③，打四十九日解冤洗业④。然后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            停灵于会芳园中，灵前另外五十众高僧、五十众高道，对坛按七
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            作好事③。那贾敬闻得长孙媳死了，因自为早晚就要飞升，如何
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            背又回家染了红尘，将前功尽弃呢，因此并不在意，只凭贾珍料
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            理。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾珍见父亲不管，亦发恣意奢华。看板时，儿副杉木板皆不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①钦天监阴阳司钦天监：明、清时代的官署名，主管观天文、定历数、千吉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凶、辩禁忌等事。阴阳司：作者虚拟的宫署名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②拜大悲杆一一拜杆：请僧众念经拜佛，代人消灾或超度亡魂的--种宗教活
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            动。拜大悲杆：是在拜样时念“大悲”。大悲咒是唐代伽梵达蘑译《千手千眼观世
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            音菩萨广大圆满无碍大悲心陀罗尼经》（简称（大悲心陀罗尼经》或《千手经》）中的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            语。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③全真道士一本指道土中信奉全真教派的人，后来也作为各派道士的通
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            称。全真教：系道教的北宗，是南宋时金道土王嘉（zhe哲）所创，杂揉儒家的忠孝、佛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            教的戒律和道教的丹鼎而成。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④打醒(jiao叫)—一拍时请僧道设坛念经，祈福消灾、超度亡魂的--种案教仪
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            式。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③按七作好事一一旧时迷信，认为人死后还会转生。从刚死之日算起，每七
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天为一期，期满后即再降生；若一期届满未得生缘，须再等一期；最多到第七期，必定
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            降生。由于从已死到再生之间祸福未定，所以死者的亲属每隔七天要设奠一次，请
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            僧道替死者诵经修福，直到七七为止。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            172 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦可卿死封龙禁尉王照熙凤协理宁国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中用。可巧薛蟠来吊问，因见贾珍寻好板，便说道：“我们木店里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有一副板，叫作什么木，出在潢海铁网山上，作了棺材，万年不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            坏。这还是当年先父带来，原系义忠亲王老干岁要的，因他坏了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            事①，就不曾拿去。现在还封在店内，也没有人出价敢买。你若
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要，就抬来使罢。”贾珍听说，喜之不尽，即命人抬来。大家看时，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只见帮底皆厚八寸，纹若槟榔，味若檀麝，以手扣之，挡如金
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉。大家都奇异称赞。贾珍笑问：“价值几何？”薛蟠笑道：“拿一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            千两银子来，只怕也没处买去。什么价不价，赏他们几两工钱就
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是了。”贾珍听说，忙谢不尽，即命解锯糊漆。贾政因劝道：“此物
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恐非常人可享者，以上等杉木也就是了。”此时贾珍恨不能代
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦氏之死，这话如何肯听。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因忽又听得秦氏之丫翼名唤瑞珠者，见秦氏死了，他也触柱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            而亡。此事可罕，合族人也都称叹。贾珍遂以孙女之礼殡，一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            并停灵于会芳园中之登仙阁。小丫名宝珠者，因见秦氏身无
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            所出，乃甘心愿为义女，誓任摔丧驾灵②之任。贾珍喜之不尽，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            即时传下，从此皆呼宝珠为小姐。那宝珠按未嫁女之丧，在灵前
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            哀哀欲绝。于是，合族人丁并家下诸人，都各遵旧制行事，自不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得紊乱。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾珍因想着贾蓉不过是个簧门监③，灵幡经榜上写时不好
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①坏了事一一这里指因获罪而被革去官爵。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②摔丧驾灵一一旧日出殡，将起动棺材时，先由主丧孝子在灵前摔碎瓦盆一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只，叫做摔丧”，也称“摔盆”。主丧孝子亲自抬扶灵枢或牵引灵车叫做“驾灵”。后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，主丧孝子只在灵枢前领路，也称“驾灵”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③黄（hong洪）门监一一即监生。本指在明清时代最高学府国子监读
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书的学生，后来也可以捐钱买得，不一定要在国子监读书。簧：舌代学校
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 173
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看，便是执事①也不多，因此心下甚不自在。可巧这日正是首
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            七第四日，早有大明宫掌宫内相②戴权，先备了祭礼遭人来，次
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后坐广大轿，打伞鸣锣，亲来上祭。贾珍忙接着，让至逗蜂轩献
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            茶。贾珍心中打算定了主意，因而趁便就说要与贾蓉捐个前程
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的话。戴权会意，因笑道：“想是为丧礼上风光些。”贾珍忙笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “老内相所见不差。”戴权道：“事倒凑巧，正有个美缺。如今三百
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            员龙禁蔚短了两员，昨儿襄阳侯的兄弟老三来求我，现拿了干
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            五百两银子，送到我家里。你知道，咱们都是老相与，不拘怎么
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            样，看着他爷爷的分上，胡乱应了。还剩了一个缺，谁知永兴节
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            度使(六}冯胖子来求，要与他孩子捐，我就没工夫应他。既是咱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            们的孩子要捐，快写个履历来。”贾珍听说，忙盼：“快命书房里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人恭敬写了大爷的履历来。”小厮不敢怠慢，去了一一刻，便拿了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            张红纸来与贾珍。贾珍看了，忙送与戴权。看时，上面写
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            江南(七)江宁府江宁县监生贾蓉，年二十岁。曾祖，原
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            任京营节度使世袭一等神威将军贾代化；祖，乙卵科进士贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            敬；父，世袭三品爵威烈将军贾珍。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            戴权看了，回手便递与一个贴身的小厮收了，说道：“回来送与户
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            部堂官③老赵，说我拜上他，起一张五品龙禁尉的票，再给个执
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            照，就把这履历填上，明儿我来兑银子送去(八)。”小厮答应了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            戴权也就告辞了。贾珍十分款留不住，只得送出府门。临上轿，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①执事一一一这里指仪仗，有时也指差事或当差的人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②内相一本为翰林的别称。《新唐书·陆赞传》：“始，人翰林，年尚少，以
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            材幸，虽外有宰相主大议，而赞常居中参裁可否，时号内相。”这重是对太监的尊
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            称。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③堂官一明、清时代称各衡署的长宫叫堂官。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            174 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦可卿死封龙禁尉王熙凤协理宁国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾珍因问：“银子还是我到部兑，还是一并送入老内相[九}府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中？”戴权道：“若到部里，你又吃亏了。不如平准干二百银子，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            犬到府谢。”于是作别。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            接着，便又听喝道之声，原来是忠靖侯史鼎的夫人来了。王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            夫人、邢夫人、凤姐等刚迎入上房，又见锦乡侯、川宁侯、寿山伯
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            三家祭礼摆在灵前。少时，三人下轿，贾政等忙接上大厅。如此
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亲朋你来我去，也不能胜数。只这四十九日，宁国府街上条白
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            漫漫人来人往，花簇簇官去官来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾珍命贾蓉次日换了吉服，领凭回来。灵前供用执事等物，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            俱按五品职例。灵牌疏上皆写“天朝诰授贾门秦氏恭人②之灵
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            位”。会芳园临街大门洞开，旋在两边起了鼓乐厅，两班青衣按
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            时奏乐，一对对执事摆的刀斩斧齐。更有两面朱红销金大字牌
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            对竖在{一〇}门外，上面大书：“防护内廷紫禁道御前侍卫龙禁
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            尉”。对面高起着宣坛③，僧道对坛榜文，榜上大书：“世袭宁国
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            公冢孙④妇、防护内廷御前侍卫龙禁尉贾门秦氏恭人之丧。四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大部洲③至中之地、奉天承运太平之国，总理虚无寂静教门僧
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①服满一一指服丧期满。据《清朝通典·礼·凶二》载，父母对嫡长子之妻服
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丧，为期一年。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②恭人封建时代，妇女根据丈夫或子孙的官职品级受封赠。明、清时四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人”，此处明写“恭人”，或隐含讽喻。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宣坛一僧道讲经作法时所设置的台子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            家（zhong肿）孙一一嫡长孙。冢：大，引申为嫡长之意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            四大部洲一一印度古代传说，称人类所居的世界为四大部洲。佛教袭用其
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说，但其名称佛家典籍中说法不一。据唐代沙门释普光述《俱舍论记），四大部洲为
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            南赠部洲、东胜身洲、西牛货洲、北拘卢洲。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 175
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            录司正堂万虚、总理元始三一教门道录司①正堂叶生等，敬谨
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            修斋，朝天佛”，以及“恭请诸伽蓝②、揭谛③、功曹④等神，圣
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恩普锡，神威远镇，四十九日消灾洗业平安水陆道场”等语，亦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不消烦记。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只是贾珍虽然此时心意满足，但里面尤氏又犯了旧疾，不能
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            料理事务，椎恐各谐命@来往，亏了礼数，怕人笑话，因此心中不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自在。当下正忧虑时，因宝玉在侧问道：“事事都算安贴了，大哥
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            哥还愁什么？”贾珍见问，便将里面无人的话说了出来。宝玉听说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笑道：“这有何难，我荐一个人与你权理这一个月的事，管必要
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当。”贾珍忙问：“是谁？”宝玉见座间还有许多亲友，不便明言，走
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            至贾珍耳边说了两句。贾珍听了喜不自禁，连忙起身笑道：“果然
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妥贴，如今就去。”说着拉了宝玉，辞了众人，便往上房里来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可巧这日非正经日期，亲友来的少，里面不过几位近亲堂
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            客，邢夫人、王夫人、凤姐并合族中的内着陪坐。闻人报：“大爷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            僧录司、道录司一一明、清时代掌管全国僧道事务的最高官衙。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            伽兰一一梵语僧伽摩兰的简称。意思是僧众居住的园林、寺院。这里指卫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            护园林、寺院的伽兰神。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③揭谛一一佛教传说中的护法猛神。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            功曹一一也称“四值功曹”。道教传说他们是值年、月、日、时的神，掌管传
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人间星文给玉皇大帝。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①水陆道场—又叫水陆斋，简称水陆，是一种用诵经拜佛、施舍斋食来“超
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            度”所谓水陆二界鬼众的佛教迷信活动。创始于梁武帝萧衔。见元代觉岸《释氏稽
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            古略》。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妇人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正经日期一丧礼诵经期间吊祭死者的正日子。经：指诵经。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            176 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦可卿死封龙禁尉王熙凤协理宁国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            进来了。”嘘的众婆娘的一声，往后藏之不迭，独凤姐款款站了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            起来。贾珍此时也有些病症在身，二则过于悲痛了，因挂个拐跛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了进来。邢夫人等因说道：“你身上不好，又连日事多，该歇歇才
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是，又进来做什么？”贾珍一面扶拐，扎挣着要避身跪下请安道
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            乏。邢夫人等忙叫宝玉撸住，命人挪椅子来与他坐。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            珍断不背坐，因勉强陪笑道：“侄儿进来有一件事要求二
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            位婵子并大妹妹。”邢夫人等忙问：“什么事？”贾珍忙笑道：“子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自然知道，如今孙子媳妇没了，侄儿媳妇偏又病倒，我看里头着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            实不成个体统。怎么屈尊大妹妹一个月，在这里料理料理，我就
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            放心了。”邢夫人笑道：“原来为这个。你大妹妹现在你二子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            家，只和你二子说就是了。”王夫人忙道：“他一个小孩子家，何
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            曾经过这样事，倘或料理不清，反叫人笑话，倒是再烦别人好。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾珍笑道：“婵子的意思侄儿猜着了，是柏大妹妹劳苦了。若说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            料理不开，我包管必料理的开，便是错一点儿，别人看着还是不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            错的。从小儿大妹妹顽笑着就有杀伐决断{}，如今出了阁，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            文在那府里办事，越发历练老成了。我想了这儿日，除了大妹妹
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            再无人了。婵子不看侄儿、侄儿媳妇的分上，只看死了的分上
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            罢！”说着滚下泪来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            主夫人心中怕的是凤姐儿未经过丧事，怕他料理不清，惹人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            耻笑。今见贾珍苦苦的说到这步田地，心中已活了几分，却又眼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看着凤姐出神。那凤姐素日最喜揽事办，好卖弄才干，虽然当家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要当，也因未办过婚丧大事，恐人还不伏，巴不得遇见这事。今
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见贾珍如此一来，他心中早已欢喜。先见王夫人不充，后见贾珍
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说的情真，王夫人有活动之意，便向王夫人道：“大哥哥说的这么
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            愿切，太太就依了罢。”王夫人悄俏的道：“你可能么？”凤姐道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “有什么不能的。外面的大事已经大哥哥料理清了，不过是里头
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            177
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            照管照管，便是我有不知道的，问问太太就是了。”王夫人见说的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有理，便不作声。贾珍见凤姐允了，又陪笑道：“也管不得许多
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，横竖要求大妹妹辛苦辛苦。我这里先与妹妹行礼，等事完
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，我再到那府里去谢【一二]。”说着，就作揖下去，凤姐儿还礼不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾珍便忙向袖中取了宁国府对牌①出来，命宝玉送与凤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐，又说：“妹妹爱怎样就怎样，要什么只管拿这个取去，也不必
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            问我。只求别存心替我省钱，只要好看为上；二则也要同那府里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一样待人才好，不要存心怕人抱怨。只这两件外，我再没不放心
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的了。”凤姐不敢就接牌，只看着王夫人。王夫人道：“你哥哥既
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这么说，你就照看照看罢了。只是别自作主意，有了事，打发人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            问你哥哥、嫂子要紧。”宝玉单向贾珍手里接过对牌来，强递与凤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐了。又问：“妹妹住在这里，还是天天来呢？若是天天来，越发
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            辛苦了。不如我这里赶着收拾出一个院落来，妹妹住过这几
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日倒安稳。”凤姐笑道：“不用。那边也离不得我，倒是天天
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来的好。”贾珍听说，只得罢了。然后又说了一回闲话，方才出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一时女着散后，王夫人因问凤姐：“你今儿怎么样？”凤姐儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“太太只管请回去，我须得先理出一个头绪来，才回去得呢。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王夫人听说，便先同邢夫人等回去，不在话下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里凤姐儿来至三间一所抱厦内坐了，因想：头一件是人口
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            混杂，遗失东西；第二件，事无专执，临期推委；第三件，需用过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            费，滥支冒领；第四件，任无大小，苦乐不均；第五件，家人豪纵，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①对牌一一用木、竹制成的支领财物的凭证，二有标记，从中劈作两半。支领
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            财物时，以两半标记相合为凭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            178
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦可卿死封龙禁尉王熙凤协理宁国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有脸者不服铃束①，无脸者不能上进。此五件实是宁国府中风
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            俗，不知凤姐如何处治，耳听下回分解。正是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            金紫万干谁治国，裙钗一二可齐家。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            校记
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “自今”，原无“自”字，从各本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “盛链必散”，原作“盛链不散”，从戚序本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [] “榴扶”，原“瘤”字点改为“摔”，已卵本作“播扶”，从。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “贾代儒代修”，己卵、蒙府、戚序、舒序、甲辰、程甲本均同底
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            本。梦稿本作贾代儒贾代修”。唯甲成本作“贾代儒带领”。从底本。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【五】“秦业”,原作“秦叶”从梦稿、甲辰本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【六］“永兴节度使”，原作“永节度使”，“永”下旁添“安”字。从甲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            成、梦稿、舒序、甲辰本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “江南”，原无，从甲戌、梦稿、戚序本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            旁添，“送去”二字点去。从甲戌、梦稿、蒙府、戚序、舒序本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【九】“老内相”，原无“内”字，从甲戌、梦稿、蒙府本增。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [-O] “大字牌对竖在”，原“对”作“位”，从甲戌本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [-] “杀伐决断”，“伐”原作“法”，朱改为“抹”。从程甲本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [-二]
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①铃(qian前)束—一约束、管制的意思。铃：锁。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            179
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林如海【一}捐馆①扬州城
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾宝玉路谌北静王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话说宁国府中都总管来开闻得里面委请了凤姐，因传齐同事
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人等说道：“如今请了西府里琏二奶奶管理内事，倘或他来支取东
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            西，或是说话，我们须要比往日小心些。每日大家早来晚散，宁可
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            辛苦这-个月，过后再歇着，不要把老脸丢了。那是个有名的烈
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            货，脸酸心硬，一时恼了，不认人的。”众人都道：“有理。”文有一个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笑道：“论理，我们里面也须得他来整治整治，都不像了。”正说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着，只见来旺媳妇拿了对牌来领取呈文京榜②纸札③，票上批着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            数目。众人连忙让坐倒茶，一面命人按数取纸来抱着，同来旺媳
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妇路来至仪门口，方交与来旺媳妇自己抱进去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐即命彩明钉造薄珊。即时传来升媳妇，兼要家口花名册
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来查看，又限于明日一早传齐家人媳妇进来听差等语。大概点了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一点数目单册，问了来升媳妇几句话，便坐车回家。一宿无话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            至次日，卵正二刻便过来了。那宁国府中婆娘媳妇闻得到
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①捐馆一一又称“捐舍”、“捐馆舍”，死亡的讳称。《战国策·赵策二》：“今奉阳
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            君捐馆舍。捐弃。馆：房舍。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②呈文、京榜一一一都是纸的名称。呈文纸是一种质地较结实、价钱较便宜的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            纸，旧时书写星文及商店薄记多用之；因其含有麻质，又称麻星文。京榜是一种比较高
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            级的榜纸，因其规格适宜于向京城销售，故称京榜。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③纸札一也作“纸扎”、“纸割”。这里悬“纸张”的意思。札·古代无纸，字写在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            小木板上，叫“札”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            180
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林如海捐馆扬州城贾宝玉路谒北静王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            齐，只见凤姐正与来升媳妇分派，众人不敢擅入，只在窗外听觀。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只听凤姐与来升媳妇道：“既托了我，我就说不得要讨你们嫌了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我可比不得你们奶奶好性儿，由着你们去。再不要说你们“这府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里原是这样”的话，如今可要依着我行，错我半点儿，管不得谁是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有脸的，谁是没脸的，一例现清白处治。说着，便吩吋彩明念花名
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            册，按名一个一个的唤进来看视。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一时看完，便又盼附道：“这二十个分作两班，一班十个，每
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日在里头单管人客来往倒茶，别的事不用他们管。这二十个也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            分作两班，每日单管本家亲戚茶饭，别的事也不用他们管。这四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            十个人也分作两班，单在灵前上香添油，挂慢守灵，供饭供茶，随
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            起举哀①，别的事也不与他们相干。这四个人单在内茶房收管
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            杯碟茶器，若少一件，便叫他四个描赔②。这四个人单管酒饭器
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            皿，少一件，也是他四个描赔。这八个单管监收祭礼。这八个单
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            管各处灯油、蜡烛、纸札，我总支了来，交与你八个，然后按我的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            定数再往各处去分派。这三十个每日轮流各处上夜，照管门户，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            监察火烛，打扫地方。这下剩的按着房屋分开，某人守某处，某
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            处所有桌椅古董起，至于痰盒掸，“一草一苗，或丢或坏，就和守
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这处的人算账描赔。来升家的每日揽总查看，或有偷懒的，赌钱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            吃酒的，打架拌嘴的，立刻来回我。你有狗情，经我查出，三四辈
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子的老脸就顾不成了。如今都有定规，以后那一行乱了，只和那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一行说话。素日跟我的人，随身自有钟表，不论大小事，我是皆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有一定的时辰。横竖你们上房里也有时辰钟。正二刻我来点
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①随起举衰一这里指分派奴仆随同死者亲誉一起号哭。举衰本是孝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着的事，但旧时有钱人家为了装璜门面，也令奴仆或专门雇人来一同哭丧，以示悲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            痛。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②描赔一一照原样赔偿。描：照底样描事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            181
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卯，已正吃早饭，凡有领牌回事的，只在午初刻。戌初烧过黄昏
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            纸①，我亲到各处查一遍，回来上夜的交明钥匙。第二日仍是卯
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正二刻过来。说不得咱们大家辛苦这几日罢，事完了，你们家大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            爷自然赏你们。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说罢，又盼吋按数发与茶叶、油烛、鸡毛掸子、箸帚等物。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面又搬取家伙：桌围、椅搭、坐褥、毡席、痰盒、脚踏之类。一一面交
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            发，一面提笔登记，某人管某处，某人领某物，开得十分清楚。众
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人领了去，也都有了投奔，不似先时只栋便宜的做，剩下的苦差
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            没个招揽。各房中也不能乱失迷东西。便是人来客往，也都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            安静了，不比先前一个正摆茶，又去端饭，正陪举哀，又顾接客。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如这些无头绪、荒乱、推托、偷闲、窃取等弊，次日一概都②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐儿见自已威重令行，心中十分得意。因见尤氏犯病，贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            珍又过于悲哀，不大进饮食，自已每日从那府中煎了各样细粥，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            精致小菜，命人送来劝食。贾珍也另外盼每日送上等菜到抱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            厦内，单与凤姐。那凤姐不畏勤劳，天天于卵正二刻就过来点卯
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            理事，独在抱厦内起坐，不与众妯娌合群，便有堂客来往，也不迎
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            会。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这日乃五七正五日上，那应佛僧③正开方破狱④，传灯
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①黄昏纸一一旧时有丧人家，每天按一定时间在灵前烧纸钱。日落黄昏时烧
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的那一次，叫“黄昏纸”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            (juan捐）一一减去，免除。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            应佛僧一一也叫“应付僧”“应赴僧”，专门支应佛事的和尚。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            开方破狱一民间习俗在人死亡后僧尼、道士大作超度亡灵的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            活动之一种。开方（放）：即开度。《愚贤经》卷六：“唯愿如来当见衰，暂下开
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            度。&#34;破狱：即诵念《破地狱傷文》以拯救亡灵出地狱得解脱而往生，见（宗镜录》卷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            九。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            182
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林如海捐馆扬州城贾宝玉路谒北静王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            照亡①，参阎君，拘都鬼，请地藏王②，开金桥③，引幢蟠④；那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道士们正伏章申表，朝三清@，吲玉帝①；禅僧们行香，放焰
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            口③，拜水杆?；又有十三众尼僧，搭绣衣，红鞋，在灵前默诵接
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            引诸咒，干分热闹。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那凤姐必知今日人客不少，在家中歇宿一夜，至寅正，平儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便请起来梳洗。及收拾完备，更衣手，吃了两口奶子糖梗米
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            粥，漱口已毕，已是卵正二刻了。来旺媳妇率领诸人伺候已久。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐出至厅前，上了车，前面打了一对明角灯①，大书“荣国府”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①传灯照亡一一旧时迷信，认为人死后走向寞途，黑暗无边，而佛法能破除黑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            暗，犹如明灯。《维摩经·菩萨品》：“无尽灯者，臀如一灯燃百干灯，寞者皆明，明终不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            尽。因此于人将死时在脚后燃灯以照亡灵，故云“传灯照亡”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②地藏王一一菩萨名，他“安忍不动如大地，静虑深密如秘藏”，故名地藏。据
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            佛教传说，他子释迦既灭之后，弥勒未生之前，在“人天地狱”之中救苦救难。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③开金桥一一一迷信传说，“善人”死后鬼魂所走的是金桥。为死者开金桥，使
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他来世能*托生于福禄之地。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④幢韬（chuang fan 床番）-一都是旗子一类的东西。幢：竿头安装宝珠，竿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            身饰以锦帛的旗子。韬：一种垂直悬挂在高竿上的窄长旗子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③伏章申表道士斋蘸时俯首身恭读表章。这里章与表皆系向上帝奏
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            告的文书。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            居住在其中的“玉清元始天尊”、“上清灵宝天尊”、“太清太上老君”三位尊神为三
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①玉帝一即玉皇大帝，是道教所尊奉的最高天神。据道书说：“玉帝居玉清
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            三元宫第中位。”宋徽宗赵借尊之为“太上开天执符御历含真体道昊天玉皇上帝”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③放焰口一一和尚替丧事人家念“焰口经”及施舍饮食于众鬼神，为饿鬼超
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            度，为死者祈福的迷信活动。焰口：据佛教传说，地狱中的饿鬼，腹天如山，喉细似
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            针，一切饮食到了口边即化为火炭，故称“焰口”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ?拜水杆一和尚念“水杆经”来为死者祈求免除冤灾祸的迷信活动。水
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            仟：又叫慈悲水杆，佛教经文之一。据说是唐代悟达禅筛遇异僧用水替他洗好人面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            疮后，他为报恩而作。见元代觉岸《释氏稽古略》。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①明角灯一一又叫羊角灯，灯罩用羊角胶制成，半透明，能防风雨。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            188
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            三个大字,款款来至宁府。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大门上门灯朗挂，两边一色戳灯①，照如白昼，白汪汪穿孝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            仆从两边侍立。请车至正门上，小厮等退去，众媳妇上来揭起车
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            帘。凤姐下了车，手扶着丰儿，两个媳妇执着手把灯罩，簇拥
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着凤姐进来。宁府诸妇迎来请安接待。凤姐缓缓走入会芳园
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中登仙阁灵前，一见了棺材，那眼泪恰似断线之珠，滚将下来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            院中许多小厮垂手伺候烧纸。凤姐盼时得一声：“供茶烧纸。”只
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            听一棒锣鸣，诸乐齐奏，早有人端过-一张大圈椅来，放在灵前，凤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐坐了，放声大哭。于是里外男女上下，见凤姐出声，都忙忙接
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            声朦哭。一时贾珍尤氏遣人来劝，凤姐方才止住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来旺媳妇献茶漱口毕，凤姐方起身，别过族中诸人，自入抱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            厦内来。按名查点，各项人数都已到齐，只有迎送亲客上的一～人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未到。即命传到，那人已张惶愧惧。凤姐冷笑道：“我说是谁误
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，原来是你！你原比他们有体面，所以才不听我的话。”那人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“小的天天都来的早，只有今儿，醒了觉得早些，因又睡迷了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来迟了一步，求奶奶饶过这次。”正说着，只见荣国府中的王兴媳
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妇来了，在前探头。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐不发放这人，却先问：“王兴媳妇作什么？”王兴媳妇
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            巴不得先问他完了事，连忙进去说：“领牌取线，打车轿网络②。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着，将个帖儿递上去。凤姐命彩明念道：“大轿两顶，小轿四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            顶，车四辆，共用大小络子若干根，用珠儿线若干斤。”凤姐听了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            数自相合，便命彩明登记，取荣国府对牌掷下。王兴家的去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①戳灯-一又名高灯。是一种竖在地上的灯笼,有长柄，可插在底座上，也可
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            扛着行走。戳：又作绰、赢。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②车轿网络一一车轿上用丝线编织成的网状装饰品。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            184
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林海捐馆扬州城贾宝玉路谌北静王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            风姐方欲说话时，见荣国府的四个执事人进来，都是要支取
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            东西领牌来的。凤姐命彩明要了帖念过{二)，听了一共四件,指
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那二人扫兴而去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐因见张材家的在旁，因问：“你有什么事？”张材家的忙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            取帖儿回说：“就是方才车轿围作成，领取裁缝工银若干两。”凤
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姐听了，便收了帖子，命彩明登记。待王兴家的[三]交过牌，得
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了买办的回押相符，然后方与张材家的去领。一面又命念那一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个，是为宝玉外书房完竣，支买纸料糊裱。凤姐听了，即命收帖
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿登记，待张材家的缴清，文发与这人去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐便说道：“明儿他也睡迷了，后儿我也睡迷了，将来都没
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了人了。本来要饶你，只是我头~次宽了，下次人就难管，不如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            现开发的好。”登时放下脸来，喝命“带出去，打二十板子！”一面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又掷下宁国府对牌：“出去说与来升，革他一月银米！”众人听说，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又见凤姐眉立，知是恼了，不敢怠慢，拖人的出去拖人，执牌传谕
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的忙去传谕。那人身不由已，已拖出去挨了二十大板，还要进来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            唧谢。凤姐道：“明日再有误的，打四十，后日的六十，有要打
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的，只管误！”说着，吩吋：“散了罢。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            窗外众人听说，方各自执事去了。彼时宁国荣国两处执事
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            领牌交牌的，人来人往不绝，那抱愧被打之人含羞去了*这才知
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道凤姐利害。众人不敢偷闲，自此就业业，执事保全。不在话
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如今且说宝玉因见今日人众，恐秦钟受了委曲，因默与他商
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            议，要同他往凤姐处来坐。秦钟道：“他的事多，况且不喜人去，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            咱们去了，他不烦腻。宝玉道：“他怎好腻我们，不相干，只管
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            185
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            跟我来。说着，便拉了秦钟，直至抱厦。凤姐才吃饭，见他们来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，便笑道：“好长腿子，快上来罢。”宝玉道：“我们偏了①。”凤姐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人吃什么！原是那边，我们两个同老太太吃了来的。”一面归坐。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐吃毕饭，就有宁国府中的个媳妇来领牌，为支取香灯
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            事。凤姐笑道：“我算着你们今儿该来支取，总不见来，想是忘
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。这会子到底来取，要忘了，自然是你们包出来，都便宜了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我。”那媳妇笑道：“何尝不是忘了，方才想起来，再迟一步，也领
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不成了。”说罢，领牌而去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一时登记交牌。秦钟因笑道：“你们两府里都是这牌，倘或
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            别人私弄一个，支了银子跑了，怎样？”凤姐笑道：“依你说，都没
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王法了。”宝玉因道：“怎么咱们家没人领牌子做东西？”凤姐道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “人家来领的时候，你还做梦呢。我且问你，你们这夜书多早晚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            才念呢？”宝玉道：“巴不得这如今就念才好，他们只是不快收拾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            出书房来，这也无法。”凤姐笑道：“你请我一请，包管就快了。”宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉道：“你要快也不中用，他们该作到那里的，自然就有了。”凤姐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笑道：“便是他们作，也得要东西，搁不住我不给对牌是难的。”宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉听说，便猴②向凤姐身上立刻要牌，说：“好姐姐，给出牌子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，叫他们要东西去。凤姐道：“我乏的身子上生疼，还搁的住揉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            搓。你放心罢，今儿才领了纸裱糊去了，他们该要的还等叫去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            呢，可不傻了？”宝玉不信，凤姐便叫彩明查册子与宝玉看了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正闹着，人回：“苏州去的人昭儿来了。”凤姐急命唤进来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            昭儿打千儿请安。凤姐便问：“回来做什么的？&#34;昭儿道：“二爷打
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①偏了一一谦词.占先、厝越之意。这里是表示自己已经吃过了的客气话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②猴一一这里作动词用,形容像猴子一样屈身攀抱、纠缠。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            186
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林如海捐馆扬州城贾宝玉路谌北静王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            发回来的。林姑老爷是九月初三日巴时没的[四)。二爷带了林
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姑娘同送林姑老爷灵到苏州，大约赶年底就回来。二爷打发小
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的来报个信请安，讨老太太示下，还瞧瞧奶奶家里好，叫把大毛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            衣服带几件去。”凤姐道：“你见过别人了没有？”昭儿道：“都见过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。”说毕，连忙退去。凤姐向宝玉笑道：“你林妹妹可在咱们家
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            住长了。”宝玉道：“了不得，想来这几日他不知哭的怎样呢。”说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着，繁眉长叹。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐见昭儿回来，因当着人未及细问贾琏，心中自是记挂，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            待要回去，争奈事情繁杂，一时去了，恐有延迟失误，惹人笑话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            少不得耐到晚上回来，复令昭儿进来，细问一路平安信息。连夜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            打点大毛衣服，和平儿亲自检点包裹，再细细追想所需何物，一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            并包藏交付昭儿。文细细昭儿：“在外好生小心伏侍，不要
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            惹你二爷生气；时时劝他少吃酒，别勾引他认得混帐老婆，一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            回来打折你的腿”五]等语。赶乱完了，天已四更将尽，总睡下
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又走了困，不觉天明鸡唱，忙梳洗过宁府中来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那贾珍因见发弓目近，亲自坐车，带了阴阳司更，往铁槛寺
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来踏看寄灵所在。又一一嘱住持①色空，好生预备新鲜陈
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            设，多请名僧(六)，以备接灵使用。色空忙看晚斋。贾珍也无心
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            茶饭，因天晚不得进城，就在净室②胡乱歇了一夜。次日早，便
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            进城来料理出殡之事，一面文派人先往铁槛寺，莲夜另外修饰停
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            灵之处，并厨茶等项接灵人口坐落[七]。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里面凤姐见日期有限，也预先逐细分派料理，一面又派荣府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①住持一主持寺庙事务的和尚，取常住护持的意思。这一职位，始于唐代
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            禅宗百丈怀海和尚尊其师为住持。见《敕修百丈清规住持章》。后道教亦袭用之。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②净室一名“净住舍”，意为清静安住之所。见《法苑珠林》。后用以称和
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            尚的住室。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 187
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中车轿人从跟王夫人送殡，文顾自已送殡去占下处。自今正值
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            国公诰命亡故，王邢二夫人文去打祭送殡：西安郡王妃华
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            诞①，送寿礼；镇国公谐命生了长男，预备贺礼；又有胞兄王仁连
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            家着回南，一面写家信烹叩父母并带往之物；又有迎春染病，每
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日请医服药，看医生启帖②、症源、药案等事,亦难尽述。又兼发引
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            在迩，因此忙的凤姐茶饭也没工夫吃得，坐卧不能清净。刚到了宁
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            府,荣府的人{八}又跟到宁府;既回到荣府，宁府的人又找到荣府。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐见如此，心中倒分欢喜，并不偷安推托，恐落人褒贬，因此日
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            夜不暇，筹画得十分的整肃。于是合族上下无不称叹者。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这日伴宿③之夕，里面两班小戏并耍百戏①的与亲朋堂客
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            伴宿，尤氏犹卧于内室，一应张罗款待，独是凤姐一人周全承应。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            合族中虽有许多妯娌，但或有羞口的，或有羞脚的，或有不惯见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人的，或有惧贵官的，种种之类，俱不及凤姐举止舒徐，言语
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            概，珍贵宽大；因此也不把众人放在眼里，挥霍指示，任其所为，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自若无人。一夜中灯明火彩，客送官迎，那百般热闹，自不用说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的。至天明，吉时已到，一般六十四名青衣请灵，前面铭旌③上
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大书：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            奉天洪建兆年不易之朝诰封一等宁国公家孙妇防护内
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            华诞一一旧时对别人生日的敬称。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            启帖一陈述事情的黏子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            百戏一一古代乐舞杂技表演的总称，这里专指“杂技”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            铭旌一一同“明旌”，也叫“旌铭”，又简称“铭”。珀时丧仪用具，绛帛粉书，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上写死者宫衔、姓名，用竹竿挑起，竖在灵前右方。《周礼·春官·司常》：“大丧供铭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            。宋代朱熹《家礼·丧礼·立铭旌》：“以绛帛为铭旌，广终幅，三品以上九尺，五品以
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上八尺，六品以下七尺。书日某宫某公之，无官即随其生时所称。以竹为杠，如其
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            长，倚于灵座之右。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            188
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林如海捐馆扬州城贾宝玉路谒北静王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            廷紫禁道御前侍卫龙禁尉享强寿①贾门秦氏恭人之灵極。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一应执事陈设，皆系现赶着新做出来的，一色光艳夺目。宝珠自
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            行未嫁女之礼外，摔丧驾灵，十分哀苦。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那时官客送殡的，有镇国公牛清之孙现袭一一等伯牛继宗，理
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            国公柳彪之孙现袭一等子柳芳，齐国公陈翼之孙世袭三品威镇
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            将军陈瑞文，治国公马魁之孙世袭三品威远将军马尚，修国公侯
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            晓明之孙世袭一等子侯孝康；国公诰命亡故，故其孙石光珠守
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            孝不曾来得。这六家与宁荣二家，当日所称“八公”的便是。余
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            者更有南安郡王之孙，西宁郡王之孙，忠靖侯史鼎，平原侯之孙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            世袭二等男蒋子宁，定城侯之孙世袭二等男兼京营游击?谢
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鲸，襄阳侯之孙世袭二等男戚建辉，景田侯之孙五城兵马司③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            裘良。徐者锦乡伯公子韩奇，神武将军公子冯紫英，陈也俊、卫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            若兰等诸王孙公子，不可枚数。堂客算来亦有十来顶大轿，三四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            十小轿，连家下大小轿车辆，不下百徐十乘。连前面各色执事、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            陈设、百耍，浩浩荡荡，一带摆三四里远。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            走不多时，路旁彩棚高搭，设席张，和音奏乐，俱是各家路
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①享强寿-一《公孙龙子·通变论》：“其有（若)君臣之于国為，故强寿矣。”强
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寿是指国家强盛永久。书中秦氏的铭旌上写“享强寿”，转意为寿命终于强健之年，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            意同“强死”。《左传》文公十年载：楚国一巫者对楚成王和子玉、子西说：“三君替将
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            强死。”唐代孔颗达蔬：“强，健也，无病而死，谓被杀也。”后晋楚城濮之战，子玉、子西
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            战败，子玉自杀，子西“缢而悬绝”。据此，强死或暗含贬，即指被杀或自缢之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            类。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②游击一官名，游击将军的简称。从汉代起，历代多有设置，但官阶及职权
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            各不相同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③五城兵马司—明、清时代，在京都设五城兵马司，掌管中、东、西、南、北五
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            城巡纽盗贼，平治街道，稽查囚犯及防火等事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④路祭一—旧时出殡时，亲友在灵枢经过的路上设供致祭，叫“路祭”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 189
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是西宁郡王，第四座是北静郡王的。原来这四王，当日惟北静王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            功高，及今子孙犹袭王爵。现今北静王水溶年未弱冠①，生得形
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            容秀美，情性谦和。近闻宁国公家孙妇告殖，因想当日彼此祖父
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            相与之情，同难同荣，未以异姓相视，因此不以王位自居，上日也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            曾探丧上祭，如今又设路奠，命魔下②各官在此伺候。自已五
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            更入朝，公事一毕，便换了素服，坐大轿鸣锣张伞而来，至棚前落
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            轿。手下各宫两旁拥侍，军民人众不得往还。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一时只见宁府大殡浩浩荡荡、压地银山一般从北而至。早
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有宁府开路传事人看见，连忙回去报与费珍。贾珍急命前面驻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            扎，同贾蔽贾政三人连忙迎来，以国礼相见。水溶在轿内欠身含
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笑答礼，仍以世交称呼接待，并不妄自尊大。贾珍道：“犬妇之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丧，累蒙郡驾下临，荫生③辈何以克当。”水溶笑道：“世交之谊，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            何出此言。”遂回头命长府宫④主祭代奠。贾赦等一旁还礼毕，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            复身又来谢恩。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            水溶十分谦逊，因问贾政道：“那一位是衔宝而诞者？几次要
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见一见，都为杂所阻，想今日是来的，何不请来一会。”贾政听
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说，忙回去，急命宝玉脱去孝服，领他前来。那宝玉素日就曾听得
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            父兄亲友人等说闲话时，赞水溶是个贤王，且生得才貌双全，风流
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            潇洒，每不以官俗国体所缚。每思相会，只是父亲拘束严密，无由
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①弱冠一一古时男子二十岁行加冠礼，表示已经成人，但还未到壮年，故称
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “弱冠”。《礼记·曲礼上》·“人生·二十白弱冠。”疏：“二十成人初加冠，体犹未壮，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            故月弱也。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②磨(hui挥)下一一犹言部下。魔：古代指挥军队用的旗帜。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③荫(yin印)生一明、清时代依靠先辈的徐荫而取得监生资格的人叫“荫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            生”。荫：受先人恩惠庇护的意思。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④长府宫这里当指王府的长史。始设于汉代;清代亲王世子、郡王府中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            各置长史一人，统师府属官员，总管全府事务。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            190 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林如海捐馆扬州城贾宝玉路谒北静王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得会，今见反来叫他，自是欢喜。一一面走，一面早臀见那水溶坐在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            轿内，好个仪表人材。不知近看时又是怎样，且听下回分解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            校记
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “林如海”，琼作“林儒海”，从甲成、梦稿、戚序、舒序、甲辰本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “凤姐命彩明要了帖念过”，原“彩明”二字作“他们”，“帖”下旁
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            添“子”字。从甲戌本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【三】“王兴家的”，原无家的”二字，从梦稿本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            {四】这个日期有讹误。林如海病重、黛玉回南，时在冬底。这也是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秦可卿病的这年冬底”。秦氏死于次年春。第十三至第十五回写秦氏丧
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            礼，王熙凤协理宁国府，弄权铁槛寺。贾琏携黛玉回京，以及凤姐为贾琏
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            接风，恰值秦氏丧期刚过，时间当然也是这年的春天或暮春。这里说：“林
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姑老爷是九月初三已时没的”，时间显然不合。至于“大约赶年底回来”，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “把大毛衣服带几件去”，矛盾也是明显的。因无别本可据，现仍从原本。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            添“果然有这些事”，蒙府、戚序本均同底本原文，从。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【六】“多请名僧”，原作“多请几名僧”，“几名”为旁添。从甲成、梦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            稿、蒙府、戚序、舒序、甲辰本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【七】“面又派人先往铁槛寺，连夜另外修饰停灵之处，并厨茶等
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            项接灵人口坐落”，原“派人”的“人”、“坐落”均为旁添；梦稿、戚序、甲辰，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            程甲、程乙本均作“一面又派人”；甲成、己卵、蒙府、舒序本均作“面又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今从底本改文。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【八】“刚到了宁府,荣府的人”，底本作“刚到了荣府，宁府的人”，从
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            梦稿本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            191
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="fax_chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本影印</span>
+        <span class="col-desc">程乙本校注本影印页（贵州人民出版社PDF）</span>
+        <span>第12回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">王熙凤毒设相思局 贾天祥正照风月鉴</h3>
+        
+        <div class="fax-view" data-fax="fax_chengyi">
+          <div class="fax-toolbar">
+            <button type="button" class="fax-prev" data-dir="-1">←</button>
+            <span class="fax-page-info">第<span class="fax-cur">1</span>页</span>
+            <button type="button" class="fax-next" data-dir="1">→</button>
+          </div>
+          <div class="fax-stage">
+            <img class="fax-img" alt="影印页">
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

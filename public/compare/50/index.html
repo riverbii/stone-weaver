@@ -1,0 +1,6012 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第50回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="50">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/49" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" >第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" >第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" >第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" >第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" >第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" selected>第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" >第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" >第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" >第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" >第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/51" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="gong" data-label="脂评汇校" checked>
+          脂评汇校
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi" data-label="程乙本" checked>
+          程乙本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi_ocr" data-label="程乙本OCR" checked>
+          程乙本OCR
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="fax_chengyi" data-label="程乙本影印" checked>
+          程乙本影印
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/50">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="gong">
+      <div class="compare-col-head">
+        <span class="badge">脂评汇校</span>
+        <span class="col-desc">脂评汇校本（庚辰本系为主，参校诸脂本，含脂批）</span>
+        <span>第50回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">芦雪广争联即景诗 暖香坞雅制春灯谜</h3>
+        
+        
+        <p class="col-para">
+          
+            此回着重在宝琴，却出色写湘云。写湘云联句极敏捷聪慧，而宝琴之联句不少于湘云，可知出色写湘云，正所以出色写宝琴。出色写宝琴者，全为与宝玉提亲作引也。金针暗渡，不可不知。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话说薛宝钗道：“到底分个次序，让我写出来。”说着，便令众人拈阄为序。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            起首恰是李氏。庚：一定要按次序，恰又不按次序，似脱落处而不脱落，文章歧路如此。然后按次各各开出。凤姐儿说道：“既是这样说，我也说一句在上头。”众人都笑说道：“更妙了！”宝钗便将稻香老农之上补了一个“凤”字，李纨又将题目讲与他听。凤姐儿想了半日，笑道：“你们别笑话我。我只有一句粗话，下剩的我就不知道了。”众人都笑道：“越是粗话越好，你说了只管干正事去罢。”凤姐儿笑道：“我想下雪必刮北风。昨夜听见了一夜的北风，我有了一句，就是‘一夜北风紧’，可使得？”众人听了，都相视笑道：“这句虽粗，不见底下的，这正是会作诗的起法。不但好，而且留了多少地步与后人。就是这句为首，稻香老农快写上续下去。”凤姐和李婶平儿又吃了两杯酒，自去了。这里李纨便写了：一夜北风紧，自己联道：开门雪尚飘。入泥怜洁白，香菱道：匝地惜琼瑶。有意荣枯草，探春道：无心饰萎苕。价高村酿熟，李绮道：年稔府粱饶。葭动灰飞管，李纹道：阳回斗转杓。寒山已失翠，岫烟道：冻浦不闻潮。易挂疏枝柳，湘云道：难堆破叶蕉。麝煤融宝鼎，宝琴道：绮袖笼金貂。光夺窗前镜，黛玉道：香粘壁上椒。斜风仍故故，宝玉道：清梦转聊聊。何处梅花笛？宝钗道：谁家碧玉箫？鳌愁坤轴陷，李纨笑道：“我替你们看热酒去罢。”宝钗命宝琴续联，只见湘云站起来道：龙斗阵云销。野岸回孤棹，第 327 页宝琴也站起道：吟鞭指灞桥。赐裘怜抚戍，湘云那里肯让人，且别人也不如他敏捷，都看他扬眉挺身的说道：加絮念征徭。坳垤审夷险，宝钗连声赞好，也便联道：枝柯怕动摇。皑皑轻趁步，黛玉忙联道：剪剪舞随腰。煮芋成新赏，一面说，一面推宝玉，命他联。宝玉正看宝钗、宝琴、黛玉三人共战湘云，十分有趣，那里还顾得联诗，今见黛玉推他，方联道：撒盐是旧谣。苇蓑犹泊钓，湘云笑道：“你快下去，你不中用，倒耽搁了我。”一面只听宝琴联道：林斧不闻樵。伏象千峰凸，湘云忙联道：盘蛇一径遥。花缘经冷结，宝钗与众人又忙赞好。探春又联道：色岂畏霜凋。深院惊寒雀，湘云正渴了，忙忙的吃茶，已被岫烟道：空山泣老鸮。阶墀随上下，湘云忙丢了茶杯，忙联道：池水任浮漂。照耀临清晓，黛玉联道：缤纷入永宵。诚忘三尺冷，湘云忙笑联道：瑞释九重焦。僵卧谁相问，宝琴也忙笑联道：狂游客喜招。天机断缟带，湘云又忙道：海市失鲛绡。林黛玉不容他出，接着便道：寂寞对台榭，湘云忙联道：清贫怀箪瓢。宝琴也不容情，也忙道：烹茶冰渐沸，湘云见这般，自为得趣，又是笑，又忙联道：煮酒叶难烧。黛玉也笑道：没帚山僧扫，宝琴也笑道：埋琴稚子挑。湘云笑的弯了腰，忙念了一句，众人问：“到底说的什么？”湘云喊道：石楼闲睡鹤，黛玉笑的握着胸口，高声嚷道：第 328 页锦罽暖亲猫。宝琴也忙笑道：月窟翻银浪，湘云忙联道：霞城隐赤标。黛玉忙笑道：沁梅香可嚼，宝钗笑称好，也忙联道：淋竹醉堪调。宝琴也忙道：或湿鸳鸯带，湘云忙联道：时凝翡翠翘。黛玉又忙道：无风仍脉脉，宝琴又忙笑联道：不雨亦潇潇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云伏着已笑软了。众人看他三人对抢，也都不顾作诗，看着也只是笑。黛玉还推他往下联，又道：“你也有才尽之时。我听听还有什么舌根嚼了！”湘云只伏在宝钗怀里，笑个不住。宝钗推他起来道：“你有本事，把‘二萧’的韵全用完了，我才伏你。”湘云起身笑道：“我也不是作诗，竟是抢命呢。”众人笑道：“倒是你说罢。”探春早已料定没有自己联的了，便早写出来，因说：“还没收住呢。”李纹听了，接过来便联了一句道：欲志今朝乐，李绮收了一句道：凭诗祝舜尧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李纨道：“够了，够了。虽没作完了韵，剩的字若生扭用了，倒不好了。”说着，大家来细细评论一回，独湘云的多，都笑道：“这都是那块鹿肉的功劳。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李纨笑道：“逐句评去都还一气，只是宝玉又落了第了。”宝玉笑道：“我原不会联句，只好担待我罢。”李纨笑道：“也没有社社担待你的。又说韵险了，又整误了，又不会联句了，今日必罚你。我才看见栊翠庵的红梅有趣，我要折一枝来插瓶。可厌妙玉为人，我不理他。如今罚你去取一枝来。”众人都道这罚的又雅又有趣。宝玉也乐为，答应着就要走。湘云黛玉一齐说道：“外头冷得很，你且吃杯热酒再去。”湘云早执起壶来，黛玉递了一个大杯，满斟了一杯。湘云笑道：“你吃了我们的酒，你要取不来，加倍罚你。”宝玉忙吃一杯，冒雪而去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李纨命人好好跟着。黛玉忙拦说：“不必，有了人反不得了。”李纨点头说：“是。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面命丫鬟将一个美女耸肩瓶拿来，贮了水准备插梅，因又笑道：“回来该咏红梅了。”湘云忙道：“我先作一首。”宝钗忙道：“今日断乎不容你再作了。你都抢了去，别人都闲着，也没趣。回来还罚宝玉，他说不会联句，如今就叫他自己作去。”庚夹：想此刻宝玉已到庵中矣。黛玉笑道：“这话很是。我还有个主意，方才联句不够，莫若拣着联的少的人作红梅。”宝钗笑道：“这话是极。方才邢李三位屈才，且又是客。琴儿和颦儿云儿三个人也抢了许多，我们一概都别作，只让他三个作才是。”李纨因说：“绮儿也不大会作，还是让琴妹妹作罢。”宝钗只得依允，庚夹：想此刻二玉已会，不知肯见赐否。又道：“就用‘红梅花’三个字作第 329 页韵，每人一首七律。邢大妹妹作‘红’字，你们李大妹妹作‘梅’字，琴儿作‘花’字。”李纨道：“饶过宝玉去，我不服。”湘云忙道：“有个好题目命他作。”众人问何题目？湘云道：“命他就作‘访妙玉乞红梅’，岂不有趣？”众人听了，都说有趣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一语未了，只见宝玉笑欣欣掮了一枝红梅进来。众丫鬟忙已接过，插入瓶内。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人都笑称谢。宝玉笑道：“你们如今赏罢，也不知费了我多少精神呢。”说着，探春早又递过一钟暖酒来，众丫鬟走上来接了蓑笠掸雪。各人房中丫鬟都添送衣服来，庚夹：冬日午后景况。袭人也遣人送了半旧的狐腋褂来。李纨命人将那蒸的大芋头盛了一盘，又将朱橘、黄橙、橄榄等物盛了两盘，命人带与袭人去。湘云且告诉宝玉方才的诗题，又催宝玉快作。宝玉道：“姐姐妹妹们，让我自己用韵罢，别限韵了。”众人都说：“随你作去罢。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面说一面大家看梅花。原来这枝梅花只有二尺来高，旁有一横枝纵横而出，约有五六尺长，其间小枝分歧，或如蟠螭，或如僵蚓，或孤削如笔，或密聚如林，花吐胭脂，香欺兰蕙，庚夹：一篇《红梅花赋》。各各称赏。谁知邢岫烟、李纹、薛宝琴三人都已吟成，各自写了出来。众人便依“红梅花”三字之序看去，写道是：咏红梅花得“红”字 邢岫烟桃未芳菲杏未红，冲寒先已笑东风。魂飞庾岭春难辨，霞隔罗浮梦未通。绿萼添妆融宝炬，缟仙扶醉跨残虹。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看来岂是寻常色，浓淡由他冰雪中。咏红梅花得“梅”字 李纹白梅懒赋赋红梅，逞艳先迎醉眼开。冻脸有痕皆是血，酸心无恨亦成灰。误吞丹药移真骨，偷下瑶池脱旧胎。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            江北江南春灿烂，寄言蜂蝶漫疑猜。咏红梅花得“花”字 薛宝琴疏是枝条艳是花，春妆儿女竞奢华。闲庭曲槛无余雪，流水空山有落霞。幽梦冷随红袖笛，游仙香泛绛河槎。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            前身定是瑶台种，无复相疑色相差。众人看了，都笑称赞了一番，又指末一首说更好。宝玉见宝琴年纪最小，才又敏捷，深为奇异。黛玉湘云二人斟了一小杯酒，齐贺宝琴。宝钗笑道：“三首各有各好。你们两个天天捉弄厌了我，如今捉弄他来了。”李纨又问宝玉：“你可有了？”宝玉忙道：“我倒有了，才一看见那三首，又吓忘了，等我再想。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云听了，便拿了一支铜火箸击着手炉，笑道：“我击鼓了，若鼓绝不成，又要罚的。”宝玉笑道：“我已有了。”黛玉提起笔来，说道：“你念，我写。”湘云便击了一下笑道：“一鼓绝。”宝玉笑道：“有了，你写吧。”众人听他念道，“酒未开樽句未裁”，黛玉写了，摇头笑道：“起的平平。”湘云又道“快着！”宝玉笑道：“寻春问腊到蓬莱。”黛玉湘云都点头笑道：“有些意思了。”宝玉又道：“不求大士瓶中露，为乞嫦娥槛外梅。”黛玉写了，又摇头道：“凑巧而第 330 页已。”湘云忙催二鼓，宝玉又笑道：“入世冷挑红雪去，离尘香割紫云来。槎枒谁惜诗肩瘦，衣上犹沾佛院苔。”黛玉写毕，湘云大家才评论时，又见几个丫鬟跑进来道：“老太太来了。”众人忙迎出来。大家又笑道：“怎么这等高兴！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着，远远见贾母围了大斗篷，带着灰鼠暖兜，坐着小竹轿，打着青绸油伞，鸳鸯琥珀等五六个丫鬟，每人都是打着伞，拥轿而来。李纨等忙往上迎，贾母命人止住说：“只在那里就是了。”来至跟前，贾母笑道：“我瞒着你太太和凤丫头来了。大雪地下坐着这个无妨，没的叫他们来跴雪。”众人忙一面上前接斗篷，搀扶着，一面答应着。贾母来至室中，先笑道：“好俊梅花！你们也会乐，我来着了。”说着，李纨早命拿了一个大狼皮褥来铺在当中。贾母坐了，因笑道：“你们只管顽笑吃喝。我因为天短了，不敢睡中觉，抹了一回牌，想起你们来了，我也来凑个趣儿。”李纨早又捧过手炉来，探春另拿了一副杯箸来，亲自斟了暖酒，奉与贾母。贾母便饮了一口，问那个盘子里是什么东西。众人忙捧了过来，回说是糟鹌鹑。贾母道：“这倒罢了，撕一两点腿子来。”李纨忙答应了，要水洗手，亲自来撕。贾母又道：“你们仍旧坐下说笑我听。”又命李纨：“你也坐下，就如同我没来的一样才好，不然我就去了。”众人听了，方依次坐下，这李纨便挪到尽下边。贾母因问作何事了，众人便说作诗。贾母道：“有作诗的，不如作些灯谜，大家正月里好顽的。”众人答应了。说笑了一回，贾母便说：“这里潮湿，你们别久坐，仔细受了潮湿。”因说：“你四妹妹那里暖和，我们到那里瞧瞧他的画儿，赶年可有了。”众人笑道：“那里能年下就有了？只怕明年端阳有了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母道：“这还了得！他竟比盖这园子还费工夫了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着，仍坐了竹轿，大家围随，过了藕香榭，穿入一条夹道，东西两边皆有过街门，门楼上里外皆嵌着石头匾，如今进的是西门，向外的匾上凿着“穿云”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二字，向里的凿着“度月”两字。来至当中，进了向南的正门，贾母下了轿，惜春已接了出来。从里边游廊过去，便是惜春卧房，门斗上有“暖香坞”三个字。庚夹：看他又写出一处，从起至末一笔一部之文也有，千万笔成一部之文也有，一二笔成一部之文也有。如“试才”一回起若都说完，以后则索然无味，故留此几处以为后文之点染也。此方活泼不板，耳目屡新。早有几个人打起猩红毡帘，已觉温香拂脸。庚夹：各处皆如此，非独因“暖香”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二字方有此景。戏注于此，以博一笑耳。大家进入房中，贾母并不归坐，只问画在那里。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            惜春因笑回：“天气寒冷了，胶性皆凝涩不润，画了恐不好看，故此收起来。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母笑道：“我年下就要的。你别托懒儿，快拿出来给我快画。”一语未了，忽见凤姐儿披着紫羯褂，笑嘻嘻的来了，口内说道：“老祖宗今儿也不告诉人，私自就来了，要我好找。”贾母见他来了，心中自是喜悦，便道：“我怕你们冷着了，所以不许人告诉你们去。你真是个鬼灵精儿，到底找了我来。以理，孝敬也不在这上头。”凤姐儿笑道：“我那里是孝敬的心找了来？我因为到了老祖宗那里，鸦没雀静的，庚夹：这四个字俗语中常闻，但不能落纸笔耳。便欲写时，究竟不知系何四字，今如此写来，真是不可移易。问小丫头子们，他又不肯说，叫我找到园里来。我正疑惑，忽然来了两三个姑子，我心里才明白。我想姑子必是来送年疏，或要年例香例银子，老祖宗年下的事也多，一定是躲债来了。我赶忙问了那姑子，果然不错。我连忙把年例给了他们去了。如今来回老祖宗，债主已去，不用躲着了。已预备下希嫩的野鸡，请用晚饭去，再迟一回就老了。”他一行说，众人一行笑。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐儿也不等贾母说话，便命人抬过轿子来。贾母笑着，搀了凤姐的手，仍旧上轿，带着众人，说笑出了夹道东门。一看四面粉妆银砌，忽见宝琴披着凫靥裘站在山坡上遥等，身后一个丫鬟抱着一瓶红梅。众人都笑道：“少了两个人，他却在这里等着，也弄梅花去了。”贾母喜的忙笑道：“你们瞧，这山坡上配上第 331 页他的这个人品，又是这件衣裳，后头又是这梅花，象个什么？”众人都笑道：“就象老太太屋里挂的仇十洲画的《双艳图》。”贾母摇头笑道：“那画的那里有这件衣裳？人也不能这样好！”一语未了，只见宝琴背后转出一个披大红猩毡的人来。贾母道：“那又是那个女孩儿？”众人笑道：“我们都在这里，那是宝玉。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母笑道：“我的眼越发花了。”说话之间，来至跟前，可不是宝玉和宝琴。宝玉笑向宝钗黛玉等道：“我才又到了栊翠庵。妙玉每人送你们一枝梅花，我已经打发人送去了。”众人都笑说：“多谢你费心。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说话之间，已出了园门，来至贾母房中。吃毕饭大家又说笑了一回。忽见薛姨妈也来了，说：“好大雪，一日也没过来望候老太太。今日老太太倒不高兴？正该赏雪才是。”贾母笑道：“何曾不高兴！我找了他们姊妹们去顽了一会子。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            薛姨妈笑道：“昨日晚上，我原想着今日要和我们姨太太借一日园子，摆两桌粗酒，请老太太赏雪的，又见老太太安息的早。我闻得女儿说，老太太心下不大爽，因此今日也没敢惊动。早知如此，我正该请。”贾母笑道：“这才是十月里头场雪，往后下雪的日子多呢，再破费不迟。”薛姨妈笑道：“果然如此，算我的孝心虔了。”凤姐儿笑道：“姨妈仔细忘了，如今先秤五十两银子来，交给我收着，一下雪，我就预备下酒，姨妈也不用操心，也不得忘了。”贾母笑道：“既这么说，姨太太给他五十两银子收着，我和他每人分二十五两，到下雪的日子，我装心里不快，混过去了，姨太太更不用操心，我和凤丫头倒得了实惠。”凤姐将手一拍，笑道：“妙极了，这和我的主意一样。”众人都笑了。贾母笑道：“呸！没脸的，就顺着竿子爬上来了！你不该说姨太太是客，在咱们家受屈，我们该请姨太太才是，那里有破费姨太太的理！不这样说呢，还有脸先要五十两银子，真不害臊！”凤姐儿笑道：“我们老祖宗最是有眼色的，试一试，姨妈若松呢，拿出五十两来，就和我分。这会子估量着不中用了，翻过来拿我做法子，说出这些大方话来。如今我也不和姨妈要银子，竟替姨妈出银子治了酒，请老祖宗吃了，我另外再封五十两银子孝敬老祖宗，算是罚我个包揽闲事。这可好不好？”话未说完，众人已笑倒在炕上。贾母因又说及宝琴雪下折梅比画儿上还好，因又细问他的年庚八字并家内景况。薛姨妈度其意思，大约是要与宝玉求配。薛姨妈心中固也遂意，只是已许过梅家了，因贾母尚未明说，自己也不好拟定，遂半吐半露告诉贾母道：“可惜这孩子没福，前年他父亲就没了。他从小儿见的世面倒多，跟他父母四山五岳都走遍了。他父亲是好乐的，各处因有买卖，带着家眷，这一省逛一年，明年又往那一省逛半年，所以天下十停走了有五六停了。那年在这里，把他许了梅翰林的儿子，偏第二年他父亲就辞世了，他母亲又是痰症。”凤姐也不等说完，便嗐声跺脚的说：“偏不巧，我正要作个媒呢，又已经许了人家。”贾母笑道：“你要给谁说媒？”凤姐儿说道：“老祖宗别管，我心里看准了他们两个是一对。如今已许了人，说也无益，不如不说罢了。”贾母也知凤姐儿之意，听见已有了人家，也就不提了。大家又闲话了一会方散。一宿无话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日雪晴。饭后，贾母又亲嘱惜春：“不管冷暖，你只画去，赶到年下，十分不能便罢了。第一要紧把昨日琴儿和丫头梅花，照模照样，一笔别错，快快添上。”惜春听了虽是为难，只得应了。一时众人都来看他如何画，惜春只是出神。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李纨因笑向众人道：“让他自己想去，咱们且说话儿。昨儿老太太只叫作灯谜，回家和绮儿纹儿睡不着，我就编了两个‘四书’的。他两个每人也编了两个。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人听了，都笑道：“这倒该作的。先说了，我们猜猜。”李纨笑道：“‘观音未有世家传’，打《四书》一句。”湘云接着就说“在止于至善。”宝钗笑道：第 332 页“你也想一想‘世家传’三个字的意思再猜。”李纨笑道：“再想。”黛玉笑道：“哦，是了。是‘虽善无征’。”众人都笑道：“这句是了。”李纨又道：“一池青草草何名。”湘云忙道：“这一定是‘蒲芦也’。再不是不成？”李纨笑道：“这难为你猜。纹儿的是‘水向石边流出冷’，打一古人名。”探春笑问道：“可是山涛？”李纹笑道：“是。”李纨又道：“绮儿的是个‘萤’字，打一个字。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人猜了半日，宝琴笑道：“这个意思却深，不知可是花草的‘花’字？”李绮笑道：“恰是了。”众人道：“萤与花何干？”黛玉笑道：“妙得很！萤可不是草化的？”众人会意，都笑了说；“好！”宝钗道：“这些虽好，不合老太太的意思，不如作些浅近的物儿，大家雅俗共赏才好。”众人都道：“也要作些浅近的俗物才是。”湘云笑道：“我编了一支《点绛唇》，恰是俗物，你们猜猜。”说着便念道：溪壑分离，红尘游戏，真何趣？名利犹虚，后事终难继。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人不解，想了半日，也有猜是和尚的，也有猜是道士的，也有猜是偶戏人的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉笑了半日，道：“都不是，我猜着了，一定是耍的猴儿。”湘云笑道：“正是这个了。”众人道：“前头都好，末后一句怎么解？”湘云道：“那一个耍的猴子不是剁了尾巴去的？”众人听了，都笑起来，说：“他编个谜儿也是刁钻古怪的。”李纨道：“昨日姨妈说，琴妹妹见的世面多，走的道路也多，你正该编谜儿，正用着了。你的诗且又好，何不编几个我们猜一猜？”宝琴听了，点头含笑，自去寻思。宝钗也有了一个，念道：镂檀锲梓一层层，岂系良工堆砌成？虽是半天风雨过，何曾闻得梵铃声！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            打一物。众人猜时，宝玉也有了一个，念道：天上人间两渺茫，琅玕节过谨隄防。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鸾音鹤信须凝睇，好把唏嘘答上苍。黛玉也有了一个，念道是：騄駬何劳缚紫绳？驰城逐堑势狰狞。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            主人指示风雷动，鳌背三山独立名。探春也有了一个，方欲念时，宝琴走过来笑道：“我从小儿所走的地方的古迹不少，我今拣了十个地方的古迹，作了十首怀古的诗。诗虽粗鄙，却怀往事，又暗隐俗物十件，姐姐们请猜一猜。”众人听了，都说：“这倒巧，何不写出来大家一看？”要知端的，下回分解。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-戚" title="戚总评">诗词之峭丽、灯谜之隐秀不待言，须看他极整齐、极参差，愈忙迫愈安闲，一波一折路转峰回，一落一起山断云连，各人局度、各人情性都现。</span>
+            
+          
+            至李纨主坛，而起句却在凤姐，李纨主坛，而结句却在最少之李绮，另是一样弄奇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 333 页最爱他中幅惜春作画一段，似与本文无涉，而前后文之景色人物，莫不筋动脉摇，而前后文之起伏照应，莫不穿插映带。文字之奇，难以言状。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 334 页
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第50回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">芦雪广争联即景诗 暖香坞雅制春灯谜</h3>
+        
+        
+        <p class="col-para">
+          
+            話說薛寶釵道：“到底分個次序，讓我寫出來。”說著，便令眾人拈鬮為序。起首恰是李氏，然後按次各各開出。[2]鳳姐兒說道：“既是這樣說，我也說一句在上頭。”眾人都笑說道：“更妙了！”寶釵便將稻香老農之上補了一個“鳳”字，李紈又將題目講與他聽。鳳姐兒想了半日，笑道：“你們別笑話我。我只有一句粗話，下剩的我就不知道了。”眾人都笑道：“越是粗話越好，你說了只管幹正事去罷。”鳳姐兒笑道：“我想下雪必刮北風。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            昨夜聽見了一夜的北風，我有了一句，就是‘一夜北風緊’，可使得？”眾人聽了，都相視笑道：“這句雖粗，不見底下的，這正是會作詩的起法。不但好，而且留了多少地步與後人。就是這句為首，稻香老農快寫上續下去。”鳳姐和李嬸平兒又吃了兩杯酒，自去了。這里李紈便寫了：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一夜北風緊，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自己聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            開門雪尚飄。入泥怜洁白，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            香菱道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            匝地惜瓊瑤。有意榮枯草，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            探春道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            無心飾萎苕。价高村釀熟，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李綺道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            年稔府粱饒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            葭動灰飛管，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李紋道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            陽回斗轉杓。寒山已失翠，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            岫煙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凍浦不聞潮。易挂疏枝柳，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            難堆破葉蕉。麝煤融寶鼎，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶琴道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            綺袖籠金貂。光奪窗前鏡，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            香粘壁上椒。斜風仍故故，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清夢轉聊聊。何處梅花笛？寶釵道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            誰家碧玉簫？鰲愁坤軸陷，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李紈笑道：“我替你們看熱酒去罷。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶釵命寶琴續聯，只見湘雲站起來道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            龍鬪陣雲銷。野岸回孤棹，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶琴也站起道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            吟鞭指灞橋。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賜裘怜撫戍，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲那里肯讓人，且別人也不如他敏捷，都看他揚眉挺身的說道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            加絮念征徭。坳垤審夷險，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶釵連聲贊好，也便聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枝柯怕動搖。皚皚輕趁步，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉忙聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            翦翦舞隨腰。煮芋成新賞，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面說，一面推寶玉，命他聯。寶玉正看寶釵，寶琴，黛玉三人共戰湘雲，十分有趣，那里還顧得聯詩，今見黛玉推他，方聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            撒鹽是舊謠。葦蓑猶泊釣，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲笑道：“你快下去，你不中用，倒耽擱了我。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”一面只聽寶琴聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林斧不聞樵。伏象千峰凸，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲忙聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盤蛇一徑遙。花緣經冷聚，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶釵與眾人又忙贊好。探春又聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            色豈畏霜凋。深院驚寒雀，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲正渴了，忙忙的吃茶，已被岫煙搶著聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            空山泣老鴞。階墀隨上下，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲忙丟了茶杯，忙聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            池水任浮漂。照耀臨清曉，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            繽紛入永宵。誠忘三尺冷，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲忙笑聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瑞釋九重焦。僵臥誰相問，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶琴也忙笑聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            狂游客喜招。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天机斷縞帶，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲又忙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            海市失鮫綃。林黛玉不容他出，接著便道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寂寞對臺榭，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲忙聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清貧怀簞瓢。寶琴也不容情，也忙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            烹茶冰漸沸，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲見這般，自為得趣，又是笑，又忙聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            煮酒葉難燒。黛玉也笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            沒帚山僧掃，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶琴也笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            埋琴稚子挑。湘雲笑的彎了腰，忙念了一句，眾人問“到底說的什麼？”湘雲喊道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            石樓閒睡鶴，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉笑的握著胸口，高聲嚷道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            錦罽暖親貓。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶琴也忙笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            月窟翻銀浪，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲忙聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            霞城隱赤標。黛玉忙笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            沁梅香可嚼，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶釵笑稱好，也忙聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            淋竹醉堪調。寶琴也忙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            或濕鴛鴦帶，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲忙聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            時凝翡翠翹。黛玉又忙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            無風仍脈脈，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶琴又忙笑聯道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不雨亦瀟瀟。湘雲伏著已笑軟了。眾人看他三人對搶，也都不顧作詩，看著也只是笑。黛玉還推他往下聯，又道：“你也有才盡之時。我聽聽還有什麼舌根嚼了！”湘雲只伏在寶釵怀里，笑個不住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶釵推他起來道：“你有本事，把‘二蕭’的韻全用完了，我才伏你。”湘雲起身笑道：“我也不是作詩，竟是搶命呢。”眾人笑道：“倒是你說罷。”探春早已料定沒有自己聯的了，便早寫出來，因說：“還沒收住呢。”李紈聽了，接過來便聯了一句道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欲志今朝樂，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李綺收了一句道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            憑詩祝舜堯。李紈道：“夠了，夠了。雖沒作完了韻，剩的字若生扭用了，倒不好了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”說著，大家來細細評論一回，獨湘雲的多，都笑道：“這都是那塊鹿肉的功勞。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李紈笑道：“逐句評去都還一氣，只是寶玉又落了第了。”寶玉笑道：“我原不會聯句，只好擔待我罷。”李紈笑道：“也沒有社社擔待你的。又說韻險了，又整誤了，又不會聯句了，今日必罰你。我才看見櫳翠庵的紅梅有趣，我要折一枝來插瓶。可厭妙玉為人，我不理他。如今罰你去取一枝來。”眾人都道這罰的又雅又有趣。寶玉也樂為，答應著就要走。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲黛玉一齊說道：“外頭冷得很，你且吃杯熱酒再去。”湘雲早執起壺來，黛玉遞了一個大杯，滿斟了一杯。湘雲笑道：“你吃了我們的酒，你要取不來，加倍罰你。”寶玉忙吃了一杯，冒雪而去。李紈命人好好跟著。黛玉忙攔說：“不必，有了人反不得了。”李紈點頭說：“是。”一面命丫鬟將一個美女聳肩瓶拿來，貯了水准備插梅，因又笑道：“回來該詠紅梅了。”湘雲忙道：“我先作一首。”寶釵忙道：“今日斷乎不容你再作了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你都搶了去，別人都閒著，也沒趣。回來還罰寶玉，他說不會聯句，如今就叫他自己作去。”黛玉笑道：“這話很是。我還有個主意，方才聯句不夠，莫若揀著聯的少的人作紅梅。”寶釵笑道：“這話是极。方才邢李三位屈才，且又是客。琴兒和顰兒、雲兒三個人也搶了許多，我們一概都別作，只讓他三個作才是。”李紈因說：“綺兒也不大會作，還是讓琴妹妹作罷。”寶釵只得依允，又道：“就用‘紅梅花’三個字作韻，每人一首七律。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            邢大妹妹作‘紅’字，你們李大妹妹作‘梅’字，琴兒作‘花’字。”李紈道：“饒過寶玉去，我不服。”湘雲忙道：“有個好題目命他作。”眾人問何題目？湘雲道：“命他就作‘訪妙玉乞紅梅’，豈不有趣？”眾人聽了，都說有趣。一語未了，只見寶玉笑嘻嘻的掮了一枝紅梅進來，眾丫鬟忙已接過，插入瓶內。眾人都笑稱謝。寶玉笑道：“你們如今賞罷，也不知費了我多少精神呢。”說著，探春早又遞過一鐘暖酒來，眾丫鬟走上來接了蓑笠撣雪。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            各人房中丫鬟都添送衣服來，襲人也遣人送了半舊的狐腋褂來。李紈命人將那蒸的大芋頭盛了一盤，又將朱橘，黃橙，橄欖等物盛了兩盤，命人帶與襲人去。湘雲且告訴寶玉方才的詩題，又催寶玉快作。寶玉道：“姐姐妹妹們，讓我自己用韻罷，別限韻了。”眾人都說：“隨你作去罷。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面說一面大家看梅花。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來這枝梅花只有二尺來高，旁有一橫枝縱橫而出，約有五六尺長，其間小枝分歧，或如蟠螭，或如僵蚓，或孤削如筆，或密聚如林，花吐胭脂，香欺蘭蕙，各各稱賞。誰知邢岫煙、李紋、薛寶琴三人都已吟成，各自寫了出來。眾人便依“紅梅花”三字之序看去，寫道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            詠紅梅花得“紅”字
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            邢岫煙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            桃未芳菲杏未紅，沖寒先已笑東風。魂飛庾岭春難辨，霞隔羅浮夢未通。綠萼添妝融寶炬，縞仙扶醉跨殘虹。看來豈是尋常色，濃淡由他冰雪中。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            詠紅梅花得“梅”字
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李紋
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            白梅懶賦賦紅梅，逞艷先迎醉眼開。凍臉有痕皆是血，醉心無恨亦成灰。誤吞丹藥移真骨，偷下瑤池脫舊胎。江北江南春燦爛，寄言蜂蝶漫疑猜。詠紅梅花得“花”字
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            薛寶琴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            疏是枝條艷是花，春妝兒女競奢華。閒庭曲檻無餘雪，流水空山有落霞。幽夢冷隨紅袖笛，游仙香泛絳河槎。前身定是瑤臺种，無復相疑色相差。眾人看了，都笑稱賞了一番，又指末一首說更好。寶玉見寶琴年紀最小，才又敏捷，深為奇异。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉湘雲二人斟了一小杯酒，齊賀寶琴。寶釵笑道：“三首各有各好。你們兩個天天捉弄厭了我，如今捉弄他來了。”李紈又問寶玉：“你可有了？”寶玉忙道：“我倒有了，才一看見那三首，又嚇忘了，等我再想。”湘雲聽了，便拿了一支銅火箸擊著手爐，笑道：“我擊鼓了，若鼓絕不成，又要罰的。”寶玉笑道：“我已有了。”黛玉提起筆來，說道：“你念，我寫。”湘雲便擊了一下笑道：“一鼓絕。”寶玉笑道：“有了，你寫吧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”眾人聽他念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            酒未開樽句未裁，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉寫了，搖頭笑道：“起的平平。”湘雲又道：“快著！”寶玉笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            尋春問腊到蓬萊。黛玉湘雲都點頭笑道：“有些意思了。”寶玉又道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不求大士瓶中露，為乞嫦娥檻外梅。黛玉寫了，又搖頭道：“湊巧而已。”湘雲忙催二鼓，寶玉又笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            入世冷挑紅雪去，離塵香割紫雲來。槎枒誰惜詩肩瘦，衣上猶沾佛院苔。黛玉寫畢，湘雲大家才評論時，只見幾個小丫鬟跑進來道：“老太太來了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”眾人忙迎出來。大家又笑道：“怎麼這等高興！”說著，遠遠見賈母圍了大斗篷，帶著灰鼠暖兜，坐著小竹轎，打著青綢油傘，鴛鴦琥珀等五六個丫鬟，每個人都是打著傘，擁轎而來。李紈等忙往上迎，賈母命人止住說：“只在那里就是了。”來至跟前，賈母笑道：“我瞞著你太太和鳳丫頭來了。大雪地下坐著這個無妨，沒的叫他們來踩雪。”眾人忙一面上前接斗篷，攙扶著，一面答應著。賈母來至室中，先笑道：“好俊梅花！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你們也會樂，我來著了。”說著，李紈早命拿了一個大狼皮褥來舖在當中。賈母坐了，因笑道：’你們只管頑笑吃喝。我因為天短了，不敢睡中覺，抹了一回牌想起你們來了，我也來湊個趣兒。”李紈早又捧過手爐來，探春另拿了一副杯箸來，親自斟了暖酒，奉與賈母。賈母便飲了一口，問那個盤子里是什麼東西。眾人忙捧了過來，回說是糟鵪鶉。賈母道：“這倒罷了，撕一兩點腿子來。”李紈忙答應了，要水洗手，親自來撕。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈母又道：“你們仍舊坐下說笑我聽。”又命李紈：“你也坐下，就如同我沒來的一樣才好，不然我就去了。”眾人聽了，方依次坐下，這李紈便挪到盡下邊。賈母因問作何事了，眾人便說作詩。賈母道：“有作詩的，不如作些燈謎，大家正月里好頑的。”眾人答應了。說笑了一回，賈母便說：“這里潮濕，你們別久坐，仔細受了潮濕。”因說：“你四妹妹那里暖和，我們到那里瞧瞧他的畫兒，赶年可有了。”眾人笑道：“那里能年下就有了？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只怕明年端陽有了。”賈母道：“這還了得！他竟比蓋這園子還費工夫了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說著，仍坐了竹轎，大家圍隨，過了藕香榭，穿入一條夾道，東西兩邊皆有過街門，門樓上里外皆嵌著石頭匾，如今進的是西門，向外的匾上鑿著“穿雲”二字，向里的鑿著“度月”兩字。來至當中，進了向南的正門，賈母下了轎，惜春已接了出來。從里邊游廊過去，便是惜春臥房，門斗上有“暖香塢”三個字。早有幾個人打起猩紅氈帘，已覺溫香拂臉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大家進入房中，賈母并不歸坐，只問畫在那里。惜春因笑問：“天氣寒冷了，膠性皆凝澀不潤，畫了恐不好看，故此收起來。”賈母笑道：“我年下就要的。你別拖懶兒，快拿出來給我快畫。”一語未了，忽見鳳姐兒披著紫羯褂，笑嘻嘻的來了，口內說道：“老祖宗今兒也不告訴人，私自就來了，要我好找。”賈母見他來了，心中自是喜悅，便道：“我怕你們冷著了，所以不許人告訴你們去。你真是個鬼靈精兒，到底找了我來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            以理，孝敬也不在這上頭。”鳳姐兒笑道：“我那里是孝敬的心找來了？我因為到了老祖宗那里，鴉沒雀靜的，問小丫頭子們，他又不肯說，叫我找到園里來。我正疑惑，忽然來了兩三個姑子，我心里才明白。我想姑子必是來送年疏，或要年例香例銀子，老祖宗年下的事也多，一定是躲債來了。我赶忙問了那姑子，果然不錯。我連忙把年例給了他們去了。如今來回老祖宗，債主已去，不用躲著了。已預備下希嫩的野雞，請用晚飯去，再遲一回就老了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”他一行說，眾人一行笑。鳳姐兒也不等賈母說話，便命人抬過轎子來。賈母笑著，攙了鳳姐的手，仍舊上轎，帶著眾人，說笑出了夾道東門。一看四面粉妝銀砌，忽見寶琴披著鳧靨裘站在山坡上遙等，身後一個丫鬟抱著一瓶紅梅。眾人都笑道：“少了兩個人，他卻在這里等著，也弄梅花去了。”賈母喜的忙笑道：“你們瞧，這山坡上配上他的這個人品，又是這件衣裳，後頭又是這梅花，象個什麼？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”眾人都笑道：“就象老太太屋里挂的仇十洲畫的《雙艷圖》。”賈母搖頭笑道：“那畫的那里有這件衣裳？人也不能這樣好！”一語未了，只見寶琴背後轉出一個披大紅猩氈的人來。賈母道：“那又是那個女孩兒？”眾人笑道：“我們都在這里，那是寶玉。”賈母笑道：“我的眼越發花了。”說話之間，來至跟前，可不是寶玉和寶琴。寶玉笑向寶釵黛玉等道：“我才又到了櫳翠庵。妙玉每人送你們一枝梅花，我已經打發人送去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”眾人都笑說：“多謝你費心。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說話之間，已出了園門，來至賈母房中。吃畢飯大家又說笑了一回。忽見薛姨媽也來了，說：“好大雪，一日也沒過來望候老太太。今日老太太倒不高興？正該賞雪才是。”賈母笑道：“何曾不高興！我找了他們姊妹們去頑了一會子。”薛姨媽笑道：“昨日晚上，我原想著今日要和我們姨太太借一日園子，擺兩桌粗酒，請老太太賞雪的，又見老太太安息的早。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我聞得女兒說，老太太心下不大爽，因此今日也沒敢驚動。早知如此，我正該請。”賈母笑道：“這才是十月里頭場雪，往後下雪的日子多呢，再破費不遲。”薛姨媽笑道：“果然如此，算我的孝心虔了。”鳳姐兒笑道：“姨媽仔細忘了，如今先稱五十兩銀子來，交給我收著，一下雪，我就預備下酒，姨媽也不用操心，也不得忘了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賈母笑道：“既這麼說，姨太太給他五十兩銀子收著，我和他每人分二十五兩，到下雪的日子，我裝心里不快，混過去了，姨太太更不用操心，我和鳳丫頭倒得了實惠。”鳳姐將手一拍，笑道：“妙极了，這和我的主意一樣。”眾人都笑了。賈母笑道：“呸，沒臉的！就順著竿子爬上來了。你不該說姨太太是客，在咱們家受屈，我們該請姨太太才是，那里有破費姨太太的理！不這樣說呢，還有臉先要五十兩銀子，真不害臊！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”鳳姐兒笑道：“我們老祖宗最是有眼色的，試一試，姨媽若松呢，拿出五十兩來，就和我分。這會子估量著不中用了，翻過來拿我作法子，說出這些大方話來。如今我也不和姨媽要銀子，竟替姨媽出銀子治了酒，請老祖宗吃了，我另外再封五十兩銀子孝敬老祖宗，算是罰我個包攬閒事。這可好不好？”話未說完，眾人已笑倒在炕上。賈母因又說及寶琴雪下折梅比畫兒上還好，因又細問他的年庚八字并家內景況。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            薛姨媽度其意思，大約是要與寶玉求配。薛姨媽心中固也遂意，只是已許過梅家了，因賈母尚未明說，自己也不好擬定，遂半吐半露告訴賈母道：“可惜這孩子沒福，前年他父親就沒了。他從小兒見的世面倒多，跟他父母四山五岳都走遍了。他父親是好樂的，各處因有買賣，帶著家眷，這一省逛一年，明年又往那一省逛半年，所以天下十停走了有五六停了。那年在這里，把他許了梅翰林的兒子，偏第二年他父親就辭世了，他母親又是痰症。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”鳳姐也不等說完，便嗐聲跺腳的說：“偏不巧，我正要作個媒呢，又已經許了人家。”賈母笑道：“你要給誰說媒？”鳳姐兒說道：“老祖宗別管，我心里看准了他們兩個是一對。如今已許了人，說也無益，不如不說罷了。”賈母也知鳳姐兒之意，聽見已有了人家，也就不提了。大家又閒話了一會方散。一宿無話。次日雪晴。飯後，賈母又親囑惜春：“不管冷暖，你只畫去，赶到年下，十分不能便罷了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第一要緊把昨日琴兒和丫頭梅花，照模照樣，一筆別錯，快快添上。”惜春聽了雖是為難，只得應了。一時眾人都來看他如何畫，惜春只是出神。李紈因笑向眾人道：“讓他自己想去，咱們且說話兒。昨兒老太太只叫作燈謎，回家和綺兒紋兒睡不著，我就編了兩個‘四書’的。他兩個每人也編了兩個。”眾人聽了，都笑道：“這倒該作的。先說了，我們猜猜。”李紈笑道：“‘觀音未有世家傳’，打‘四書’一句。”湘雲接著就說“在止于至善。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”寶釵笑道：“你也想一想‘世家傳’三個字的意思再猜。”李紈笑道：“再想。”黛玉笑道：“哦，是了。是‘雖善無徵’。”眾人都笑道：“這句是了。”李紈又道：“一池青草青何名。”湘雲忙道：“這一定是‘蒲蘆也’。再不是不成？”李紈笑道：“這難為你猜。紋兒的是‘水向石邊流出冷’，打一古人名。”探春笑問道：“可是山濤？”李紋笑道：“是。”李紈又道：“綺兒的是個‘螢’字，打一個字。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”眾人猜了半日，寶琴笑道：“這個意思卻深，不知可是花草的‘花’字？”李綺笑道：“恰是了。”眾人道：“螢與花何干？”黛玉笑道：“妙得很！螢可不是草化的？”眾人會意，都笑了說“好！”寶釵道：“這些雖好，不合老太太的意思，不如作些淺近的物兒，大家雅俗共賞才好。”眾人都道：“也要作些淺近的俗物才是。”湘雲笑道：“我編了一枝《點絳唇》，恰是俗物，你們猜猜。”說著便念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            溪壑分離，紅塵游戲，真何趣？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            名利猶虛，後事終難繼。眾人不解，想了半日，也有猜是和尚的，也有猜是道士的，也有猜是偶戲人的。寶玉笑了半日，道：“都不是，我猜著了，一定是耍的猴兒。”湘雲笑道：“正是這個了。”眾人道：“前頭都好，末後一句怎麼解？”湘雲道：“那一個耍的猴子不是剁了尾巴去的？”眾人聽了，都笑起來，說：“他編個謎兒也是刁鑽古怪的。”李紈道：“昨日姨媽說，琴妹妹見的世面多，走的道路也多，你正該編謎兒，正用著了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你的詩且又好，何不編幾個我們猜一猜？”寶琴聽了，點頭含笑，自去尋思。寶釵也有了一個，念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鏤檀鍥梓一層層，豈系良工堆砌成？雖是半天風雨過，何曾聞得梵鈴聲！打一物。眾人猜時，寶玉也有了一個，念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天上人間兩渺茫，琅玕節過謹提防。鸞音鶴信須凝睇，好把唏噓答上蒼。黛玉也有了一個，念道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            騄駬何勞縛紫繩？馳城逐塹勢猙獰。主人指示風雷動，鰲背三山獨立名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            探春也有了一個，方欲念時，寶琴走過來笑道：“我從小兒所走的地方的古跡不少。我今揀了十個地方的古跡，作了十首怀古的詩。詩雖粗鄙，卻怀往事，又暗隱俗物十件，姐姐們請猜一猜。”眾人聽了，都說：“這倒巧，何不寫出來大家一看？”要知端的，下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本</span>
+        <span class="col-desc">程乙本（1792程伟元/高鹗重订本，120回）</span>
+        <span>第50回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">芦雪广争联即景诗 暖香坞雅制春灯谜</h3>
+        
+        
+        <p class="col-para">
+          
+            話說薛寶釵道：「到底分個次序，讓我寫出來。」說著，便令眾人拈鬮為序。起首恰是李氏，然後按次各各開出。鳳姐兒道：「既這麼說，我也說一句在上頭。」眾人都笑起來了，說：「這麼更妙了！」寶釵將稻香老農之上補了一個「鳳」字，李紈又將題目講給他聽。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳳姐兒想了半天，笑道：「你們別笑話我。我只有了一句粗話，可是五個字的。下剩的我就不知道了。」眾人都笑道：「越是粗話越好。你說了，就只管幹正事去罷。」鳳姐兒笑道：「想下雪必刮北風，昨夜聽見一夜的北風，我有一句。這一句就是『一夜北風緊。』使得使不得，我就不管了。」眾人聽說，都相視笑道：「這句雖粗，不見底下的，這正是會作詩的起法。不但好，而且留了寫不盡的多少地步與後人。就是這句為首，稻香老農快寫上續下去。」鳳姐兒和李嬸娘平兒又吃了兩杯酒，自去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這裡李紈就寫了：「一夜北風緊，」自己聯道：「開門雪尚飄。入泥憐潔白，」香菱道：「匝地惜瓊瑤。有意榮枯草，」探春道：「無心飾萎苗。價高村釀熟，」李綺道：「年稔府粱饒。葭動灰飛管，」李紋道：「陽回斗轉杓。寒山已失翠，」岫煙道：「凍浦不生潮。易掛疏枝柳，」湘雲道：「難堆破葉蕉。麝煤融寶鼎，」寶琴道：「綺袖籠金貂。光奪窗前鏡，」黛玉道：「香粘壁上椒。斜風仍故故，」寶玉道：「清夢轉聊聊。何處梅花笛？」寶釵道：「誰家碧玉簫？鼇愁坤軸陷，」李紈笑道：「我替你們看熱酒去罷。」寶釵命寶琴續聯，只見湘雲起來道：「龍鬥陣雲銷。野岸迴孤棹，」寶琴也聯道：「吟鞭指灞橋。賜裘憐撫戌，」湘雲那裡肯讓人？且別人也不如他敏捷，都看他揚眉挺身的說道：「加絮念征徭。坳垤審夷險，」寶釵連聲讚好，也便聯道：「枝柯怕動搖。皚皚輕趁步，」黛玉忙聯道：「剪剪舞隨腰。苦茗成新賞，」一面說，一面推寶玉命他聯。寶玉正看寶琴、寶釵、黛玉三人共戰湘雲，十分有趣，那裡還顧得聯詩？今見黛玉推他，方聯道：「孤松訂久要。泥鴻從印跡，」寶琴接著聯道：「林斧或聞樵。伏象千峰凸，」湘雲忙聯道：「盤蛇一徑遙。花緣經冷結，」寶釵和眾人又都讚好。探春聯道：「色豈畏霜凋？深院驚寒雀，」湘雲正渴了，忙忙的吃茶，已被岫煙搶著聯道：「空山泣老鴞。階墀隨上下，」湘雲忙丟了茶杯，聯道：「池水任浮漂。照耀臨清曉，」黛玉忙聯道：「繽紛入永宵。誠忘三尺冷，」湘雲忙笑聯道：「瑞釋九重焦。僵臥誰相問？」寶琴也忙笑聯道：「狂遊客喜招。天機斷縞帶，」湘雲又忙道：「海市失鮫綃。」黛玉不容他道出，接著便道：「寂寞封台榭，」湘雲忙聯道：「清貧懷簞瓢。」寶琴也不容情，也忙道：「烹茶水漸沸，」湘雲見這般自為得趣，又是笑，又忙聯道：「煮酒葉難燒。」黛玉也笑道：「沒帚山僧掃，」寶琴也笑道：「埋琴稚子挑。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲笑彎了腰，忙念了一句。眾人問道：「到底說的是什麼？」湘雲道：「石樓閒睡鶴，」黛玉笑得握著胸口，高聲嚷道：「錦罽暖親貓。」寶琴也忙笑道：「月窟翻銀浪，」湘雲忙聯道：「霞城隱赤標。」黛玉忙笑道：「沁梅香可嚼，」寶釵笑稱好句，也忙聯道：「淋竹醉堪調。」寶琴也忙道：「或濕鴛鴦帶，」湘雲忙聯道：「時凝翡翠翹。」黛玉又忙道：「無風仍脈脈，」寶琴又忙笑聯道：「不雨亦瀟瀟。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲伏著，已笑軟了。眾人看他三人對搶，也都不顧作詩，看著也只是笑。黛玉還推他往下聯，又道：「你也有才盡力窮之時？我聽聽，還有什麼舌頭嚼了？」湘雲只伏在寶釵懷裡，笑個不住。寶釵推他起來，道：「你有本事把『二蕭』的韻全用完了，我纔服你。」湘雲起身笑道：「我也不是作詩，竟是搶命呢！」眾人笑道：「倒是你自己說罷。」探春早已料定沒有自己聯的了，便早寫出來，因說：「還沒收住呢。」李紋聽了，接過來，便聯一句道：「欲誌今朝樂，」李綺收了一句道：「憑詩祝舜堯。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李紈道：「夠了，夠了！雖沒作完了韻，騰挪的字，若生扭了，倒不好了。」說著，大家來細細評論一回，獨湘雲的多，都笑道：「這都是那塊鹿肉的功勞。」李紈笑道：「逐句評去，卻還一氣，只是寶玉又落了第了。」寶玉笑道：「我原不會聯句，只好擔待我罷。」李紈笑道：「也沒有社社擔待的。又說韻險了，又整誤了，又不會聯句，今日必罰你。我纔看見櫳翠庵的紅梅有趣，我要折一枝插在瓶裡，可厭妙玉為人，我不理他。如今罰你取一枝來，插著玩兒。」眾人都道：「這罰的又雅又有趣。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉也樂為，答應著就要走。湘雲黛玉一起說道：「外頭冷得很，你且吃杯熱酒再去。」於是湘雲早熱起壺酒來了。黛玉遞了個大杯，滿斟了一杯。湘雲笑道：「你吃了我們這酒，要取不來，加倍罰你！」寶玉忙吃了一杯，冒雪而去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李紈命人好好跟著，黛玉忙攔說：「不必，有了人，反不得了。」李紈點頭道：「是。」一面命丫鬟將一個美女聳肩瓶拿來，貯了水，準備插梅，因又笑道：「回來該吟紅梅了。」湘雲忙道：「我先作一首。」寶釵笑道：「今日斷不容你再作了。你都搶了去，別人都閒著也沒趣。回來罰寶玉。他說不會聯句，如今就叫他自己做去。」黛玉笑道：「這話很是。我還有主意：方纔聯句不夠，莫若揀那聯得少的人作紅梅詩。」寶釵笑道：「這話是極。方纔邢李二位屈才，且又是客；琴兒和顰兒雲兒他們搶了許多，我們一概都別作，只他們三人做纔是。」李紈因說：「綺兒也不大會做，還是讓琴妹妹罷。」寶釵只得依允。又道：「就用『紅梅花』三個字做韻，每人一首七言律；邢大妹妹做『紅』字，你們李大妹妹做『梅』字，琴兒做『花』字。」李紈道：「饒過寶玉去，我不服。」湘雲忙道：「有個好題目命他做。」眾人問：「何題？」湘雲道：「命他就做『訪妙玉乞紅梅』，豈不有趣？」眾人聽了，都說：「有趣！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一語未了，只見寶玉笑欣欣擎了一枝紅梅進來。眾丫鬟忙已接過，插入瓶內。眾人都過來賞玩。寶玉笑道：「你們如今賞罷。也不知費了我多少精神呢！」說著，探春早又遞了一鍾暖酒來。眾丫鬟上來接了簑笠撣雪。各人屋裡丫鬟都添送衣裳來。襲人也遣人送了半舊的狐腋褂來。李紈命人將那蒸的大芋頭盛了一盤，又將硃橘、黃橙、橄欖等物盛了兩盤，命人帶給襲人去。湘雲且告訴寶玉方纔的詩題，又催寶玉快做。寶玉道：「好姐姐好妹妹們，讓我自己用韻罷，別限韻了！」眾人都說：「隨你做去罷。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面說，一面大家看梅花。原來這一枝梅花只有二尺來高，旁有一枝，縱橫而出，約有二三尺長，其間小枝分歧，或如蟠螭，或如僵蚓，或孤削如筆，或密聚如林。真乃花吐胭脂，香欺蘭蕙。各各稱賞。誰知岫煙、李紋、寶琴三人都已吟成，各自寫了出來。眾人便依「紅」「梅」「花」三字之序看去，寫道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賦得紅梅花桃未芳菲杏未紅，衝寒先喜笑東風。魂飛庾嶺春難辨，霞隔羅浮夢未通。綠萼添粧融寶炬，縞仙扶醉跨殘虹。看來豈是尋常色？濃淡由他冰雪中。－－邢岫煙。白梅懶賦賦紅梅，逞豔先迎醉眼開。凍臉有痕皆是血，酸心無恨亦成灰。誤吞丹藥移真骨，偷下瑤池脫舊胎。江北江南春燦爛，寄言蜂蝶漫疑猜。－－李紋。疏是枝條豔是花，春粧兒女競奢華。閒庭曲檻無餘雪，流水空山有落霞。幽夢冷隨紅袖笛，遊仙香泛絳河槎。前身定是瑤台種，無復相疑色相差。－－寶琴。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眾人看了，都笑著，稱讚了一回，又指末一首更好。寶玉見寶琴年紀最小，才又敏捷。黛玉湘雲二人斟了一小杯酒，都賀寶琴。寶釵笑道：「三首各有好處。你們兩個天天捉弄厭了我，如今又捉弄他來了。」李紈又問寶玉：「你可有了？」寶玉忙道：「我倒有了，纔一看見這三首，又唬忘了。等我再想。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘雲聽了，便拿了一支銅火箸擊著手爐，笑道：「我擊了，若鼓絕不成，又要罰的。」寶玉笑道：「我已有了。」黛玉提起筆來，笑道：「你念，我寫。」湘雲便擊了一下，笑道：「一鼓絕。」寶玉笑道：「有了，你寫罷。」眾人聽他念道：「酒未開罇句未裁，」黛玉寫了，搖頭笑道：「起的平平。」湘雲又道：「快著！」寶玉笑道：「尋春問臘到蓬萊。」黛玉湘雲都點頭笑道：「有些意思了。」寶玉又道：「不求大士瓶中露，為乞孀娥檻外梅。」黛玉寫了，搖頭說：「小巧而已。」湘雲將手又敲了一下。寶玉笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            入世冷挑紅雪去，離塵香割紫雲來。槎枒誰惜詩肩瘦？衣上猶沾佛院苔。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉寫畢，湘雲大家纔評論時，只見幾個丫鬟跑進來道：「老太太來了。」眾人忙迎出來。大家又笑道：「怎麼這等高興？」說著，遠遠見賈母圍了大斗篷，帶著灰鼠暖兜，坐著小竹轎，打著青綢油傘，鴛鴦琥珀等五六個丫鬟，每人都是打著傘，擁轎而來。李紈等忙往上迎。賈母命人止住，說：「只站在那裡就是了。」來至跟前，賈母笑道：「我瞞著你太太和鳳丫頭來了。大雪地下，我坐著這個無妨，沒的叫他娘兒們跴雪嗎。」眾人忙上前來接斗篷，攙扶著，一面答應著。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈母來至室中，先笑道：「好俊梅花！你們也會樂，我也不饒你們！」說著，李紈早命人拿了一個大狼皮褥子來，鋪在當中。賈母坐了，因笑道：「你們只管照舊玩笑吃喝。我因為天短了，不敢睡中覺，抹了一會牌，想起你們來了，我也來湊個趣兒。」李紈早又捧過手爐來。探春另拿了一副杯箸來，親自斟了暖酒，奉給賈母。賈母便飲了一口，問：「那個盤子是什麼東西？」眾人忙捧了過來，回說：「是糟鵪鶉。」賈母道：「這倒罷了，撕一點子腿兒來。」李紈忙答應了，要水洗手，親自來撕。賈母道：「你們仍舊坐下說笑，我聽著纔喜歡。」又命李紈：「你也只管坐下，就如同我沒來的一樣纔好；不然，我就走了。」眾人聽了，方纔依次坐下，只李紈挪到儘下邊。賈母因問：「你們作什麼玩呢？」眾人便說：「做詩呢。」賈母道：「有做詩的，不如做些燈謎兒，大家正月裡好玩。」眾人答應。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說笑了一會，賈母便說：「這裡潮濕，你們別久坐，仔細著了涼。倒是你四妹妹那裡暖和，我們到那裡瞧瞧他的畫兒，趕年下可能有了不能。」眾人笑道：「那裡能年下就有了？只怕明年端陽纔有呢。」賈母道：「這還了得！他竟比蓋這園子還費工夫了！」說著，仍坐了竹椅轎，大家圍隨，過了藕香榭，穿入一條夾道，東西兩邊皆是過街門，門樓上，裡外都嵌著石頭匾。如今進的是西門，向外的匾上鑿著「穿雲」二字，向裡的鑿著「度月」兩字。來至堂中，進了向南的正門，賈母下了轎，惜春已接出來了。從裡面遊廊過去，便是惜春臥房，廈簷下掛著「暖香塢」的匾，早有幾個人打起猩紅氈簾，已覺暖氣拂臉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大家進入屋裡，賈母並不歸坐，只問惜春：「畫到那裡了？」惜春因笑回：「天氣寒冷了，膠性都凝澀不潤，畫了恐不好看，故此收起來了。」賈母笑道：「我年下就要的，你別脫懶兒。快拿出來，給我快畫。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一語未了，忽見鳳姐披著紫羯羢褂，笑嘻嘻的來了，口內說道：「老祖宗今兒也不告訴人，私自就來了，叫我好找！」賈母見他來了，心中喜歡，道：「我怕你凍著，所以不許人告訴你去。你真是個小鬼靈精兒，到底找了我來。論禮，孝敬也不在這上頭。」鳳姐兒笑道：「我那裡是孝敬的心找了來呢？我因為到了老祖宗那裡，鴉沒鵲靜的，問小丫頭子們，他又不肯叫我找到園裡來。我正疑惑，忽然又來了兩個姑子，我心裡纔明白了：那姑子必是來送年疏，或要年例香例銀子，老祖宗年下的事也多，一定是躲債來了。我趕忙問了那姑子，果然不錯，我纔就把年例給了他們去了。這會子老祖宗的債主兒已去了，不用躲著了。已預備下稀嫩的野雞，請用晚飯去罷，再遲一回就老了。」他一行說，眾人一行笑。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳳姐兒也不等賈母說話，便命人抬過轎來。賈母笑著，挽了鳳姐兒的手，仍上了轎，帶著眾人，說笑出了夾道東門。一看，四面粧妝銀砌，忽見寶琴披著鳧靨裘，站在山坡背後遙等，身後一個丫鬟，抱著一瓶紅梅。眾人都笑道：「怪道少了兩個，他卻在這裡等著，也弄梅花去了。」賈母喜的忙笑道：「你們瞧，這雪坡兒上，配上他這個人物兒，又是這件衣裳，後頭又是這梅花，像個什麼？」眾人都笑道：「就像老太太屋裡掛的仇十洲畫的『豔雪圖』。」母搖頭笑道：「那畫的那裡有這件衣裳？人也不能這樣好！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一語未了，只見寶琴身後又轉出一個穿大紅猩猩氈的人來。賈母道：「那又是那個女孩兒？」眾人笑道：「我們都在這裡，那是寶玉。」賈母笑道：「我的眼越發花了。」說話之間，來至跟前，可不是寶玉和寶琴兩個。寶玉笑向寶釵黛玉等道：「我纔又到了櫳翠庵，妙玉竟每人送你們一枝梅花，我已經打發人送去了。」眾人都笑道：「多謝你費心。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說話之間，已出了園門。來至賈母房中，吃畢飯，大家又說笑了一回。忽見薛姨媽也來了，說：「好大雪！一日也沒過來望候老太太。今日老太太倒不高興？正該賞雪纔是。」賈母笑道：「何曾不高興了？我找了他們姐妹去玩了一會子。」薛姨媽笑道：「昨兒晚上，我原想著今日要和我們姨太太借一天園子，擺兩桌粗酒，請老太太賞雪的，又見老太太安歇的早。我聽見寶兒說，老太太心裡不大爽，因此，如今也不敢驚動。早知如此，我竟該請了纔是呢。」賈母笑道：「這纔是十月，是頭場雪；往後下雪的日子多著呢，再破費姨太太不遲。」薛姨媽笑道：「果然如此，算我的孝心虔了。」鳳姐兒笑道：「姨媽怎麼忘了？如今現秤五十兩銀子來，交給我收著，一下雪，我就預備下酒。姨媽也不用操心，也不得忘了。」賈母笑道：「既這麼說，姨太太給他五十兩銀子收著，我和他每人分二十五兩，到下雪的日子，我裝心裡不爽，混過去了。姨太太更不用操心，我和鳳姐倒得實惠呢！」鳳姐將手一拍，笑道：「妙極！這和我的主意一樣。」眾人都笑了。賈母笑道：「呸！沒臉的！就順著竿子爬上來了。你不說姨太太是客，在偺們家受屈，我們該請姨太太纔是；那裡有破費姨太太的理？不這麼說呢，還有臉先要五十兩銀子？真不害臊！」鳳姐笑道：「我們老祖宗最是有眼色的，試一試，姨媽要鬆呢，拿出五十兩來，就和我分；這會子估量著不中用了，翻過來拿我做法子，說出這些大方話來。如今我也不和姑媽要銀子了，我竟替姨媽出銀子，治了酒，請老太太吃了，我另外再封五十兩銀子孝敬老祖宗，算是罰我個包攬閒事，這可好不好？」話未說完，眾人都笑倒在炕上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈母因又說及寶琴雪下折梅，比畫兒上還好；又細問他的年庚八字並家內景況。薛姨媽度其意思，大約是要給他求配。薛姨媽心中因也遂意，只是已許過梅家了，因賈母尚未說明，自己也不好擬定，遂半吐半露，告訴賈母道：「可惜了這孩子沒福！前年他父親就沒了。他從小兒見的世面倒多，跟他父親四山五岳都走遍了。他父親好樂的，各處因有買賣，帶了家眷，這一省逛一年，明年又到那一省逛半年，所以天下十停走了有五六停了。那年在這裡把他許了梅翰林的兒子，偏第二年他父親就辭世了。如今他母親又是痰症。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鳳姐兒也不等說完，便嗐聲跺腳的說：「偏不巧！我正要做個媒呢，又已經許了人家！」賈母笑道：「你要給誰說媒？」鳳姐兒笑道：「老祖宗別管。心裡看準了，他們兩個是一對。如今有了人家，說也無益，不如不說罷了。」賈母也知鳳姐兒的意思，聽見已有人家，也就不提了。大家又閒話了一會方散。一宿無話。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日雪晴，飯後，賈母又吩咐惜春：「不管冷暖，你要畫去。趕到年下，十分不能，就罷了。第一要緊，把昨兒琴兒和丫頭、梅花，照樣一筆別錯，快快添上。」惜春聽了，雖是為難的事，就應了。一時，眾人都來看他如何畫。惜春只是出神。李紈因笑向眾人道：「讓他自己想去，偺們且說話兒。昨兒老太太只叫做燈謎兒，回到家，和綺兒紋兒睡不著，我就編了兩個四書的。他兩個每人也編了兩個。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眾人聽了，都笑道：「這倒該做的。先說了，我們猜猜。」李紈笑道：「『觀音未有世家傳』，打四書一句。」湘雲接著就說道：「『在止於至善。』」寶釵笑道：「你也想一想『世家傳』三個字的意思再猜。」李紈笑逼：「再想。」黛玉笑道：「我猜罷。可是『雖善，無徵』？」眾人都笑道：「這句是了。」李紈又道：「『一池青草草何名？』」湘雲又忙道：「這一定是『蒲蘆也。』－－再不是不成？」李紈笑道：「這難為你猜。紋兒的是『水向石邊流出冷』，打一古人名。」探春笑著問道：「可是山濤？」李紈道：「是。」李紈又道：「綺兒是個『螢』字，打一個字。」眾人猜了半日，寶琴道：「這個意思卻深，不知可是花草的『花』字？」李綺笑道：「恰是了。」眾人道：「螢與花何干？」黛玉笑道：「妙的很！螢可不是草化的？」眾人會意，都笑了，說：「好。」寶釵道：「這些雖好，不合老太太的意；不如做些淺近的物兒，大家雅俗共賞纔好。」眾人都道：「也要做些淺近的俗物纔是。」湘雲想了一想，笑道：「我編了一支《點絳脣》，卻真是個俗物，你們猜猜。」說著，便念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            溪壑分離，紅塵遊戲，真何趣？名利猶虛，後事終難繼。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眾人都不解，想了半日，也有猜是和尚的，也有猜是道士的，也有猜是偶戲人的。寶玉笑了半日道：「都不是。我猜著了，必定是耍的猴兒。」湘雲笑道：「正是這個了。」眾人道：「前頭都好，末後一句怎麼樣解？」湘雲道：「那一個耍的猴兒不是剁了尾巴去的？」眾人聽了，都笑起來說：「偏他編個謎兒也是刁鑽古怪的！」李紈道：「昨日姨媽說，琴妹妹見得世面多，走的道路也多，你正該編謎兒。況且你的詩又好，為什麼不編幾個兒我們猜一猜？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶琴聽了，點頭含笑，自去尋思。寶釵也有一個，念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鏤檀鐫梓一層層，豈係良工堆砌成？雖是半天風雨過，何曾聞得梵鈴聲？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眾人猜時，寶玉也有一個，念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天上人間兩渺茫，琅玕節過謹提防。鸞音鶴信須凝睇，好把欷歔答上蒼。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉也有了一個，念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            騄駬何勞縛紫繩？馳城逐塹勢猙獰。主人指示風雲動，鰲背三山獨立名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            探春也有了一個。方欲念時，寶琴走來笑道：「從小兒所走的地方的古蹟不少，我也來挑了十個地方古蹟，做了十首懷古詩。詩雖粗鄙，卻懷往事，又暗隱俗物十件，姐姐們請猜一猜。」眾人聽了，都說：「這倒巧！何不寫出來大家一看？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要知端的，且聽下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi_ocr">
+      <div class="compare-col-head">
+        <span class="badge">程乙本OCR</span>
+        <span class="col-desc">程乙本OCR（欧阳健校注本PDF本地识别）</span>
+        <span>第50回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">芦雪广争联即景诗 暖香坞雅制春灯谜</h3>
+        
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗 暖香坞雅制春灯谜【--)
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话说薛宝钗道：“到底分个次序，让我写出来。”说着，便令众
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人枯阉为序。起首恰是李氏【二}，然后按次各各开出。凤姐儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说道：“既是这样说，我也说一句在上头。”众人都笑说道：“更妙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了！”宝钗便将稻香老农之上补了一个“凤”字，李绒又将题目讲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            与他听。凤姐儿想了半日，笑道：“你们别笑话我。我只有一句
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            粗话，下剩的我就不知道了。”众人都笑道：“越是粗话越好，你说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了只管干正事去罢。”凤姐儿笑道：“我想下雪必刮北风。昨夜听
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见了一夜的北风，我有了一句，就是“夜北风紧’，可使得？”众
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人听了，都相视笑道：“这句虽粗，不见底下的，这正是会作诗的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            起法。不但好，而且留了多少地步与后人。就是这句为首，稻香
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            老农快写上续下去。”凤姐和李平儿又吃了两杯酒，自去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这里李便写了：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一夜北风紧，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自己联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            开门雪尚。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            入泥怜洁白，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            香菱道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            匝地惜琼瑶①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“入泥二句一一意谓白雪落入污泥，犹如琼瑶（美玉）抛撒遍地，令人岭惜。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            匝（za扎）：周；遍。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            667
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有意荣枯草，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            探春道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无心饰菱苕①。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            价高村酿熟②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李绮道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            年稔府梁饶③。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            蔑动灰飞管，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李纹道:
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            阳回斗转④
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寒山已失翠，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            烟道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            冻浦不闻潮。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            易挂疏枝柳，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            菱苕(tiao 条)-一枯菱的苇花。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②“价高”句价高：指酒价高，雪大天寒，故酒价高涨。唐代郑谷《萃下冬
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            暮咏怀》诗：“满长安酒价高”。村酿：即村酒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“年稔（rén忍）&#34;句一年稔：年景好；收成好。稔，庄稼成熟。这里是说大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雪之后将会有一个丰收的年景。府粮：也称府栗”，指宫仓中的粮食。饶（ro娆）：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丰富。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④“动二句一一这里是用冬至节代指雪天。意谓乐律管里的灰飞动，斗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            柄已转，正是阴极阳回的冬至节气。（ia家）：芦苇。灰飞管：古代预测节气，把芦
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            木案上，到了某一节气，相应律管里的蔑灰就会自行飞动（见《后汉书·律历志上》）。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            阳回：阳气复回，说明已到“冬至”。《通纬·孝经援神契》：“大雪后十五日，斗指子，为
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            冬至，（阴历）十一月中。阴极而阳始至。”斗：指北斗星。构（biao标）：斗，北斗七
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            星中第五、六、七颗星的总称，也叫“斗柄”。由于地球的自转和公转，斗柄的指向和
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方位不断变动转换。冬至这天，斗柄指向正北，阴极阳生，自此开始，斗柄即渐向东
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            转，所以说是“阳回”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            668
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗暖香坞雅制春灯谜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            难堆破叶蕉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            麝煤①融宝鼎,
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝琴道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            绮袖笼金貂。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            光夺窗前镜，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            香粘壁上椒?。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            斜风仍故故③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清梦转聊聊④。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            何处梅花笛？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝钗道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            谁家碧玉箫？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            螯愁坤轴陷(三)③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李绒笑道：“我替你们看热酒去。”宝钗命宝琴续联，只见湘云
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            站(四}起来道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            煤本为香墨的别名，也叫“墨”；这里指取暖用的优质木炭之类。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            壁上椒一一以椒涂壁，取其温暖有香气。参阅第十六回“椒房”注。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            故故一一屡屡。这里指风吹阵阵。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            聊聊一一略微；短暂。这里指因天冷而梦境不长。或为“塞塞”之误；墓寒，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            稀少的意思。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            梅花笛-一指吹奏梅花落》的笛声。宋代郭茂倩编（乐府诗集》：“《梅花
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            落》，本笛中曲也。”这里又用落梅隐喻飞雪。南唐李煜《清平乐·忆别》：“砌下落梅如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雪乱，拂了一身还满。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            @“整（ao散)愁”句一一巨鳌因怕大雪压大地雨发愁。整：传说中的大海
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            龟。（淮南子·览寞训》“往古之时，四极废，九州裂，天不兼覆，地不阔载于是女
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            娲氏炼五色石以补天，断整足以立四极。坤轴：即地轴，这里泛指大地。唐代虞世
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            南撰（北堂书钞》卷一五七引《河海括地象》：昆仑之山，横为地轴。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            669
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            龙斗阵云销①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            野岸回孤模，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝琴也站起道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            吟鞭指桥②。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赐裘怜抚成③，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云那里背让人，且别人也不如他敏捷，都看他扬眉挺身的说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            加絮念征④。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            坳埕审夷险①,
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝锣连声赞好，也便联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枝柯怕动摇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            轻趁步，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉忙联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“龙斗”句一一以玉龙战罢鳞片纷飞的景象，比喻大雪纷飞。宋代张元咏
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雪》诗：“战罢玉龙三百万，败鳞残甲满天飞。阵云销：浓云消散，表示龙战已毕。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得之？*澜桥：在今西安市东水上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“赐裘”句一一意谓帝怜恤守边将土，赏给他们过冬衣裘。《宋史·太宗本
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            纪》：雍熙二年“十二月·葵卯，南康军言，雪降三尺，天江冰合，可胜重载。丁未，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道中使赐缘边成卒裤。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④“加絮&#34;句一意谓制衣者惦念服谣役的征人寒冷，在衣中多加棉絮。《唐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            诗纪事·开元宫人》：“开元中，赐边军衣（棉衣），制于宫中。有兵士于短袍中得诗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日：“沙场征成客，寒苦若为眠？战袍经手作，知落阿谁边？蓄意多添线，含情更着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            绵。今生已过也，重结后生缘。兵士以诗白师，帅进呈。玄宗以诗遍示中日：“作
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            者勿隐，不汝罪也。有一宫人自言万死。上深闵之，遂以嫁得诗者，谓日：“吾与汝结
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今生缘。边人感泣。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “坳（wa凹;ao傲)塔（die迭）&#34;句一一意谓大雪铺平了洼坑和高坎儿，走路
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            时需要细察路面的高低不平。坳：地低洼处；山间平地。埃：小土堆。审：详察。夷：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            平坦；平安。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            670
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            暖香玛雅制春灯谜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            剪剪舞随腰①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            煮芋成新赏，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面说，一面推宝玉，命他联。宝玉正看宝钗、宝琴、黛玉三人共
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            战湘云，分有趣，那里还顾得联诗，今见黛玉推他，方联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            撒盐是旧谣②。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            苇蓑犹泊钓③，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云笑道：“你快下去，你不中用，倒耽搁了我。”一面只听宝琴联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林斧不闻樵。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            伏象千峰凸，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云忙联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盘蛇一径遥④。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            花缘经冷聚[五】
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝钗与众人又忙赞好。探春又联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            色岂畏霜调①。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            深院惊寒雀，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云正渴了，忙忙的吃茶，已被岫烟道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            空山泣老。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            阶随上下，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “剪剪&#34;句一一以轻盈舞姿喻白雪的随风飞旋。剪剪：形容风轻带寒意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “煮芋”二句一一一煮芋：苏东坡赞其幼子苏过以山芋作玉糁樊，诗中有“香似龙诞仍
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            配白（纯白）&#34;句，这里是用玉惨樊的“配白”以喻雪色之白。撤盐参阅第76页注②。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “伏象”二句一一意谓山峰积雪如伏卧的白象，雪地小路似盘曲的长蛇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ）“花缘”二句一一意谓雪花由于天冷才结聚而成，洁白的颜色哪里会因怕霜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            冻而消褪。花、色：均指雪花。缘：因为由于。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            @泣老一一意谓雪光照得夜色如同白昼，怕光的鹅鸡（chi xiao吃消）因不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            能捕食而衰泣。：鹅，即猫头，叠伏夜出，常于夜间捕提食物，鸣声惨厉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            671
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云忙丢了茶杯，忙联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            池水任浮漂。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            照耀临清晓，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            缤纷入永宵。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            诚忘三尺冷，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云忙笑联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瑞释九重焦①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卧谁相问②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝琴也忙笑联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            狂游客喜招③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天机断带，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云又忙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            海市失鲛绡(六)①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林黛玉不容他出，接着便道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寂寞对台榭，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“诚忘”二句一一意谓诚敬之心，使将士忘却了戊守的寒苦；雪兆丰年，可以
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            消除皇帝的焦愿。三尺：剑。《汉书高帝纪》：吾以布衣提三尺取天下。“颜师古注：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “三尺，剑也。&#34;雪中成守，刀剑随身，尤觉寒冷。瑞：指瑞雪。南朝宋谢惠连《雪赋》：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “盈尺则呈瑞于丰年”。九重：代指皇帝。宋玉《九辩》：“君之门以九重。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②“卧”句一一用“袁安卧雪”故事。《后汉书·衰安传》注引《汝南先贤传》“时
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大雪积地文徐。洛阳令身出案行，见人家皆除雪出，有食者。至袁安门，无有行路。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            谓安已死，令人除雪入户，见安卧，间何以不出。安日：大雪人替饿，不宜干人。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            事）：“巨蒙王元宝，每大雪则自所居至坊口扫雪开道，迎搏宾客饮宴，谓之暖寒会。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④“天机”二句一一用天上落下的编带、海市移来的鲛绡喻雪的洁白美好。天
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            机：传说中天上织女的织机。编带：白色的丝带。海市：即海市盛楼，海上由于光线
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            变化而出现的奇异幻景。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            672
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗暖香坞雅制春灯谜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云忙联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清贫怀算瓢①。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝琴也不容情，也忙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            烹茶冰渐沸，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云见这般，自为得趣，又是笑，又忙联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            煮酒叶难烧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉也笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            没帚山僧扫，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝琴也笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            埋琴稚子挑。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云笑的弯了腰，忙念了句，众人问“到底说的什么？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云喊道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            石楼闲睡鹤，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉笑的握着胸口，高声道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            锦暖亲猫。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝琴也忙笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            月窟翻银浪，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云忙联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            霞城隐赤标②。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“清贫”句一一意谓穷苦之土由于大雪封门饮食无着，连“算食飘饮”的清贫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            生活也怀念起来了。耸(dan丹）飘：语本《论语·雍也》：&#34;-第食，一饮。这是孔子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            称赞他的学生颜回不以贫困为忧的话。肇：盛饭用的圆形竹器。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            深厚。银浪：月光。宋代陈与义《咏月》诗：“银浪泻干顷。”这里代指雪波，唐代李威
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            用《雪》诗：“云汉风多银浪溅”。霞城：指赤城山，在浙江天台县北，状如城墙雉蝶，土
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            色皆赤，望之似饅、故名（见《会稽记》）。赤标：这里指赤城山的高峰。晋代孙绰《游
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天台山赋》：“赤城霞起而建标”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 673
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉忙笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            沁梅香可嚼①，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝笑称好，也忙联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            淋竹醉堪调。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝琴也忙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            或湿鸳鸯带，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云忙联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            时凝翡翠翘②
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉文忙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无风仍脉脉，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝琴又忙笑联道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不雨亦潇潇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘云伏着已笑软了。众人看他三人对抢，也都不顾作诗，看着也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只是笑。黛玉还推他往下联，又道：“你也有才尽之时。我听听
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            还有什么舌根嚼了！”湘云只伏在宝钗怀里，笑个不住。宝钗推
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他起来道：“你有本事，把“二萧”的韵全用完了，我才伏你。”湘云
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            起身笑道：“我也不是作诗，竟是抢命呢。”众人笑道：“倒是你说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            。”探春卓已料定没有自已联的了，便早写出来，因说：“还没收
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            住呢。&#34;李听了，接过来便联了一句道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“沁梅”句一一或指宋代铁脚道人故事。传说“铁脚道人常爱赤脚走雪中，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            兴发则朗诵《南华·秋水篇》，嚼梅花满口，和雪咽之。日：‘吾欲寒香沁入肺腑，”（见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清代爱菊主人《花史》）。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②“鸳鸯带”二句一一駕鸯带：有驾鸯图案花纹的带子。唐代徐彦伯（拟古三
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            首》之三：“赠君鸳鸯带”。翡翠翘：也称翠翘。翘，首饰。用翡翠鸟的羽毛粘在首饰
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上叫“点翠”，点翠的凤冠叫“翠翘”，但也可泛指点翠的其他首饰。唐代韦应物《长安
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            羽的妇女首饰。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗暖香坞雅制春灯谜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            欲志今朝乐，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李绮收了一句道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凭诗祝舜尧。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李道：“够了，够了。虽没作完了韵；的字[七}若生扭用了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倒不好了。”说着，大家来细细评论一回，独湘云的多，都笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “这都是那块鹿肉的功劳。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李绒笑道：“逐旬评去都还一气，只是宝玉又落了第了。”宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉笑道：“我原不会联句，只好担待我罢。”李绒笑道：“也没有社
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            社担待你的。又说韵险了，文整误了，又不会联句了，今日必罚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你。我才看见翠庵的红梅有趣，我要折一枝来插瓶。可厌妙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉为人，我不理他。如今罚你去取一枝来。”众人都道这罚的又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雅又有趣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉也乐为，答应着就要走。湘云黛玉一齐说道：“外头冷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得很，你且吃杯热酒再去。”湘云早执起壶来，黛玉递了一个大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            杯，满了一杯。湘云笑道：“你吃了我们的酒，你要敢不来，加
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倍罚你。宝玉忙吃一杯，冒雪而去。李命人好好跟着。黛玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            忙拦说：“不必，有了人反不得了。李绒点头说：“是。”一面命丫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            養将一个美女箕肩瓶拿来，贮了水准备插梅，因文笑道：“回来该
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            咏红梅了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。你都抢了去，别人都闲着，也没趣，回来还罚宝玉，他说不会
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            联句，如今就叫他自已作去。”黛玉笑道：“这话很是。我还有个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            主意，方才联句不够，莫若栋着联的少的人作红梅。”宝钗笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “这话是极。方才邢李三位屈才，且又是客。琴儿和儿云儿三
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个人也抢了许多，我们一概都别作，只让他三个作才是。”李因
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说：“绮儿也不大会作，还是让琴妹妹作罢。”宝钗只得依充，文
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            675
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“就用‘红梅花，三个字作韵，每人一首七律。邢大妹妹作
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “红”字，你们李大妹妹作“梅”字，琴儿作‘花”字。”李绒道：“饶过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉去，我不服。”湘云忙道：“有个好题目命他作。”众人问何题
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            都说有趣。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一语未了，只见宝玉笑软软①了一枝红梅进来，众丫髪忙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            已接过，插入瓶内。众人都笑称谢。宝玉笑道：“你们如今赏罢，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也不知费了我多少精神呢。”说着，探春早又递过一钟暖酒来，众
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丫走上来接了笠掸雪。各人房中丫都添送衣服来，袭人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也遣人送了平旧的狐孤褂来。李绒命人将那蒸的大芋头盛了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盘，又将朱橘、黄橙、橄榄等物盛了两盘，命人带与袭人去。湘云
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且告诉宝玉方才的诗题，又催宝玉快作。宝玉道：“姐姐妹妹们，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            让我自己用韵罢，别限韵了。”众人都说：“随你作去罢。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一面说，一面大家看梅花。原来这枝梅花只有二尺来高，旁
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有一横枝纵横而出，约有五六尺长，其间小枝分歧，或如蟠螨，或
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如蚓，或孤削如笔，或密聚如林，花吐胭脂，香欺兰蕙，各各称
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赏。谁知邢烟、李纹、薛宝琴三人都已吟成，各自写了出来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人便依“红梅花”三字之序看去，写道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            咏红梅花得“红”字② 邢鼬烟
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            桃未芳菲杏未红，冲寒先己笑东风③。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①勋（qian虔）一一此指擎着、小心地把扶着。《康熙字典》《集韵》：“，渠
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            為切，音虔，负物也。”·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②得“红”字一多人一起作诗，先提出若干字为韵字，由大家自由选择或括
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            阎决定，叫做“分韵”。分到某一韵字的人，在他的诗题下注明“得某字”，并用这个字
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            所在韵部的字作韵脚。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“冲寒”句一意谓红梅先于桃杏冲破寒冷笑向东风。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            676
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗暖香坞雅制春灯谜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            魂飞庾岭①春难辩，霞隔罗浮②梦未通。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            绿萼添妆融宝炬，仙扶醉跨残虹③。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看来岂是寻常色，浓淡由他冰雪中。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            咏红梅花 得“梅”字 李纹
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            白梅懒赋赋红梅,艳先迎醉眼开④。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            冻脸有痕皆是血，酸心无恨亦成灰③。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            误吞丹药移真骨?，偷下瑶池脱旧胎①。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            江北江南春灿烂，寄言蜂蝶漫疑猜③。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            咏红梅花得“花”字 薛宝琴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            疏是枝条艳是花，春妆儿女竞奢华③。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①庾岭一一即大庾岭，五岭之，在江西、广东两省边境。因龄上多梅花，又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            称梅岭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②罗浮一一山名，在广东省东江北岸，增城、博罗、河源等县之间。据《龙城
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            录》载：隋代赵师雄迁罗浮，一日日暮，于松林酒肆旁见一一美人，淡妆素服，出迎与语，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            语极清丽，因与扣酒家门共饮。师雄醉寝，天明起视，在大梅树下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“绿萼”二句一用绿仙女（绿梅）为添妆而熔化红烛，白衣仙子（白梅）带
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            薛颜跨上残虹来形容红梅。“融宝炬”、“扶醉”、“跨残虹”均红色。缘萼：即绿萼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            梅，是梅中之花萼蒂皆绿者（见李时珍《本草集解》），有人比之为仙女薄绿华（见宋
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            代范成大《石湖梅谱》）。编仙：白衣仙人，这里代指白梅。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            醉眼开一喻微开的红梅。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“冻脸”二旬一-冻脸;喻开放于冰雪严寒中的红梅。酸心:梅花结子味酸，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            故云“酸心”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“误吞”句一一意谓红梅是白梅误吞了仙丹换掉真骨化成。宋代方子通诗：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “紫府与丹来换骨”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②“偷下”句一—意谓红梅是瑶池仙女偷下凡间，脱化旧胎而成。宋代毛滂
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            《红梅》诗：“何处曾临阿母池，将绛雪照寒枝”。瑶池：郎阿母池，古代传说中西王
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母的住处。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“寄言&#34;句一一意谓告诉蜂蝶，切莫误认为已是桃李芳菲的暖春，眼下还正
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            在冰雪严寒的季节。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“春妆”句一一暗喻红梅怒放，犹如少女妆，争艳斗妍。春妆：红妆。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            229
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            闲庭曲槛无涂雪，流水空山有落霞①。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幽梦冷随红袖笛，游仙香泛绛河槎②。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            前身定是瑶台种，无复相疑色相③差。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人看了，都笑称赏了一番，又指未一首说更好。宝玉见宝琴年
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            纪最小，才又敏捷，深为奇异。黛玉湘云二人勘了一小杯酒，齐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贺宝琴。宝钗笑道：“三首各有各好。你们两个天天捉弄厌了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我，如今捉弄他来了。”季绒又问宝玉：“你可有了？”宝玉忙道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “我倒有了，才一看见那三首，又吓忘了，等我再想。”湘云听了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便拿了支铜火箸击着手炉，笑道：“我击鼓④了，若鼓绝不成，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又要罚的。”宝玉笑道：“我已有了。”黛玉提起笔来，说道：“你念，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我写。”湘云便击了一下笑道：“一鼓绝。”宝玉笑道：“有了，你写
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            吧。”众人听他念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            酒未开樽句未裁，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉写了，摇头笑道：“起的平乎。”湘云又道“快着！宝玉笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            春间腊到蓬莱。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“闲庭”二句意谓无论庭院或山野，尽是红梅无白梅。徐雪：代指白梅。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            落霞：代指红梅。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②“幽梦”二句一意谓随着红袖少女的清冷笛声进入梦境；乘坐绛河的香筱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游于仙界。红袖笛：这里代指红梅花，绛河：即天河、银河。这里用绛”，意在点出
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “红”字，以喻红梅。明代王達《懿海集·天文类》：“河汉日银河可也，而日绛河。盖观
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天者以北极为标准，所仰视而见者皆在于北极之南，故称之目丹、日绛，借南之色以
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            为喻也。&#34;泛槎（cha查）：泛，浮行，乘船。槎，木筱，这里指神话传说中往来关上的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “星槎”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            色相一本佛家语，这里指红梅花的颜色和形状。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④击鼓一即&#34;击鼓催”，是侣日多人一起作诗的活动形式之一，以鼓声的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            起止为限定的构思时间，到时作不出来或超过时间便要受罚。据南史·王憎孺传》
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            载：“竟陵王子良尝夜集学士，刻烛为诗，四韵者刻一一寸，以此为率。（萧）文琰日：“顿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            烧寸烛，而成四韵诗，何难之有。乃与（丘)令楷、江洪等共打铜钵立韵，响灭则诗
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            放，皆可观览。&#34;击鼓亦时用击炉、击钵等代替。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            678
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗暖香坞雅制春灯谜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉湘云都点头笑道：“有些意思了。”宝玉又道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不求大士瓶中露，为乞娥槛外梅。①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉写了，又摇头道：“凑巧而已。”湘云忙催二鼓，宝玉又笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人世冷挑红雪去,离尘香割紫云来②。·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            槎谁惜诗肩瘦③，衣上犹沾佛院④苔。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉写毕，湘云大家才评论时，只见几个丫養跑进来道：“老太太
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来了。”众人忙迎出来。大家又笑道：“怎么这等高兴！”说着，远
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            远见贾母围了大斗篷，带着灰鼠暖兜③，坐着小竹轿，打着青绸
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            油伞，鸳鸯琥珀等五六个丫餐，每人都是打着伞，拥轿而来。季
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            绒等忙往上迎，贾母命人止住说：“只在那里就是了。”来至跟前，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母笑道：“我瞒着你太太和凤丫头来了。大雪地下坐着这个无
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妨，没的叫他们来硒雪。”众人忙一面上前接斗篷，换扶着，一面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            答应着。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母来至室中，先笑道：“好俊梅花！你们也会乐，我来着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。”说着，李绒早命拿了一个大狼皮褥来铺在当中。贾母坐了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因笑道：“你们只管顽笑吃竭。我因为天短了，不敢睡中觉，抹了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一回牌，想起你们来了，我也来凑个趣儿。”李幼早又捧过手炉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来，探春另拿了一副杯箸来，亲自了暖酒，奉与贾母。贾母便
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①“不求”二句一这里大士、嫦娥皆隐指妙玉。大士本为菩萨之称，这里指
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            观世音。传说观世音形为女身，手持净瓶，中有甘露，上插杨枝，以杨枝洒甘露，能解
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人间困厄。槛外：世外，这里指榄翠庵。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②“入世”一联一一这里是将枕翠庵当作仙佛境地，把从庵中采梅回来叫“人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            世”，去庵中求梅叫“离尘”。梅称冷香，分嵌于两句中。挑红雪、割紫云：均喻折红梅。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③“槎桁”句一，一槎：尚“查牙”、“权丫”，这里形容诗人骨瘦茹柴。诗肩瘦：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            指诗人瘦削高耸的肩头。.未代杨万里《梅》诗：“却来啮雪耸诗肩”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④佛院一代指枕翠庵。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ?暖兜一一种能够防风保暖的帽子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 679
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第五十间
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            饮了口，问那个盘子里是什么东西。众人忙捧了过来，回说是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            糟鹑。贾母道：“这倒罢了，撕两点腿子来。”李忙答应了，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要水洗手，亲自来撕。贾母又道：“你们仍旧坐下说笑我听。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又命李绒：“你也坐下，就如同我没来的一样才好，不然我就去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人听了，方依次坐下。这李执便挪到尽下边。贾母因问
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            作何事了，众人便说作诗。贾母道：“有作诗的，不如作些灯谜，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大家正月里好顽的。”众人答应了。说笑了一回，贾母便说：“这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            里潮湿，你们别久坐，仔细受了潮湿。”因说：“你四妹妹那里暖
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            和，我们到那里瞧瞧他的画儿，赶年可有了。”众人笑道：“那里能
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            年下就有了？只怕明年端阳有了。”贾母道：“这还了得！他竟比
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盖这园子还费工夫了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着，仍坐了竹轿，大家围随，过了藕香榭，穿入一条夹道，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            东西两边皆有过街门，门楼上里外皆嵌着石头匾，如今进的是西
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            门，向外的匾上凿着“穿云”二字，向里的凿着“度月”两字。来至
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当中，进了向南的正门，贾母下了轿，惜春已接了出来。从里边
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            游廊过去，便是惜春卧房，门斗上有“暖香坞”三个字。早有几个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人打起猩红毡帘，已觉温香拂脸。大家进入房中，贾母并不归
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            坐，只问画在那里。惜春因笑回：“天气寒冷了，胶性皆凝涩不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            润，画了恐不好看，故此收起来。”贾母笑道：“我年下就要的。你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            别托懒儿，快拿出来给我快画。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一语未了，忽见凤姐儿披着紫羯褂，笑坎的来了，口内说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“老祖宗今儿也不告诉人，私自就来了，要我好找。”贾母见他
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来了，心中自是喜悦，便道：“我怕你们冷着了，所以不许人告诉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你们去。你真是个鬼灵精儿，到底找了我来。以理，孝敬也不在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            680 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗暖香坞雅制春灯谜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这上头。”凤姐儿笑道：“我那里是孝敬的心我了来？我因为到了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            老祖宗那里，鸦没雀静的，问小丫头子们，他又不肯说，叫我找到
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            园里来。我正疑惑，忽然来了两三个姑子，我心里才明白。我想
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姑子必是来送年疏①，或要年例香例银子，老祖宗年下的事也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            多，一定是躲债来了。我赶忙问了那姑子，果然不错。我连忙把
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            年例给了他们去了【八】。如今来回老祖宗，债主已去，不用躲着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。已预备下希嫩的野鸡，请用晚饭去，再迟一回就老了。”他一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            行说，众人一行笑。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐儿也不等贾母说话，便命人抬过轿子来。贾母笑着，换
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了凤姐的手，仍旧上轿，带着众人，说笑出了夹道东门。一看四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抱着一瓶红梅。众人都笑道：“少了两个人，他却在这里等着，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            也弄梅花去了。”贾母喜的忙笑道：“你们瞧，这山坡上配上他的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这个人品，又是这件衣裳，后头文是这梅花，像个什么？”众人都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            头笑道：“那画的那里有这件衣裳？人也不能这样好！&#34;
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一语未了，只见宝琴背后转出一个披大红猩毡的人来。贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母道：“那又是那个女孩儿？”众人笑道：“我们都在这里，那是宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉。”贾母笑道：“我的眼越发花了。”说话之间，来至跟前，可不是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉和宝琴。宝玉笑向宝锣黛玉等道：“我才又到了翠庵。妙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①年疏一一蔬:这里指焚化在神佛前的祭文、祝辞等，又称“疏头”。旧时为了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            析福消灾，请僧尼诵经，并指定诵经遍数，每诵-一遍，便在预先准备好的疏头上印
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个朱砂小红圈，年终送至施主家中，以备祭神礼佛时焚化，并照例得到施主的报酬。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这种每年送一次的疏头，羽做“年蔬”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②优（qiu求）十洲一一明代画家仇英的别号。仇英，字实父，太仓人，移居吴
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            郡（苏州），擅画工笔仕女及山水，为明代四大画家之一。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 681
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉每人送你们一一枝梅花，我已经打发人送去了。”众人都笑说：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “多谢你费心。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说话之间，已出了园门，来至贾母房中。吃毕饭大家又说笑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            广回。忽见薛姨妈也来了，说·“好大雪，日也没过来望候老
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            太太。今日老太太倒不高兴？正该赏雪才是。”贾母笑道：何曾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不高兴！我找了他们姊妹们去顽了~会子。”薛姨妈笑道：“昨日
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            晚上，我原想着今日要和我们姨太太借一日园子，摆两桌粗酒，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            请老太太赏雪的，又见老太太安息的草。我闻得女儿说，老太太
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心下不大爽，因此今日也没敢惊动。早知如此，我正该请。”贾母
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笑道：“这才是十月里头场雪，往后下雪的日子多呢，再破费不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            迟。”薛姨妈笑道：“果然如此，算我的孝心虔了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤姐儿笑道：“姨妈仔细忘了，如今先秤五十两银子来，交给
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我收着，一下雪，我就预备下酒，姨妈也不用操心，也不得忘了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母笑道：“既这么说，姨太太给他五十两银子收着，我和他每人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            分二十五两，到下雪的百子，我装心里不快，混过去了，姨太太更
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，这和我的主意一一样。”众人都笑了。贾母笑道：“吓！没脸的，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            就顺着竿子爬上来了！你不该说姨太太是客，在咱们家受屈，我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            们该请姨太太才是，那里有破费姨太太的理！不这样说呢，还有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            脸先要五十两银子，真不害！”凤姐儿笑道：“我们老祖宗最是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有眼色的，试一试姨妈，若松呢，拿出五十两来，就和我分。这会
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子估量着不中用了，翻过来拿我做法子，说出这些大方话来。如
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今我也不和姨妈要银子，竟替姨妈出银子治了酒，请老祖宗吃
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            厂，我另外再封五十两银子孝敬老祖宗，算是罚我个包揽闲事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这可好不好？”话未说完，众人已笑倒在炕上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母因又说及宝琴雪下折梅比画儿上还好，因文细间他的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            682 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗暖香坞雅制春灯谜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            年庚八字并家内景况。薛姨妈度其意思，大约是要与宝玉求配。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            薛姨妈心中固也遂意，只是已许过梅家了，因贾母尚未明说，自
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            已也不好拟定，遂半吐半露告诉贾母道：“可惜这孩子没福，前年
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他父亲就没了。他从小儿见的世面倒多，跟他父母四山五岳都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            走遍了。他父亲是好乐的，各处因有买卖，带着家着，这一省逛
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一年，明年又往那一省逛半年，所以天下十停走了有五六停了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那年在这里，把他许了梅翰林的儿子，偏第二年他父亲就辞世
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，他母亲又是痰症。”凤姐也不等说完，便瞎声踩脚的说：“偏不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            巧，我正要作个媒呢，又已经许了人家。”贾母笑道：“你要给谁说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            媒？”凤姐儿说道：“老祖宗别管，我心里看准了他们两个是一对。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如今已许了人，说也无益，不如不说罢了。”贾母也知凤姐儿之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            意，听见已有了人家，也就不提了。大家又闲话了一会方散。一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宿无话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日雪晴。饭后，贾母又亲嘱惜春：“不管冷暖，你只画去，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赶到年下，十分不能便罢了。第一要紧把昨日琴儿和丫头梅花，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            照模照样，一笔别错，快快添上。”惜春听了虽是为难，只得应了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一时众人都来看他如何画，惜春只是出神。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李绒因笑向众人道：“让他自已想去，咱们且说话儿。昨儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            老太太只叫作灯谜，回家和绮儿纹儿睡不着，我就编了两个‘四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书”的。他两个每人也编了两个。”众人听了，都笑道：“这倒该作
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的。先说了，我们猜猜。”李笑道：““观音未有世家传’，打“四
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书”句。”湘云接着就说“在止于至善。”①宝钗笑道：“你也想
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①在止于至善—一意谓德行达到最完美的境界。语出《礼记·大学》。至：极；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            顶峰。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 688
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“哦，是了。是‘虽善无征’。”①众人都笑道：“这句是了。”李
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又道：“一池青草草何名。”湘云忙道：“这一定是“蒲芦也②。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            再不是不成？”李绒笑道：“这难为你猜。纹儿的是“水向石边流
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            出冷，打一古人名。”探春笑问道：“可是山涛③？”李纹笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “是。”李又道：“绮儿的是个“萤”学，打一个字。”众人猜了半
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日，宝琴笑道：“这个意思却深，不知可是花草的‘花”字？”李绮笑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不是草化的④”众人会意，都笑了[九}说“好!”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝钗道：“这些虽好，不合老太太的意思，不如作些浅近的物
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            儿，大家雅俗共赏才好。”众人都道：“也要作些浅近的俗物才
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是。”湘云笑道：“我编了-一枝《点绛唇》，恰是俗物，你们猜猜。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说着便念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            溪分离，红尘游戏，真何趣？名利犹虚，后事终难继。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人不解，想了半日，也有猜是和尚的，也有猜是道士的，也有猜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是偶戏人的。宝玉笑了半日，道：“都不是，我猜着了，一一定是耍
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的猴儿。”湘云笑道：“正是这个了。”众人道：“前头都好，未后一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            听了，都笑起来，说：“他编个谜儿也是刁钻古怪的。”季绒道：“昨
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好，但无从证实。征：征验：证实。此语为“观音未有世家传”的谜底，“世家”当取《史
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            记》之例，观音至善，未有世家为传，无从征考。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            蒲芦也一一语出《礼记·中）：&#34;夫政也者，蒲芦也。蒲芦：即蒲苇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            山涛一晋代诗人，字巨源，竹林七贤之一。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①萤可不是草化的一一萤在夏季多就水草产卵，化蛹成长，古人误认为萤是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            由腐草本身变化而成。《礼记·月令：“季夏之月·腐草为萤。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①（点绛唇》一本为词牌名，取自南朝梁江淹《咏美人春游》诗“明珠点绛唇”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            句。这里用作曲牌名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            684 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            芦雪广争联即景诗暖香坞雅制春灯谜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            日姨妈说，琴妹妹见的世面多，走的道路也多，你正该编谜儿，正
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            用着了。你的诗且又好，何不编儿个我们猜一猜？”宝琴听广，点
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            头含笑，自去寻思。宝钗也有了个，念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            镂檀锲梓①一层层，岂系良工堆砌成？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            虽是半天风雨过，何曾闻得梵铃②声！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            打一物。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人猜时，宝玉也有了一个，念道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天上人间两渺茫，琅③节过谨阴防。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鸾音鹤信④须凝③,好把晞嘘答上苍。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉也有了一个，念道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③何劳缚紫绳？驰城逐堑势挣疗。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            主人指示风雷动，鳌背三山独立名。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            探春也有了一个，方欲念时，宝琴走过来笑道：“我从小儿所走的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            地方的舌迹不少。我今了十个地方的古迹，作了十首杯古的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            诗。诗虽粗，却怀往事，又暗隐俗物十件，姐姐们请猜一猜。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人听了，都说：“这倒巧，何不写出来天家一看？”要知端的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①镂（lou漏）檀锲梓（z子）一-镂、锲：都是雕刻的意思。檀、梓：都是质地比
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            较坚硬的木材。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            梵铃佛寺和宝塔檐角上悬挂的铜铃。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            琅环（langgan郎甘）这里指竹子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鸾音鹤信一指仙界传来的消息。唐代罗隐《准南高所造迎仙楼》诗：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “鸾音鹤信查难回”。鸾和鹤在传说中都被看作“仙禽”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③凝—一注视。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①(lu ér 录耳)一—马名，亦作“耳”“绿耳”。传说为周穆王八骏之一。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见《穆天子传》。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 685
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            校记
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “暖香坞雅制春灯谜”，原作“暖春坞创制春灯谜”，从各本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [三] “起首恰是李氏”句下，原有“一定要按次序恰又不按次序，似
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            脱落处而不脱落，文章岐路如此”二十六字，系批语混入正文，参照各本珊
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “陷”原作“限”，从程甲本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “站”字原无，从蒙府、戚序本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [五] “聚”原作“绪”，从戚序本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [六]
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “”原作“銷”，从戚序本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “腾的字”，原作“腾的字”，又点去，旁添“脚的字”，显系误添。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今从底本原文。“腾”系“腾”之误，径改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [八] “我赶忙问了那姑子，果然不错。我连忙把年例给了他们去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了”二十四字，原无，从戚序、甲辰本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【九］“都笑了”后，原有“道，萤与花”四字，系衔文，从各本删。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            686
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="fax_chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本影印</span>
+        <span class="col-desc">程乙本校注本影印页（贵州人民出版社PDF）</span>
+        <span>第50回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">芦雪广争联即景诗 暖香坞雅制春灯谜</h3>
+        
+        <div class="fax-view" data-fax="fax_chengyi">
+          <div class="fax-toolbar">
+            <button type="button" class="fax-prev" data-dir="-1">←</button>
+            <span class="fax-page-info">第<span class="fax-cur">1</span>页</span>
+            <button type="button" class="fax-next" data-dir="1">→</button>
+          </div>
+          <div class="fax-stage">
+            <img class="fax-img" alt="影印页">
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

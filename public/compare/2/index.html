@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第2回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="2">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/1" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" selected>第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" >第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" >第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" >第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" >第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" >第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" >第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" >第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" >第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" >第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/3" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="gong" data-label="脂评汇校" checked>
+          脂评汇校
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengjia" data-label="程甲本" checked>
+          程甲本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi" data-label="程乙本" checked>
+          程乙本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi_ocr" data-label="程乙本OCR" checked>
+          程乙本OCR
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="fax_chengyi" data-label="程乙本影印" checked>
+          程乙本影印
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/2">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="gong">
+      <div class="compare-col-head">
+        <span class="badge">脂评汇校</span>
+        <span class="col-desc">脂评汇校本（庚辰本系为主，参校诸脂本，含脂批）</span>
+        <span>第2回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾夫人仙逝扬州城 冷子兴演说荣国府</h3>
+        
+        
+        <p class="col-para">
+          
+            甲：此回亦非正文，本旨只在冷子兴一人，即俗谓“冷中出热，无中生有”也。其演说荣府一篇者，盖因族大人多，若从作者笔下一一叙出，尽一二回不能得明，则成何文字？故借用冷子一人，略出其大半，使阅者心中，已有一荣府隐隐在心，然后用黛玉、宝钗等两三次皴染，则耀然于心中眼中矣。此即画家三染法也。未写荣府正人，先写外戚，是由远及近、由小至大也。若使先叙出荣府，然后一一叙及外戚，又一一至朋友、至奴仆，其死板拮据之笔，岂作“十二钗”人手中之物也？今先写外戚者，正是写荣国一府也。故又怕闲文赘累，开笔即写贾夫人已死，是特使黛玉入荣之速也。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            通灵宝玉于士隐梦中一出，今又于子兴口中一出，阅者已洞然矣。然后于黛玉、宝钗二人目中极精极细一描，则是文章锁合处。盖不肯一笔直下，有若放闸之水、燃信之爆，使其精华一泄而无馀也。究竟此玉原应出自钗、黛目中，方有照应。今预从子兴口中说出，实虽写而却未写。观其后文可知。此一回则是虚敲傍击之文，笔则是反逆隐曲之笔。戚：以百回之大文，先以此回作两大笔以冒之，诚是大观。世态人情，尽盘旋于其间，而一丝不乱，非具龙象力者，其孰能哉？诗云：
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">只此一诗便妙极！</span>
+            
+          
+            此等才情，自是雪芹平生所长，余自谓评书非关评诗也。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一局输赢料不真，香销茶尽尚逡巡。欲知目下兴衰兆，须问旁观冷眼人。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">故用冷子兴演说。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说封肃因听见公差传唤，忙出来陪笑启问。那些人只嚷：“快请出甄爷来！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-甲" title="甲侧">一丝不乱。</span>
+            
+          
+            封肃忙陪笑道：“小人姓封，并不姓甄。只有当日小婿姓甄，今已出家一二年了，不知可是问他？”那些公人道：“我们也不知什么‘真’‘假’，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">点睛妙笔。</span>
+            
+          
+            因奉太爷之命来问。他既是你女婿，便带了你去亲见太爷面禀，省得乱跑。”说着，不容封肃多言，大家推拥他去了。封家人各各惊慌，不知何兆。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那天约有二更时分，只见封肃方回来，欢天喜地。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">出自封肃口内，便省却多少闲文。</span>
+            
+          
+            众人忙问端的。他乃说道：“原来本府新升的太爷，姓贾名化，本贯胡州人氏，曾与女婿旧日相交。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">世态精神，叠露于数语间。</span>
+            
+          
+            方才在咱门前过去，因看见娇杏
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">侥幸也。</span>
+            
+          
+            托言当日丫头回顾，故有今日，亦不过偶然侥幸耳，非真实得尘中英杰也。非近日小说中满纸红拂紫烟之可比。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">余批重出。</span>
+            
+          
+            余阅此书，偶有所得，即笔录之。非从首至尾阅过复从首加批者，故偶有复处。且诸公之批，自是诸公眼界；脂斋之批，亦有脂斋取乐处。后每一阅，亦必有一语半言，重加批评于侧，故又有于前后照应之说等批。那丫头买线，所以他只当女婿移住于此。我一一将原故回明，那太爷倒伤感叹息了一回，又问外孙女儿，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">细。</span>
+            
+          
+            我说看灯丢了。太爷说：‘不妨，我自使番役务必探访回来。’
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">为葫芦案伏线。</span>
+            
+          
+            说了一回话，临走倒送了我二两银子。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">此事最要紧。</span>
+            
+          
+            甄家娘子听了，不免心中伤感。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">所谓“旧事凄凉不可闻”也。</span>
+            
+          
+            一宿无话。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            至次日，早有雨村遣人送两封银子、四匹锦缎，答谢甄家娘子，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">雨村已是下流人物，看此，今之如雨村者亦未有矣。</span>
+            
+          
+            又寄一封密书与封肃，转托他向甄家娘子要那娇杏作二房。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">谢礼却为此。</span>
+            
+          
+            险哉，人之心也！封肃喜得屁滚尿流，巴不得去奉承，便在女儿前一力撺掇成了，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一语道尽。</span>
+            
+          
+            乘夜只用一乘小轿，便把娇杏送进去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村欢喜自不必说。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">知己相逢，得遂平生，一大快事。</span>
+            
+          
+            乃封百金赠封肃外，又谢第 10 页甄家娘子许多物事，令其好生养赡，以待寻访女儿下落。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">找前伏后。</span>
+            
+          
+            封肃回家无话。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">士隐家一段小荣枯至此结住，所谓“真不去，假焉来”也！</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说娇杏这丫鬟，便是那年回顾雨村者。因偶然一顾，便弄出这段事来，亦是自己意料不到之奇缘。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">注明一笔，更妥当。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">点出情事。</span>
+            
+          
+            谁想他命运两济，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">好极！</span>
+            
+          
+            与英莲“有命无运”四字遥遥相映射。莲，主也；杏，仆也。今莲反无运，而杏则两全，可知世人原在运数，不在眼下之高低也。此则大有深意存焉。不承望自到雨村身边，只一年便生了一子，又半载，雨村嫡妻忽染疾下世，雨村便将他扶册作正室夫人了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正是：偶因一着错，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">妙极！</span>
+            
+          
+            盖女儿原不应私顾外人之谓。便为人上人。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">更妙！</span>
+            
+          
+            可知守礼俟命者终为饿莩。其调侃寓意不小。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">从来只见集古、集唐等句，未见集俗语者。</span>
+            
+          
+            此又更奇之至！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来，雨村因那年士隐赠银之后，他于十六日便起身入都。至大比之期，不料他十分得意，已会了进士，选入外班，今已升了本府知府。虽才干优长，未免有些贪酷之弊，且又恃才侮上，那些官员皆侧目而视。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此亦奸雄必有之理。</span>
+            
+          
+            不上一年，便被上司寻了个空隙，作成一本，参他“生情狡猾，擅纂礼仪，且沽清正之名，而暗结虎狼之属，致使地方多事，民命不堪”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此亦奸雄必有之事。</span>
+            
+          
+            等语。龙颜大怒，即批革职。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">罪重而法轻，何其幸也。</span>
+            
+          
+            该部文书一到，本府官员无不喜悦。那雨村心中虽十分惭恨，却面上全无一点怨色，仍是嘻笑自若。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此亦奸雄必有之态。</span>
+            
+          
+            交代过公事，将历年做官积的些资本并家小人属送至原籍，安排妥协，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">先云“根基已尽”，故今用此四字，细甚！</span>
+            
+          
+            却是自己担风袖月，游览天下胜迹。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">已伏下至金陵一节矣。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那日，偶又游至淮扬地面，因闻得今岁盐政点的是林如海。这林如海姓林名海，表字如海。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">盖云“学海文林”也。</span>
+            
+          
+            总是暗写黛玉。乃是前科的探花，今已升至兰台寺大夫，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">官制半遵古名亦好。</span>
+            
+          
+            余最喜此等半有半无，半古半今，事之所无，理之必有，极玄极幻，荒唐不经之处。本贯姑苏
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">十二钗正出之地，故用真。</span>
+            
+          
+            人氏，今钦点出为巡盐御史，到任方一月有余。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来这林如海之祖，曾袭过列侯，今到如海，业经五世。起初时，只封袭三世，因当今隆恩盛德，远迈前代，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">可笑近时小说中，无故极力称扬浪子淫女，临收结时，还必致感动朝廷，使君父同入其情欲之界，明遂其意，何无人心之至！</span>
+            
+          
+            不知彼作者有何好处，有何谢！报到朝廷高庙之上，直将半生淫朽秽资睿德，又苦拉君父作一干证护身符，强媒硬保，得遂其淫欲哉！额外加恩，至如海之父，又袭了一代；至如海，便从科第出身。虽系钟鼎之家，却亦是书香
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">要紧二字，盖钟鼎亦必有书香方至美。</span>
+            
+          
+            之族。只可惜这林家支庶不盛，子孙有限，虽有几门，却与如海俱是堂族而已，没甚亲支嫡派的。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">总为黛玉极力一写。</span>
+            
+          
+            今如海年已四十，只有一个三岁之子，偏又于去岁死了。虽有几房姬妾，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">带写贤妻。</span>
+            
+          
+            奈他命中无子，亦无可如何之事。今只有嫡妻贾氏，生得一女，乳名黛玉，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">绛珠初见。</span>
+            
+          
+            年方五岁。夫妻无子，故爱如珍宝，且又见他聪明清秀，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">看他写黛玉，只用此四字。</span>
+            
+          
+            可笑近来小说中，满纸“天下无二”“古今无双”等字。便也欲使他读书识得几个字，不过假充养子之意，聊解膝下荒凉之叹。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">如此叙法，方是至情至理之妙文。</span>
+            
+          
+            最可笑者，近小说中满纸班昭蔡琰、文君道韫。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村正值偶感风寒，病在旅店，将一月光景方渐愈。一因身体劳倦，二因盘费不继，也正欲寻个合式之处，暂且歇下。幸有两个旧友，亦在此境居住，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写雨村自得意后之交识也。</span>
+            
+          
+            又为冷子兴作引。因闻得盐政欲聘一西宾，雨村便相托友力，谋了进去，且作安身之计。妙在只一个女学生，并两个伴读丫鬟，这女学生年又第 11 页小，身体又极怯弱，工课不限多寡，故十分省力。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            堪堪又是一载的光阴，谁知女学生之母贾氏夫人一疾而终。女学生侍汤奉药，守丧尽哀，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">先要使黛玉哭起。</span>
+            
+          
+            遂又将辞馆别图。林如海意欲令女学生守制读书，故又将他留下。近因女学生哀痛过伤，本自怯弱多病，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">又一染。</span>
+            
+          
+            触犯旧症，遂连日不曾上学。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">上半回已终，写“仙逝”正为黛玉也。</span>
+            
+          
+            故一句带过，恐闲文有妨正笔。雨村闲居无聊，每当风日晴和，饭后便出来闲步。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这日，偶至郭外，意欲赏鉴那村野风光。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">大都世人意料此，终不能此；不及彼者，而反及彼。</span>
+            
+          
+            故特书意在村野风光，却忽遇见子兴一篇荣国繁华气象。忽信步至一山环水旋、茂林深竹之处，隐隐的有座庙宇，门巷倾颓，墙垣朽败，门前有额，题着“智通寺”三字，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">谁为智者？</span>
+            
+          
+            又谁能通？一叹。门旁又有一副旧破的对联，曰：身后有余忘缩手，眼前无路想回头。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">先为宁、荣诸人当头一喝，却是为余一喝。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村看了，因想到：这两句话，文虽浅近，其意则深。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一部书之总批。</span>
+            
+          
+            我也曾游过些名山大刹，倒不曾见过这话头，其中想必有个翻过筋斗来的亦未可知，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">随笔带出禅机，又为后文多少语录不落空。</span>
+            
+          
+            何不进去试试？想着走入，只有一个龙钟老僧在那里煮粥。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是雨村火气。</span>
+            
+          
+            雨村见了，便不在意。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">火气。</span>
+            
+          
+            及至问他两句话，那老僧既聋且昏，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是翻过来的。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">欲写冷子兴，偏闲闲有许多着力语。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            齿落舌钝，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是翻过来的。</span>
+            
+          
+            所答非所问。雨村不耐烦，便仍出来，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">毕竟雨村还是俗眼，只能识得阿凤、宝玉、黛玉等未觉之先，却不识得既证之后。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">未出宁、荣繁华盛处，却先写一荒凉小景；未写通部入世迷人，却先写一出世醒人。</span>
+            
+          
+            回风舞雪，倒峡逆波，别小说中所无之法。意欲到那村肆中沽饮三杯，以助野趣，于是款步行来，将入肆门，只见座上吃酒之客有一人起身大笑，接了出来，口内说：“奇遇，奇遇！”雨村忙看时，此人是都中在古董行中贸易的号冷子兴者，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此人不过借为引绳，不必细写。</span>
+            
+          
+            旧日在都相识。雨村最赞这冷子兴是个有作为大本领的人，
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">不赞出则文不灵活，而冷子兴之谈吐似觉唐突矣。</span>
+            
+          
+            这子兴又借雨村斯文之名，故二人说话投机，最相契合。雨村忙笑问道：“老兄何日到此？弟竟不知。今日偶遇，真奇缘也。”子兴道：“去年岁底到家，今因还要入都，从此顺路找个敝友说一句话，承他之情，留我多住两日。我也无紧事，且盘桓两日，待月半时也就起身了。今日敝友有事，我因闲步至此，且歇歇脚。不期这样巧遇！”一面说，一面让雨村同席坐了，另整上酒肴来。二人闲谈漫饮，叙些别后之事。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">好！</span>
+            
+          
+            若多谈则累赘。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">又抛一笔。</span>
+            
+          
+            雨村因问：“近日都中可有新闻没有？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">不突然，亦常问常答之言。</span>
+            
+          
+            子兴道：“倒没有什么新闻，倒是老先生你贵同宗家，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">雨村已无族中矣，何及此耶？</span>
+            
+          
+            看他下文。出了一件小小的异事。”雨村笑道：“弟族中无人在都，何谈及此？”子兴笑道：“你们同姓，岂非同宗一族？”雨村问是谁家。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子兴道：“荣国府贾府中，可也不玷辱了先生的门楣了？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">刳小人之心肺，闻小人之口角。</span>
+            
+          
+            雨村笑道：“原来是他家。若论起来，寒族人丁却不少，自东汉贾复以来，支派繁盛，各省皆有，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此话纵真，亦必谓是雨村欺人语。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">如闻其声。</span>
+            
+          
+            谁逐细考查得来？若论荣国一支，却是同谱。但他那等荣耀，我们不便去攀扯，至今故越发生疏难认了。”子兴叹
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">叹得怪。</span>
+            
+          
+            道：“老先生休如此说。如今的这宁、荣两门，也都萧疏了，不比先时的光景。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">记清此句。</span>
+            
+          
+            可知书中之荣府已是末世了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村道：“当日宁荣两宅的人口也极多，如何就萧疏了？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">作者之意原只写末第 12 页世，此已是贾府之末世了。</span>
+            
+          
+            冷子兴道：“正是，说来也话长。”雨村道：“去岁我到金陵地界，因欲游览六朝遗迹，那日进了石头城，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">点睛神妙。</span>
+            
+          
+            从他老宅门前经过。街东是宁国府，街西是荣国府，二宅相连，竟将大半条街占了。大门前虽冷落无人，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">好！</span>
+            
+          
+            写出空宅。隔着围墙一望，里面厅殿楼阁，也还都峥嵘轩峻，就是后
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“后”字何不直用“西”字？</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">恐先生堕泪，故不敢用“西”字。</span>
+            
+          
+            一带花园子里面树木山石，也还都有蓊蔚洇润之气，那里象个衰败之家？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            冷子兴笑道：“亏你是进士出身，原来不通！古人有云：‘百足之虫，死而不僵。’如今虽说不及先年那样兴盛，较之平常仕宦之家，到底气象不同。如今生齿日繁，事务日盛，主仆上下，安富尊荣者尽多，运筹谋画者无一，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">二语乃今古富贵世家之大病。</span>
+            
+          
+            其日用排场费用，又不能将就省俭，如今外面的架子虽未甚倒，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“甚”字好！</span>
+            
+          
+            盖已半倒矣。内囊却也尽上来了。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">世家兴败，寄口与人，诚可悲夫。</span>
+            
+          
+            这还是小事，更有一件大事。谁知这样钟鸣鼎食之家，翰墨诗书之族，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">两句写出荣府。</span>
+            
+          
+            如今的儿孙，竟一代不如一代了！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">文是极好之文，理是必有之理，话则极痛极悲之话。</span>
+            
+          
+            雨村听说，也纳罕道：“这样诗礼之家，岂有不善教育之理？别门不知，只说这宁、荣二宅，是最教子有方的。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一转有力。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子兴叹道：“正说的是这两门呢。待我告诉你。当日宁国公
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">演。</span>
+            
+          
+            与荣国公
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">源。</span>
+            
+          
+            是一母同胞弟兄两个。宁公居长，生了四个儿子。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">贾蔷、贾菌之祖，不言可知矣。</span>
+            
+          
+            宁公死后，贾代化袭了官，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">第二代。</span>
+            
+          
+            也养了两个儿子。长名贾敷，至八九岁上便死了，只剩了次子贾敬袭了官，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">第三代。</span>
+            
+          
+            如今一味好道，只爱烧丹炼汞，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">亦是大族末世常有之事。</span>
+            
+          
+            叹叹！
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">偏先从好神仙的苦处说来。</span>
+            
+          
+            余者一概不在心上。幸而早年留下一子，名唤贾珍，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">第四代。</span>
+            
+          
+            因他父亲一心想作神仙，把官倒让他袭了。他父亲又不肯回原籍来，只在都中城外和道士们胡羼。这位珍爷倒生了一个儿子，今年才十六岁，名叫贾蓉。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">至蓉五代。</span>
+            
+          
+            如今敬老爹一概不管。这珍爷那里肯读书，只一味高乐不了，把宁国府竟翻了过来，也没有人敢来管他。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">伏后文。</span>
+            
+          
+            再说荣府你听，方才所说异事，就出在这里。自荣公死后，长子贾代善袭了官，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">第二代。</span>
+            
+          
+            娶的也是金陵世勋史侯家的小姐
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">因湘云，故及之。</span>
+            
+          
+            为妻，生了两个儿子：长子贾赦，次子贾政。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">第三代。</span>
+            
+          
+            如今代善早已去世，太夫人
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">记真，湘云祖姑史氏太君也。</span>
+            
+          
+            尚在。长子贾赦袭着官。次子贾政，自幼酷喜读书，祖父最疼。原欲以科甲出身的，不料代善临终时遗本一上，皇上因恤先臣，即时令长子袭官外，问还有几子，立刻引见，遂额外赐了这政老爹一个主事之衔，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">嫡真实事，非妄拟也。</span>
+            
+          
+            令其入部习学，如今现已升了员外郎了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">总是称功颂德。</span>
+            
+          
+            这政老爹的夫人王氏，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">记清。</span>
+            
+          
+            头胎生的公子，名唤贾珠，十四岁进学，不到二十岁就娶了妻生了子，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此即贾兰也。</span>
+            
+          
+            至兰第五代。一病死了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">略可望者即死，叹叹！</span>
+            
+          
+            第二胎生了一位小姐，生在大年初一，这就奇了；不想后来又生一位公子，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">一部书中第一人却如此淡淡带出，故不见后来玉兄文字繁难。</span>
+            
+          
+            说来更奇：一落胎胞，嘴里便衔下一块五彩晶莹的玉来，上面还有许多字迹，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">青埂顽石已得下落。</span>
+            
+          
+            就取名叫作宝玉。你道是新奇异事不是？”辰夹：正是宁、荣二处支谱。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村笑道：“果然奇异。只怕这人来历不小。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子兴冷笑道：“万人皆如此说，因而乃祖母便先爱如珍宝。那年周岁时，政老爹便要试他将来的志向，便将那世上所有之物摆了无数，与他抓取。谁知他一概不取，伸手只把些脂粉钗环抓来。政老爹便大怒了，说：‘将来酒色之徒耳！’因此便大不喜悦。独那史老太君还是命根一样。说来又奇，如今长了七八岁，虽然淘气异常，但其聪明乖觉处，百个不及他一个。说起孩子话来也奇怪，他说：‘女儿是水作的骨肉，男人是泥作的骨肉。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">真千古奇文奇情。</span>
+            
+          
+            我见了女儿，我第 13 页便清爽；见了男子，便觉浊臭逼人。’你道好笑不好笑？将来色鬼无移了！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">没有这一句，雨村如何罕然厉色，并后奇奇怪怪之论？</span>
+            
+          
+            雨村罕然厉色忙止道：“非也！可惜你们不知道这人来历。大约政老前辈也错以淫魔色鬼看待了。若非多读书识事，加以致知格物之功，悟道参玄之力，不能知也。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子兴见他说得这样重大，忙请教其端。雨村道：“天地生人，除大仁大恶两种，余者皆无大异。若大仁者，则应运而生，大恶者，则应劫而生。运生世治，劫生世危。尧、舜、禹、汤、文、武、周、召、孔、孟、董、韩、周、程、张、朱，皆应运而生者。蚩尤、共工、桀、纣、始皇、王莽、曹操、桓温、安禄山、秦桧等，皆应劫而生者。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此亦略举大概几人而言。</span>
+            
+          
+            大仁者，修治天下；大恶者，挠乱天下。清明灵秀，天地之正气，仁者之所秉也；残忍乖僻，天地之邪气，恶者之所秉也。今当运隆祚永之朝，太平无为之世，清明灵秀之气所秉者，上至朝廷，下及草野，比比皆是。所余之秀气，漫无所归，遂为甘露，为和风，洽然溉及四海。彼残忍乖僻之邪气，不能荡溢于光天化日之中，遂凝结充塞于深沟大壑之内，偶因风荡，或被云催，略有摇动感发之意，一丝半缕误而泄出者，偶值灵秀之气适过，正不容邪，邪复妒正，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">譬得好。</span>
+            
+          
+            两不相下，亦如风水雷电，地中既遇，既不能消，又不能让，必至搏击掀发后始尽。故其气亦必赋人，发泄一尽始散。使男女偶秉此气而生者，在上则不能成仁人君子，下亦不能为大凶大恶。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">恰极，是确论。</span>
+            
+          
+            置之于万万人中，其聪俊灵秀之气，则在万万人之上，其乖僻邪谬不近人情之态，又在万万人之下。若生于公侯富贵之家，则为情痴情种，若生于诗书清贫之族，则为逸士高人，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">巧笔奇言，另开[生]面。</span>
+            
+          
+            但此数语，恐误尽聪明后生者。纵再偶生于薄祚寒门，断不能为走卒健仆，甘遭庸人驱制驾驭，必为奇优名倡。如前代之许由、陶潜、阮籍、嵇康、刘伶、王谢二族、顾虎头、陈后主、唐明皇、宋徽宗、刘庭芝、温飞卿、米南宫、石曼卿、柳耆卿、秦少游，近日之倪云林、唐伯虎、祝枝山，再如李龟年、黄幡绰、敬新磨、卓文君、红拂、薛涛、崔莺、朝云之流。此皆易地则同之人也。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子兴道：“依你说，‘成则王侯败则贼’
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">《女仙外史》中论魔道已奇，此又非《外史》之立意，故觉愈奇。</span>
+            
+          
+            了。”雨村道：“正是这意。你还不知，我自革职以来，这两年遍游各省，也曾遇见两个异样孩子。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">先虚陪一个。</span>
+            
+          
+            所以，方才你一说这宝玉，我就猜着了八九亦是这一派人物。不用远说，只金陵城内，钦差金陵省体仁院总裁
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此衔无考，亦因寓怀而设，置而勿论。</span>
+            
+          
+            甄家，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">又一真正之家，特与假家遥对，故写假则知真。</span>
+            
+          
+            你可知么？”子兴道：“谁人不知！这甄府和贾府就是老亲，又系世交。两家来往，极其亲热的。便在下也和他家来往非止一日了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">说大话之走狗，毕真。</span>
+            
+          
+            雨村笑道：“去岁我在金陵，也曾有人荐我到甄府处馆。我进去看其光景，谁知他家那等显贵，却是个富而好礼之家，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">如闻其声。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">只一句便是一篇世家传，与子兴口中是两样。</span>
+            
+          
+            倒是个难得之馆。但这一个学生，虽是启蒙，却比一个举业的还劳神。说起来更可笑，他说：‘必得两个女儿伴着我读书，我方能认得字，心里也明白，不然我自己心里糊涂。’
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">甄家之宝玉乃上半部不写者，故此处极力表明，以遥照贾家之宝玉，凡写贾家之宝玉，则正为真宝玉传影。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">灵玉却只一块，而宝玉有两个，情性如一，亦如六耳、悟空之意耶？</span>
+            
+          
+            又常对跟他的小厮们说：‘这女儿两个字，极尊贵，极清净的，比那阿弥陀佛，元始天尊的这两个宝号还更尊荣无对的呢！
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">如何只以释、老二号为譬，略不敢及我先师儒圣等人？</span>
+            
+          
+            余则不敢以顽劣目之。你们这浊口臭舌，万不可唐突了这两个字，要紧。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">(固)[故]作险笔，以为后文之伏线。</span>
+            
+          
+            但凡要说时，必须先用清水香茶
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">恭敬。</span>
+            
+          
+            漱了口才可，设若失错，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">罪过。</span>
+            
+          
+            便要凿牙穿腮等事。’其暴虐浮躁，顽劣憨痴，种种异常。只一放了学，进去见第 14 页了那些女儿们，其温厚和平，聪敏文雅，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">与前八个字嫡对。</span>
+            
+          
+            竟又变了一个。因此，他令尊也曾下死笞楚过几次，无奈竟不能改。每打的吃疼不过时，他便‘姐姐’‘妹妹’乱叫起来。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">以自古未闻之奇语，故写成自古未有之奇文。</span>
+            
+          
+            此是一部书中大调侃寓意处。盖作者实因鹡鸰之悲、棠棣之威，故撰此闺阁庭帏之传。后来听得里面女儿们拿他取笑：‘因何打急了只管叫姐妹做甚？莫不是求姐妹去说情讨饶？你岂不愧些！’他回答的最妙。他说：‘急疼之时，只叫“姐姐”“妹妹”字样，或可解疼也未可知，因叫了一声，便果觉不疼了，遂得了秘法。每疼痛之极，便连叫姐妹起来了。’
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">闲闲逗出无穷奇语，都只为下文。</span>
+            
+          
+            你说可笑不可笑？也因祖母溺爱不明，每因孙辱师责子，因此我就辞了馆出来。如今在这巡盐御史林家做馆了。你看，这等子弟，必不能守祖父之根基，从师长之规谏的。只可惜他家几个姊妹都是少有的。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">实点一笔，余谓作者必有。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子兴道：“便是贾府中，现有的三个也不错。政老爹的长女，名元
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“原”也。</span>
+            
+          
+            春，现因贤孝才德，选入宫作女史
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">因汉以前例，妙！</span>
+            
+          
+            去了。二小姐乃赦老爹之妾所出，名迎
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“应”也。</span>
+            
+          
+            春，三小姐乃政老爹之庶出，名探
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“叹”也。</span>
+            
+          
+            春，四小姐乃宁府珍爷之胞妹，名唤惜
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“息”也。</span>
+            
+          
+            春。辰夹：贾敬之女。因史老夫人极爱孙女，都跟在祖母这边一处读书，听得个个不错。”辰夹：复续前文未及，正词源三叠。雨村道：“更妙在甄家的风俗，女儿之名，亦皆从男子之名命字，不似别家另外用这些‘春’‘红’‘香’‘玉’等艳字的，何得贾府亦乐此俗套？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子兴道：“不然，只因现今大小姐是正月初一日所生，故名元春，余者方从了‘春’字。上一辈的，却也是从兄弟而来的。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">黛玉之入宁国府的根源，却藉他二人之口，下文便不费力。</span>
+            
+          
+            现有对证：目今你贵东家林公之夫人，即荣府中赦、政二公之胞妹，在家时名唤贾敏。不信时，你回去细访可知。”雨村拍案笑道：“怪道这女学生读至凡书中有‘敏’字，皆念作‘密’字，每每如是；写字遇着‘敏’字，又减一二笔，我心中就有些疑惑。今听你说的，是为此无疑矣。怪道我这女学生言语举止另是一样，不与近日女子相同，度其母必不凡，方得其女，今知为荣府之孙，又不足罕矣。可伤上月竟亡故了。”子兴叹道：“老姊妹四个，这一个是极小的，又没了。长一辈的姊妹，一个也没了。只看这小一辈的，将来之东床如何呢。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">灵玉却只一块，而宝玉有两个。</span>
+            
+          
+            情性如一，亦如六耳悟空之意耶？雨村道：“正是，方才说这政公，已有衔玉之儿，又有长子所遗一个弱孙。这赦老竟无一个不成？”子兴道：“政公既有玉儿之后，其妾又生了一个，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">带出贾环。</span>
+            
+          
+            倒不知其好歹。只眼前现有二子一孙，却不知将来如何。若问那赦公，也有二子。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">本家族谱记不清者甚多，偏是旁人说来，一丝不乱。</span>
+            
+          
+            长名贾琏，今已二十来往了。亲上作亲，娶的就是政老爹夫人王氏之内侄女，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">另出熙凤一人。</span>
+            
+          
+            今已娶了二年。这位琏爷身上现捐的是个同知，也是不喜读书，于世路上好机变言谈去的，所以如今只在乃叔政老爷家住着，帮着料理些家务。谁知自娶了他令夫人之后，倒上下无一人不称颂他夫人的，琏爷倒退了一射之地。说模样又极标致，言谈又爽利，心机又极深细，竟是个男人万不及一的。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">未见其人，先已有照。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-甲" title="甲眉">非警幻案下而来为谁？</span>
+            
+          
+            雨村听了，笑道：“可知我前言不谬。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">略一总住。</span>
+            
+          
+            你我方才所说的这几个人，都只怕是那正邪两赋而来一路之人，未可知也。”子兴道：“邪也罢，正也罢，只顾算别人家的帐，你也吃一杯酒才好。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">笔转如流，毫无沾滞。</span>
+            
+          
+            雨村道：“正是，只顾说话，竟多吃了几杯。”子兴笑道：“说着别人家的闲话，正好下酒，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">盖云此一段话亦为世人茶酒之笑谈耳。</span>
+            
+          
+            即多吃几杯何妨。”雨村向窗外看
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">第 15 页画。</span>
+            
+          
+            道：“天也晚了，仔细关了城。我们慢慢的进城再谈，未为不可。”于是，二人起身，算还酒帐。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">不得谓此处收得索然，盖原非正文也。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方欲走时，又听得后面有人叫道：“雨村兄，恭喜了！特来报个喜信的。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此等套头，亦不得不用。</span>
+            
+          
+            雨村忙回头看时——己夹：语言太烦，令人不耐。古人云“惜墨如金”，看此则视墨如土矣。虽演至千万回亦可也。
+            
+          
+            <span class="ann-inline ann-戚" title="戚总评">先自写幸遇之情于前，而叙借口谈幻境之情于后。</span>
+            
+          
+            世上不平事，道路口如碑。虽作者之苦心，亦人情之必有。雨村之遇娇杏，是此文之总冒，故在前。冷子兴之谈，是事迹之总冒，故叙写于后。冷暖世情，比比如画。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有情原比无情苦，生死相关总在心。也是前缘天作合，何妨黛玉泪淋淋。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 16 页
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第2回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾夫人仙逝扬州城 冷子兴演说荣国府</h3>
+        
+        
+        <p class="col-para">
+          
+            詩云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一局輸贏料不真，香銷茶盡尚逡巡。欲知目下興衰兆，須問傍觀冷眼人。卻說封肅因聽見公差傳喚，忙出來陪笑啟問。那些人只嚷：「快請出甄爺來！」封肅忙陪笑道：「小人姓封，並不姓甄。只有當日小婿姓甄，今已出家一二年了，不知可是問他？」那些公人道：「我們也不知什麼『真』『假』，因奉太爺之命來問，他既是你女婿，便帶了你去親見太爺面稟，省得亂跑。」說著，不容封肅多言，大家推擁他去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            封家人個個都驚慌，不知何兆。那天約二更時，只見封肅方回來，歡天喜地。眾人忙問端的。他乃說道：「原來本府新升的太爺姓賈名化，本貫胡州人氏，曾與女婿舊日相交。方纔在咱門前過去，因見嬌杏那丫頭買線，所以他只當女婿移住於此。我一一將原故回明，那太爺倒傷感歎息了一回，又問外孫女兒，我說看燈丟了。太爺說：『不妨，我自使番役務必探訪回來。』說了一回話，臨走倒送了我二兩銀子。」甄家娘子聽了，不免心中傷感。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一宿無話。至次日，早有雨村遣人送了兩封銀子，四疋錦緞，答謝甄家娘子，又寄一封密書與封肅，轉託問甄家娘子要那嬌杏作二房。封肅喜的屁滾尿流，巴不得去奉承，便在女兒前一力攛掇成了，乘夜只用一乘小轎，便把嬌杏送進去了。雨村歡喜，自不必說，乃封百金贈封肅，外謝甄家娘子許多物事，令其好生養贍，以待尋訪女兒下落。封肅回家無話。卻說嬌杏這丫鬟，便是那年回顧雨村者。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因偶然一顧，便弄出這段事來，亦是自己意料不到之奇緣。誰想他命運兩濟，不承望自到雨村身邊，只一年便生了一子，又半載，雨村嫡妻忽染疾下世，雨村便將他扶側作正室夫人了。正是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            偶因一著錯，便為人上人。原來，雨村因那年士隱贈銀之後，他於十六日便起身入都，至大比之期，不料他十分得意，已會了進士，選入外班，今已升了本府知府。雖才幹優長，未免有些貪酷之弊，且又恃才侮上，那些官員皆側目而視。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不上一年，便被上司尋了個空隙，作成一本，參他「生情狡猾，擅纂禮儀，且沽清正之名，而暗結虎狼之屬，致使地方多事，民命不堪」等語。龍顏大怒，即批革職。該部文書一到，本府官員無不喜悅。那雨村心中雖十分慚恨，卻面上全無一點怨色，仍是嘻笑自若，交代過公事，將歷年做官積的些資本並家小人屬送至原籍，安排妥協，卻是自己擔風袖月，游覽天下胜跡。那日，偶又游至維揚地面，因聞得今歲鹺政點的是林如海。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這林如海姓林名海，表字如海，乃是前科的探花，今已升至蘭臺寺大夫，本貫姑蘇人氏，今欽點出為巡鹽御史，到任方一月有餘。原來這林如海之祖，曾襲過列侯，今到如海，業經五世。起初時，只封襲三世，因當今隆恩盛德，遠邁前代，額外加恩，至如海之父，又襲了一代；至如海，便從科第出身。雖系鐘鼎之家，卻亦是書香之族。只可惜這林家支庶不盛，子孫有限，雖有幾門，卻與如海俱是堂族而已，沒甚親支嫡派的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今如海年已四十，只有一個三歲之子，偏又於去歲死了。雖有幾房姬妾，奈他命中無子，亦無可如何之事。今只有嫡妻賈氏，生得一女，乳名黛玉，年方五歲。夫妻無子，故愛如珍寶，且又見他聰明清秀，便也欲使他讀書識得幾個字，不過假充養子之意，聊解膝下荒涼之歎。雨村正值偶感風寒，病在旅店，將一月光景方漸愈。一因身体勞倦，二因盤費不繼，也正欲尋個合式之處，暫且歇下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            幸有兩個舊友，亦在此境居住，因聞得鹽政欲聘一西賓，雨村便相托友力，謀了進去，且作安身之計。妙在只一個女學生，並兩個伴讀丫鬟，這女學生年又小，身体又极怯弱，工課不限多寡，故十分省力。堪堪又是一載的光陰，誰知女學生之母賈氏夫人一疾而終。女學生侍湯奉藥，守喪盡哀，遂又將辭館別圖。林如海意欲令女守制讀書，故又將他留下。近因女學生哀痛過傷，本自怯弱多病的，触犯舊症，遂連日不曾上學。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村閒居無聊，每當風日晴和，飯後便出來閒步。這日，偶至郭外，意欲賞鑒那村野風光。忽信步至一山環水旋，茂林深竹之處，隱隱的有座廟宇，門巷傾頹，牆垣朽敗，門前有額，題著「智通寺」三字，門旁又有一副舊破的對聯，云：「身後有餘忘縮手，眼前無路想回頭。」雨村看了，因想到：「這兩句話，文雖淺近，其意則深。我也曾游過些名山大剎，倒不曾見過這話頭，其中想必有個翻過筋斗來的亦未可知，何不進去試試。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」想著走入，只有一個龍鐘老僧在那裏煮粥。雨村見了，便不在意。及至問他兩句話，那老僧既聾且昏，齒落舌鈍，所答非所問。雨村不耐煩，便仍出來，意欲到那村肆中沽飲三杯，以助野趣，於是款步行來。將入肆門，只見座上吃酒之客有一人起身大笑，接了出來，口內說：「奇遇，奇遇。」雨村忙看時，此人是都中在古董行中貿易的號冷子興者，舊日在都相識。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村最贊這冷子興是個有作為大本領的人，這子興又借雨村斯文之名，故二人說話投机，最相契合。雨村忙笑問道：「老兄何日到此？弟竟不知。今日偶遇，真奇緣也。」子興道：「去年歲底到家，今因還要入都，從此順路找個敝友說一句話，承他之情，留我多住兩日。我也無緊事，且盤桓兩日，待月半時也就起身了。今日敝友有事，我因閒步至此，且歇歇腳，不期這樣巧遇！」一面說，一面讓雨村同席坐了，另整上酒肴來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            二人閒談漫飲，敘些別後之事。雨村因問：「近日都中可有新聞沒有？」子興道：「倒沒有什麼新聞，倒是老先生你貴同宗家，出了一件小小的异事。」雨村笑道：「弟族中無人在都，何談及此？」子興笑道：「你們同姓，豈非同宗一族？」雨村問是誰家。子興道：「榮國府賈府中，可也玷辱了先生的門楣么？」雨村笑道：「原來是他家。若論起來，寒族人丁卻不少，自東漢賈复以來，支派繁盛，各省皆有，誰逐細考查得來？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            若論榮國一支，卻是同譜。但他那等榮耀，我們不便去攀扯，至今故越發生疏難認了。」子興歎道：「老先生休如此說。如今的這宁榮兩門，也都蕭疏了，不比先時的光景。」雨村道：「當日宁榮兩宅的人口也极多，如何就蕭疏了？」冷子興道：「正是，說來也話長。」雨村道：「去歲我到金陵地界，因欲游覽六朝遺跡，那日進了石頭城，從他老宅門前經過。街東是宁國府，街西是榮國府，二宅相連，竟將大半條街占了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大門前雖冷落無人，隔著圍牆一望，裏面廳殿樓閣，也還都崢嶸軒峻，就是後一帶花園子裏面樹木山石，也還都有蓊蔚洇潤之氣，那裏象個衰敗之家？」冷子興笑道：「虧你是進士出身，原來不通！古人有云：『百足之虫，死而不僵。』如今雖說不及先年那樣興盛，較之平常仕宦之家，到底氣象不同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如今生齒日繁，事務日盛，主仆上下，安富尊榮者盡多，運籌謀畫者無一，其日用排場費用，又不能將就省儉，如今外面的架子雖未甚倒，內囊卻也盡上來了。這還是小事。更有一件大事：誰知這樣鐘鳴鼎食之家，翰墨詩書之族，如今的兒孫，竟一代不如一代了！」雨村聽說，也納罕道：「這樣詩禮之家，豈有不善教育之理？別門不知，只說這宁、榮二宅，是最教子有方的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興歎道：「正說的是這兩門呢。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            待我告訴你：當日宁國公與榮國公是一母同胞弟兄兩個。宁公居長，生了四個兒子。宁公死後，賈代化襲了官，也養了兩個兒子：長名賈敷，至八九歲上便死了，只剩了次子賈敬襲了官，如今一味好道，只愛燒丹煉汞，餘者一概不在心上。幸而早年留下一子，名喚賈珍，因他父親一心想作神仙，把官倒讓他襲了。他父親又不肯回原籍來，只在都中城外和道士們胡羼。這位珍爺倒生了一個兒子，今年纔十六歲，名叫賈蓉。如今敬老爹一概不管。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這珍爺那裏肯讀書，只一味高樂不了，把宁國府竟翻了過來，也沒有人敢來管他。再說榮府你聽，方纔所說异事，就出在這裏。自榮公死後，長子賈代善襲了官，娶的也是金陵世勳史侯家的小姐為妻，生了兩個兒子：長子賈赦，次子賈政。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如今代善早已去世，太夫人尚在，長子賈赦襲著官，次子賈政，自幼酷喜讀書[1]，祖父最疼，原欲以科甲出身的，不料代善臨終時遺本一上，皇上因恤先臣，即時令長子襲官外，問還有幾子，立刻引見，遂額外賜了這政老爹一個主事之銜，令其入部習學，如今現已升了員外郎了。這政老爹的夫人王氏，頭胎生的公子，名喚賈珠，十四歲進學，不到二十歲就娶了妻生了子，一病死了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第二胎生了一位小姐，生在大年初一，這就奇了，不想後來又生一位公子，說來更奇，一落胎胞，嘴裏便銜下一塊五彩晶瑩的玉來，上面還有許多字跡，就取名叫作寶玉。你道是新奇异事不是？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村笑道：「果然奇异。只怕這人來歷不小。」子興冷笑道：「萬人皆如此說，因而乃祖母便先愛如珍寶。那年周歲時，政老爹便要試他將來的志向，便將那世上所有之物擺了無數，與他抓取。誰知他一概不取，伸手只把些脂粉釵環抓來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            政老爹便大怒了，說：「『將來酒色之徒耳！』因此便大不喜悅。獨那史老太君還是命根一樣。說來又奇，如今長了七八歲，雖然淘氣异常，但其聰明乖覺處，百個不及他一個。說起孩子話來也奇怪，他說：『女兒是水作的骨肉，男人是泥作的骨肉。我見了女兒，我便清爽，見了男子，便覺濁臭逼人。』你道好笑不好笑？將來色鬼無疑了！」雨村罕然厲色忙止道：「非也！可惜你們不知道這人來歷。大約政老前輩也錯以淫魔色鬼看待了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            若非多讀書識事，加以致知格物之功，悟道參玄之力，不能知也。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興見他說得這樣重大，忙請教其端。雨村道：「天地生人，除大仁大惡兩种，餘者皆無大异。若大仁者，則應運而生，大惡者，則應劫而生。運生世治，劫生世危。堯，舜，禹，湯，文，武，周，召，孔，孟，董，韓，周，程，張，朱，皆應運而生者。蚩尤，共工，桀，紂，始皇，王莽，曹操，桓溫，安祿山，秦檜等，皆應劫而生者。大仁者，修治天下，大惡者，撓亂天下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            清明靈秀，天地之正氣，仁者之所秉也，殘忍乖僻，天地之邪氣，惡者之所秉也。今當運隆祚永之朝，太平無為之世，清明靈秀之氣所秉者，上至朝廷，下及草野，比比皆是。所餘之秀氣，漫無所歸，遂為甘露，為和風，洽然溉及四海。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            彼殘忍乖僻之邪氣，不能蕩溢於光天化日之中，遂凝結充塞於深溝大壑之內，偶因風蕩，或被云催，略有搖動感發之意，一絲半縷誤而泄出者，偶值靈秀之氣适過，正不容邪，邪复妒正，兩不相下，亦如風水雷電，地中既遇，既不能消，又不能讓，必至搏擊掀發後始盡。故其氣亦必賦人，發泄一盡始散。使男女偶秉此氣而生者，在上則不能成仁人君子，下亦不能為大凶大惡。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            置之於萬萬人中，其聰俊靈秀之氣，則在萬萬人之上，其乖僻邪謬不近人情之態，又在萬萬人之下。若生於公侯富貴之家，則為情痴情种，若生於詩書清貧之族，則為逸士高人，縱再偶生於薄祚寒門，斷不能為走卒健仆，甘遭庸人驅制駕馭，必為奇优名倡。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如前代之許由，陶潛，阮籍，嵇康，劉伶，王謝二族，顧虎頭，陳後主，唐明皇，宋徽宗，劉庭芝，溫飛卿，米南宮，石曼卿，柳耆卿，秦少游，近日之倪云林，唐伯虎，祝枝山，再如李龜年，黃幡綽，敬新磨，卓文君，紅拂，薛濤，崔鶯，朝云之流，此皆易地則同之人也。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興道：「依你說，『成則王侯敗則賊』了。」雨村道：「正是這意。你還不知，我自革職以來，這兩年遍游各省，也曾遇見兩個异樣孩子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            所以，方纔你一說這寶玉，我就猜著了八九亦是這一派人物。不用遠說，只金陵城內，欽差金陵省体仁院總裁甄家，你可知么？」子興道：「誰人不知！這甄府和賈府就是老親，又系世交。兩家來往，极其親熱的。便在下也和他家來往非止一日了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村笑道：「去歲我在金陵，也曾有人荐我到甄府處館。我進去看其光景，誰知他家那等顯貴，卻是個富而好禮之家，倒是個難得之館。但這一個學生，雖是啟蒙，卻比一個舉業的還勞神。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說起來更可笑，他說：『必得兩個女兒伴著我讀書，我方能認得字，心裏也明白，不然我自己心裏糊涂。』又常對跟他的小廝們說：『這女兒兩個字，极尊貴，极清淨的，比那阿彌陀佛，元始天尊的這兩個寶號還更尊榮無對的呢！你們這濁口臭舌，萬不可唐突了這兩個字，要緊。但凡要說時，必須先用清水香茶漱了口纔可，設若失錯，便要鑿牙穿腮等事。』其暴虐浮躁，頑劣憨痴，种种异常。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只一放了學，進去見了那些女兒們，其溫厚和平，聰敏文雅，竟又變了一個。因此，他令尊也曾下死笞楚過幾次，無奈竟不能改。每打的吃疼不過時，他便『姐姐』『妹妹』亂叫起來。後來聽得裏面女兒們拿他取笑：『因何打急了只管叫姐妹做甚？莫不是求姐妹去說情討饒？你豈不愧些！』他回答的最妙。他說：『急疼之時，只叫『姐姐』妹妹』字樣，或可解疼也未可知，因叫了一聲，便果覺不疼了，遂得了秘法：每疼痛之极，便連叫姐妹起來了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            』你說可笑不可笑？也因祖母溺愛不明，每因孫辱師責子，因此我就辭了館出來。如今在這巡鹽御史林家做館了。你看，這等子弟，必不能守祖父之根基，從師長之規諫的。只可惜他家幾個姊妹都是少有的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興道：「便是賈府中，現有的三個也不錯。政老爹的長女，名元春，現因賢孝才德，選入宮作女史去了。二小姐乃赦老爹前妻所出[2]，名迎春，三小姐乃政老爹之庶出，名探春，四小姐乃宁府珍爺之胞妹，名喚惜春。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因史老夫人极愛孫女，都跟在祖母這邊一處讀書，聽得個個不錯。」雨村道：「更妙在甄家的風俗，女兒之名，亦皆從男子之名命字，不似別家另外用這些『春』『紅』『香』『玉』等艷字的。何得賈府亦樂此俗套？」子興道：「不然。只因現今大小姐是正月初一日所生，故名元春，餘者方從了『春』字。上一輩的，卻也是從弟兄而來的。現有對證：目今你貴東家林公之夫人，即榮府中赦，政二公之胞妹，在家時名喚賈敏。不信時，你回去細訪可知。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」雨村拍案笑道：「怪道這女學生讀至凡書中有『敏』字，皆念作『密』字，每每如是，寫字遇著『敏』字，又減一二筆，我心中就有些疑惑。今聽你說的，是為此無疑矣。怪道我這女學生言語舉止另是一樣，不與近日女子相同，度其母必不凡，方得其女，今知為榮府之孫，又不足罕矣，可傷上月竟亡故了。」子興歎道：「老姊妹四個，這一個是極小的，又沒了。長一輩的姊妹，一個也沒了。只看這小一輩的，將來之東床如何呢。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村道：「正是。方纔說這政公，已有銜玉之兒，又有長子所遺一個弱孫。這赦老竟無一個不成？」子興道：「政公既有玉兒之後，其妾又生了一個，倒不知其好歹。只眼前現有二子一孫，卻不知將來如何。若問那赦公，也有二子，長名賈璉，今已二十來往了，親上作親，娶的就是政老爹夫人王氏之內侄女，今已娶了二年。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這位璉爺身上現捐的是個同知，也是不肯讀書，於世路上好机變，言談去的，所以如今只在乃叔政老爺家住著，幫著料理些家務。誰知自娶了他令夫人之後，倒上下無一人不稱頌他夫人的，璉爺倒退了一射之地：說模樣又极標致，言談又爽利，心机又极深細，竟是個男人萬不及一的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村聽了，笑道：「可知我前言不謬。你我方纔所說的這幾個人，都只怕是那正邪兩賦而來一路之人，未可知也。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」子興道：「邪也罷，正也罷，只顧算別人家的帳，你也吃一杯酒纔好。」雨村道：「正是，只顧說話，竟多吃了幾杯。」子興笑道：「說著別人家的閒話，正好下酒，即多吃幾杯何妨。」雨村向窗外看道：「天也晚了，仔細關了城。我們慢慢的進城再談，未為不可。」於是，二人起身，算還酒帳。方欲走時，又聽得後面有人叫道：「雨村兄，恭喜了！特來報個喜信的。」雨村忙回頭看時——
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要知是誰，且聽下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengjia">
+      <div class="compare-col-head">
+        <span class="badge">程甲本</span>
+        <span class="col-desc">程甲本（1791程伟元/高鹗活字本，120回）</span>
+        <span>第2回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾夫人仙逝扬州城 冷子兴演说荣国府</h3>
+        
+        
+        <p class="col-para">
+          
+            却說封肅聼見公差傳喚，忙出來陪笑啟問，那些人只嚷：「快請出甄爺來！」封肅忙陪笑道：「小人姓封，並不姓甄。只有當日小婿姓甄，今已出家一二年了，不知可是問他？」那些公人道：「我們也不知什麽『眞』『假』，旣是你的女婿，便帶了你去面禀太爺便了。」大家把封肅推擁而去，封家各各驚慌，不知何事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            至二更時分，封肅方囘來，衆人忙問端的。「原來新任太爺姓賈名化，本湖州人氏，曾與女婿舊交，因在我家門首看見嬌杏丫頭買線，只說女婿移住此間，所以來傳。我將緣故囬明，那太爺感傷歎息了一囬，又問外孫女兒，我說看燈丢了。太爺說：『不妨，待我差人去，務必找𡬶囬來。』說了一囬話，臨走又送我二兩銀子。」甄家娘子聼了，不覺感傷。一夜無話。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日早有雨村遣人送了兩封銀子、四疋錦縀，答謝甄家娘子；又一封宻書與封肅，託他向甄家娘子要那嬌杏作二房。封肅喜得眉開眼笑，巴不得去奉承太爺，便在女兒前一力攛掇，當夜用一乗小嬌，便把嬌杏送進衙内去了。雨村歡喜，自不必言，又封百金贈與封肅，又送甄家娘子許多禮物，令其且自過活，以待訪𡬶女兒下落。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            𨚫說嬌杏那丫嬛，便是當年囬顧雨村的，因偶然一顧，便弄出這叚竒緣，也是意想不到之事。誰知他命運兩濟，不承望自到雨村身邊，只一年，便生一子。又半載，雨村嫡配忽𣑱疾下世，雨村便將他扶作正室夫人，正是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            偶因一囬顧，便爲人上人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來雨村因那年士隱贈銀之後，他於十六日便起身赴京，大比之期，十分得意，中了進士，選入外班，今已陞了本縣太爺。雖才幹優長，未免貪酷。且恃才侮上，那官員皆側目而視，不上一年，便被上司叅了一本，說他性情狡猾，擅攺禮儀，外沽淸正之名，暗結虎狼之势，使地方多事，民命不堪等語。龍顔大怒，卽批革職。部文一到，本府各官無不喜悅。那雨村雖十分慚恨，靣上全無一㸃怨色，仍是嘻笑自若，交代過公事，將歴年所積宦囊，並家屬人等，送至原籍安頓妥當，𨚫自己擔風袖月，遊覧天下勝蹟。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那日偶又遊至維揚地方，聞得今年鹽政㸃的是林如海。這林如海姓林名海，表字如海，乃是前科的探花，今已陞蘭臺寺大夫，本貫姑蘇人氏，今欽㸃爲廵鹽御史，到任未久。原来這林如海之祖，曾襲過列侯，今到如海，業經五世，起初只襲三世，因當今隆恩盛德，額外加恩，至如海之父，又襲了一代。至如海，便從科第出身，雖係世禄之家，𨚫是書香之族。只可惜這林家支庶不盛，人丁有限，雖有幾門，𨚫與如海俱是堂没族，甚親支嫡𣲖的。今如海年已四十，只有一個三歲之子，又于去歲亡了，雖有幾房姫妾，奈命中無子，亦無可如何之事。只嫡妻賈氏生得一女，乳名黛玉，年方五歲，夫妻愛之如掌上明珠，見他生得聰明俊秀，也欲使他識幾個字，不過假充養子之意，聊解𦡀下荒凉之歎。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且說雨村在旅店偶感風寒，愈後又因盤費不繼，正欲得一居停之所，以爲息肩之地，偶遇兩個舊友，認得新鹽政，知他正要請一西席教訓女兒，遂將雨村薦進衙門去。這女學生年紀㓜小，身體又弱，工課不限多寡，其餘不過兩個伴讀丫鬟，故雨村十分省力，正好養病。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看看又是一載有餘，不料女學生之母賈氏夫人一病而亡，女學生奉侍湯藥，守喪盡禮，過于哀痛，素本怯弱，因此舊症復發，有好些時不曾上學。雨村閒居無聊，每當風日晴和，飯後便出来閒歩。這一日偶至郊外，意欲賞鍳那村野風光，信歩至一山𤨔水漩、茂林修竹之處，隱隱有座廟宇，門巷傾頺，墻垣朽敗，有額題曰「智通寺」，門傍又有一副舊破的對聨云：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            身後有餘忘縮手，眼前無路想囘頭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村看了，因想道：「這兩句文雖甚淺，其意則深，也曾遊過些名山大剎，倒不曾見過這話頭，其中想必有個翻過筋斗來的，也未可知，何不進去一訪。」走入看時，只有一個龍鍾老僧在那裡煑粥，雨村見了，𨚫不在意，及至問他兩句話，那老僧旣聾且昏，又齒落舌鈍，所答非所問。雨村不耐煩，仍退出來，意欲到那村肆中沽飮三盃，以助野趣，於是𭭎歩行來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            剛入肆門，只見座上吃酒之客，有一人起身大笑，接了出來，口内說：「竒遇，竒遇！」雨村忙看時，此人是都中古董行中貿易姓冷號子興的，舊日在都相識。雨村最讚這冷子興是個有作爲大本領的人，這子興又借雨村斯文之名，故二人最相投契。雨村忙亦笑問：「老兄何日到此？弟竟不知。今日偶遇，眞竒緣也。」子興道：「去年歲底到家，今因還要入都，從此順路找個敝友說一句話，承他之情，留我多住兩日，我也無甚𦂳事，且盤桓兩日，待月半時，也就起身了。今日敝友有事，我因閒歩至此，不期這樣巧遇。」一面說，一面讓雨村同席坐了，另整上酒肴來，二人閒談慢飮，叙些别後之事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村因問：「近日都中可有新聞没有？」子興道：「倒没有什麽新聞，倒是老先生的貴同宗家出了一件小小的異事。」雨村笑道：「弟族中無人在都，何談及此？」子興笑道：「你們同姓，豈非一族？」雨村問是誰家，子興笑道：「榮國賈府中，可也不玷辱了老先生的門楣。」雨村道：「原来是他家。若論起來，寒族人丁却不少，自東漢賈復以來，支𣲖繁盛，各省皆有，誰能逐細考查。若論榮國一支，𨚫是同譜，但他那等榮耀，我們不便去認他，故越發生踈了。」子興歎道：「老先生休如此說。如今的這榮寧兩府也都蕭索了，不比先時的光景。」雨村道：「當日寧榮兩宅，人口也極多，如何便蕭索了？」冷子興道：「正是，說来也話長。」雨村道：「去歲我到金陵，因欲遊覧六朝遺蹟，那日進了石頭城，從他老宅門前經過，街東是寧國府，街西是榮國府，二宅相連，竟將大半條街占了。大門外雖冷落無人，隔着圍墻一望，裡面廳殿楼閣，也還都崢嶸軒峻。就是後邉一帶花園裡，樹木山石，也都還有棻蔚洇潤之氣，那裡像個衰敗之家？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興笑道：「𧇊你是進士出身，原来不通。古人有言：『百足之蟲，死而不僵。』如今雖說不似先年那樣興盛，較之平常仕宦之家，到底氣象不同。如今生齒日繁，事務日盛，主僕上下，安富尊榮儘多，運籌謀畫者無一。其日用排塲費用，又不能將就省儉，如今外面的架子雖未甚倒，内囊𨚫也盡上来了。這也小事。更有一件大事：誰知這樣鐘鳴鼎食之家，翰墨詩書之族，如今的兒孫，竟一代不如一代了！」雨村聼說，也道：「這樣詩禮之家，豈有不善教育之理？别門不知，只說這寧榮兩宅，是最教子有方的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興歎道：「正說得是這兩門呢。待我告訴你：當日寧國公是一母同胞弟兄兩個。寧公居長，生了四個兒子。寧國公死後，長子賈代化襲了官，也養了兩個兒子，長名敷，八九歲上死了，只剩了一個次子賈敬，襲了官，如今一味好道，只愛燒丹煉汞，餘者一㮣不在他心上。幸而早年留下一子，名喚賈珍，因他父親一心想作神仙，把官倒讓他襲了。他父親又不肯囬原籍来，只在都中城外和那些道士們胡羼。這位珍爺也倒生了一個兒子，今年纔十六歲，名呌賈蓉。如今敬老爺是一㮣不管。這珍爺那裡肯讀書，只一味高樂不了，把那寧國府竟翻了過來，也没有敢來管他的人。再說榮府你聼，方纔所說異事就出在這裡。自榮公死後，長子賈代善襲了官，娶的是金陵世家史侯的小姐爲妻，生了兩個兒子，長名賈赦，次名賈政。如今代善早已去世，太夫人尙在，長子賈赦襲了官，爲人平静中和，也不管理家。次子賈政，自㓜酷喜讀書，爲人端方正直，祖父鍾愛，原要他以科甲出身的，不料代善臨終時遺本一上，皇上因恤先臣，卽時令長子襲官外，問還有幾子，立刻引見，遂又額外賜了這政老爺一個主事之銜，令其入部習學，如今現已陞了員外郎。這政老爺的夫人王氏，頭胎生的公子名喚賈珠，十四歲進學，不到二十歲就娶了妻，生了子，一病就死了。第二胎生了一位小姐，生在大年初一，就竒了。不想次年又生了一位公子，說來更竒，一落胞胎，嘴裡便啣下一塊五彩晶瑩的玉来，還有許多字跡，你道是新聞異事不是？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村笑道：「果然竒異。只怕這人的來歴不小。」子興冷笑道：「萬人皆如此說，因而乃祖母愛如珎寳。那週歲時，政老爺便要試他將來的志向，便將那世上所有之物，擺了無數與他㧓取，誰知他一槪不取，伸手只把些𮌖粉釵環㧓来玩弄。那政老爺便不喜歡，說將來是酒色之徒耳，因此便不甚愛惜。獨那太君還是命根一般。說來又竒，如今長了七八歲，雖然淘氣異常，但聰明乖覺，百個不及他一個，說起孩子話来也竒怪，他說：『女兒是水做的骨肉，男人是泥做的骨肉，我見了女兒便淸𤕤，見了男子便覺濁臭逼人。』你道好笑不好笑？將来色鬼無疑了。」雨村罕然厲色忙止道：「非也。可惜你們不知道這人來厯，大約政老前輩也錯以淫魔色鬼看待了。若非多讀書識事，加以致知格物之功、悟道叅元之力者，不能知也。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興見他說得這樣重大，忙請教其故。雨村道：「天地生人，除大仁大惡，餘者皆無大異。若大仁者則應運而生，大惡者則應刼而生，運生世治，刼生世危。堯、舜、禹、湯、文、武、周、召、孔、孟、董、韓、周、程、朱、張，皆應運而生者。蚩尤、共工、桀、紂、始皇、王莽、曹操、桓温、安祿山、秦檜等，皆應刼而生者。大仁者修治天下，大惡者擾亂天下。淸明靈秀，天地之正氣，仁者之所秉也。殘忍乖僻，天地之邪氣，惡者之所秉也。今當祚永運隆之日，太平無爲之世，淸明靈秀之氣所秉者，上至朝廷，下至草野，比比皆是。所餘之秀氣，漫無所歸，遂爲甘露、爲和風，洽然漑及四海。彼殘忍乖邪之氣，不能蕩溢於光天化日之下，遂凝結充塞於深溝大壑之中，偶因風蕩，或彼雲摧，略有搖動感發之意，一絲半縷，悞而逸出者，值靈秀之氣適過，正不容邪，邪復妬正，兩不相下，如風水雷電，地中旣遇，旣不能消，又不能讓，必致搏擊掀𤼵後始盡。故其氣亦必賦人，發洩一盡始散，使男女偶秉此氣而生者，上則不能爲仁人君子，下亦不能爲大𠒋大惡。置之千萬人之中，其聰俊靈秀之氣，則在千萬人之上。其乖僻邪謬不近人情之態，又在千萬人之下。若生于公侯富貴之家，則爲情痴情種。若生于詩書淸貧之族，則爲逸士高人。縱偶生于薄祚寒門，亦㫁不至爲走卒健僕，甘遭庸夫驅制駕馭，必爲竒優名倡。如前之許由、陶潜、阮籍、嵇康、劉伶、王謝二族、顧虎頭、陳後主、唐明皇、宋徽宗、劉庭芝、温飛卿、米南宫、石曼卿、柳耆卿、秦少游，近日倪雲林、唐伯虎、祝枝山，再如李龜年、黄繙綽、敬新磨、卓文君、紅拂、薛濤、崔鶯、朝雲之流：此皆易地則同之人也。」子興道：「依你說，『成則公侯敗則賊』了？」雨村道：「正是這意。你𮟃不知，我自革職以来，這兩年遍遊各省，也曾遇見兩個異樣孩子，所以方纔你一說這寳玉，我就猜着了八九也是這一𣲖人物。不用遠說，只這金陵城内，欽差金陵省體仁院總裁甄家，你可知道？」子興道：「誰人不知！這甄府就是賈府老親，他們兩家来徃極親熱的。至在下也和他家往來非止一日了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村笑道：「去歲我在金陵，也曾有人薦我到甄府處舘，我進去看其光景，誰知他家那等榮貴，却是個『富而好禮』之家，倒是個難得之舘。但是這個學生雖是啟𫎇，𨚫比一個舉業的還勞神。說起來𮟃可笑，他說：『必得兩個女兒伴着我讀書，我方能認得字，心上也明白。不然，我心裡自己糊塗。』又常對着跟他的小厮們說：『這「女兒」兩個字極尊貴極淸凈的，比那瑞獸珍禽、竒花異草更覺希罕尊貴呢！你們這種濁口臭舌，萬萬不可唐突了這兩個字，要𦂳，要𦂳。但凡要說的時節，必用凈水香茶𠻳了口方可。設若失錯，便要𨯳牙穿眼的。』其暴虐頑劣，種種異常。只放了學進去，見了那些女兒們，其温厚和平，聰敏文雅，竟變了一個樣子。因此他令尊也曾下死笞楚過幾次，竟不能攺，每打的吃疼不過時，他便『姐姐』『妹妹』的亂呌起來。後來聼得裡面女兒們拿他取笑：『因何打急了只管呌姐妹作什麽？莫不呌姐妹們去討情討饒？你豈不愧些！』他囬答的最妙，他說：『急痛之時，只呌「姐姐」「妹妹」字樣，或可解疼，也未可知，因呌了一聲，果覺疼得好些，遂得了秘法，每疼痛之極，便連呌姐妹起來了。』你說可笑不可笑？爲他祖母溺愛不明，每因孫辱師責子，我所以辞了館出來的。這等子弟，必不能守父祖基業、從師友規勸的。只可惜他家幾個好姊妹都是少有的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興道：「便是賈府中現在三個也不錯。政老爺之長女名元春，因賢孝才德，選入宮作女史去了；二小姐乃是赦老爺姨娘所出，名迎春；三小姐政老爺庶出，名探春；四小姐乃寧府𤤽爺之胞妹，名惜春；因史老夫人極愛孫女，多跟在祖母這邉，一處讀書，聼得個個不錯。」雨村道：「更妙在甄家風俗，女兒之名，亦皆從男子之名命取，不似别家，另外用這些『春』『紅』『香』『玉』等艶字，何得賈府亦落此俗套？」子興道：「不然。只因現今大小姐是正月初一所生，故名『元春』，餘者方從了『春』字。上一排的𨚫也是從弟兄而来的。現有對証：目今你貴東家林公之夫人，卽榮府中赦政二公之胞妹，在家時名字喚賈敏，不信時你囬去細訪可知。」雨村拍手笑道：「是極！我這女學生名呌黛玉，他讀書凡『敏』字他皆念作『宻』字，寫字遇着『敏』字亦減一二筆，我心中每每疑惑，今聼你說，是爲此無疑矣。怪道我這女學生言語舉止另是一樣，不與凡女子相同，度其母不凡，故生此女，今知爲榮府之外孫，又不足罕矣。可惜上月其母竟亡故了。」子興歎道：「老姊妹三個，這是極小的，又没了；長一軰的姊妹，一個也没了。只看這小一輩的將来的東床何如呢。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村道：「正是。方纔說政公已有了一個啣玉之子，又有長子所遺弱孫，這赦老竟無一個不成？」子興道：「政公旣有玉兒之後，其妾又生了一個，倒不知其好歹。只眼前現有二子一孫，𨚫不知將來何如。若問那赦公，也有二子，次名賈璉，今已二十来徃了，親上做親，娶的是政爺夫人王氏之内侄女，今已娶了二年。這位璉爺身上，現捐的是個同知，也是不喜讀書的。于世路上好機變，言談去得，所以目今現在乃叔政老爺家住，帮着料理家務。誰知自娶了令夫人之後，倒上下無一人不稱頌他夫人的，璉爺倒退了一舍之地。模樣又極標緻，言談又極𤕤利，心機又極深細，竟是一個男人萬不及一的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村𦘏了笑道：「可知我言不謬。你我方纔所說的這幾個人，只怕都是那正邪兩賦而來，一路之人，未可知也！」子興道：「正也罷，邪也罷，只顧算别人家的賬，你也吃一杯酒纔好。」雨村道：「只顧說話，就多吃了幾杯。」子興笑道：「說着别人家的閒話，正好下酒，卽多吃幾杯何妨。」雨村向𥦗外看道：「天也晚了，仔細關了城，我們慢慢進城再談，未爲不可。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            于是二人起身，筭還酒錢。方欲走時，忽聼得後面有人呌道：「雨村兄恭喜了！特來報個喜信的。」雨村忙囬頭看時，要知是誰，且聼下囘分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本</span>
+        <span class="col-desc">程乙本（1792程伟元/高鹗重订本，120回）</span>
+        <span>第2回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾夫人仙逝扬州城 冷子兴演说荣国府</h3>
+        
+        
+        <p class="col-para">
+          
+            卻說封肅聽見公差傳喚，忙出來陪笑啟問。那些人只嚷：「快請出甄爺來！」封肅忙陪笑道：「小人姓封，並不姓甄。只有當日小婿姓甄，今已出家一二年了。不知可是問他？」那些公人道：「我們也不知什麼『真』『假』！既是你的女婿，就帶了你去面稟太爺便了。」大家把封肅推擁而去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            封家各各驚慌，不知何事。至二更時分，封肅方回來，眾人忙問端的。「原來新任太爺姓賈，名化，本湖州人氏，曾與女婿舊交，因在我家門首看見嬌杏丫頭買線，只當女婿移住此間，所以來傳。我將緣故回明，那太爺感傷歎息了一回，又問外孫女兒。我說：『看燈丟了。』太爺說：『不妨，待我差人去，務必找尋回來。』說了一回話，臨走又送我二兩銀子。」甄家娘子聽了，不覺感傷。一夜無話。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日早有雨村遣人送了兩封銀子，四疋錦緞，答謝甄家娘子；又一封密書與封肅，託他向甄家娘子要那嬌杏作二房。封肅喜得眉開眼笑，巴不得去奉承太爺，便在女兒前一力攛掇，當夜用一乘小轎，便把嬌杏送進衙內去了。雨村歡喜，自不必言，又封百金贈與封肅。又送甄家娘子許多禮物，命其且自過活，以待訪尋女兒下落。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卻說嬌杏那丫頭便是當年回顧雨村的。因偶然一看，便弄出這段奇緣，也是意想不到之事。誰知他命運兩濟：不承望自到雨村身邊，只一年，便生一子；又半載，雨村嫡配忽染疾下世，雨村便將他扶作正室夫人。正是：「偶因一回顧，便為人上人。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來雨村因那年士隱贈銀之後，他於十六日便起身赴京，大比之期，十分得意，中了進士，選入外班，今已陞了本縣太爺。雖才幹優長，未免貪酷，且恃才侮上，那同寅皆側目而視。不上一年，便被上司參了一本，說他「貌似有才，性實狡猾」；又題了一兩件徇庇蠹役，交結鄉紳之事。龍顏大怒，即命革職。部文一到，本府各官無不喜悅。那雨村雖十分慚恨，面上卻全無一點怨色，仍是嘻笑自若。交代過了公事，將歷年所積的宦囊並家屬人等送至原籍安頓妥當了，卻自己擔風袖月，遊覽天下勝跡。那日偶又游至維揚地方，聞得今年鹽政點的是林如海。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這林如海，姓林，名海，表字如海，乃是前科的探花，今已陞蘭台寺大夫。本貫姑蘇人氏，今欽點為巡鹽御史，到任未久。原來這林如海之祖也曾襲過列侯的，今到如海，業經五世。起初只襲三世，因當今隆恩盛德，額外加恩，至如海之父又襲了一代，到了如海便從科第出身。雖係世祿之家，卻是書香之族。只可惜這林家支庶不盛，人丁有限，雖有幾門，卻與如海俱是堂族，沒甚親支嫡派的。今如海年已五十，只有一個三歲之子，又於去歲亡了，雖有幾房姬妾，奈命中無子，亦無可奈何之事。只嫡妻賈氏生得一女，乳名黛玉，年方五歲，夫妻愛之如掌上明珠。見他生得聰明俊秀，也欲使他識幾個字，不過假充養子，聊解膝下荒涼之歎。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且說雨村在旅店偶感風寒，愈後又因盤費不繼，正欲得一居停之所，以為息肩之地。偶遇兩個舊友，認得新鹽政，知他正要請一西席教訓女兒，遂將雨村薦進衙門去。這女學生年紀幼小，身體又弱，功課不限多寡，其餘不過兩個伴讀丫鬟，故雨村十分省力，正好養病。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看看又是一載有餘，不料女學生之母賈氏夫人一病而亡。女學生奉侍湯藥，守喪盡禮，過於哀痛，素本怯弱，因此舊病復發，有好些時不曾上學。雨村閒居無聊，每當風日晴和，飯後便出來閒步。這一日，偶至郊外，意欲賞鑒那村野風光。信步至一山環水漩茂林修竹之處，隱隱有座廟宇，門巷傾頹，牆垣剝落，有額題曰「智通寺」。門旁又有一副舊破的對聯云：「身後有餘忘縮手，眼前無路想回頭。」雨村看了，因想到：「這兩句，文雖甚淺，其意則深。也曾遊過些名山大剎，倒不曾見過這話頭。其中想必有個翻過筋斗來的也未可知，何不進去一訪？」走入看時，只有一個龍鍾老僧在那裡煮粥。雨村見了，卻不在意，及至問他兩句話，那老僧既聾且昏，又齒落舌鈍，所答非所問。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村不耐煩，仍退出來，意欲到那村肆中沽飲三杯，以助野趣，於是移步行來。剛入肆門，只見座上吃酒之客，有一人起身大笑，接了出來，口內說：「奇遇，奇遇！」雨村忙看時，此人是都中古董行中貿易，姓冷號子興的，舊日在都相識。雨村最讚這冷子興是個有作為大本領的人，這子興又借雨村斯文之名，故二人最相投契。雨村忙亦笑問：「老兄何日到此？弟竟不知。今日偶遇，真奇緣也！」子興道：「去歲年底到家。今因還要入都，從此順路找個敝友說一句話，承他的情，留我多住兩日。我也無甚緊事，且盤桓兩日，待月半時也就起身了。今日敝友有事，我因閒走到此，不期這樣巧遇！」一面說，一面讓雨村同席坐了，另整上酒肴來，二人閒談慢飲，敘些別後之事。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村因問：「近日都中可有新聞沒有？」子興道：「倒沒有什麼新聞，倒是老先生的貴同宗家出了一件小小的異事。」雨村笑道：「弟族中無人在都，何談及此？」子興笑道：「你們同姓，豈非一族？」雨村問：「是誰家？」子興笑道：「榮國賈府中，可也不玷辱老先生的門楣了！」雨村道：「原來是他家。若論起來，寒族人丁卻自不少，東漢賈復以來，支派繁盛，各省皆有，誰能逐細考查？若論榮國一支，卻是同譜。但他那等榮耀，我們不便去認他，故越發生疏了。」子興歎道：「老先生，休這樣說！如今的這榮寧二府也都蕭索了，不比先時的光景。」雨村道：「當日榮寧兩宅，人口也極多，如何便蕭索了呢？」子興道：「正是，說來也話長。」雨村道：「去歲我到金陵時，因欲游覽六朝遺跡，那日進了石頭城，從他宅門前經過，街東是寧國府，街西是榮國府，二宅相連，竟將大半條街占了。大門外雖冷落無人，隔著圍牆一望，裡面廳殿樓閣，也還都崢嶸軒峻；就是後邊一帶花園裡，樹木山石，也都還有蔥蔚洇潤之氣：那裡像個衰敗之家？」子興笑道：「虧你是進士出身！原來不通！古人有言，『百足之蟲，死而不僵』，如今雖說不似先年那樣興盛，較之平常仕宦人家，到底氣象不同。如今人口日多，事務日盛，主僕上下都是安富尊榮，運籌謀畫的竟無一個。那日用排場，又不能將就省儉。如今外面的架子雖未甚倒，內囊卻也盡上來了。－－這也是小事，更有一件大事：誰知這樣鐘鳴鼎食的人家兒，如今養的兒孫竟一代不如一代了！」雨村聽說，也道：「這樣詩禮之家，豈有不善教育之理？別門不知，只說這寧榮兩宅，是最教子有方的，何至如此？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興歎道：「正說的是這兩門呢！待我告訴你：當日寧國公與榮國公是一母同胞弟兄兩個。寧公居長，生了兩個兒子。寧公死後，長子賈代化襲了官，也養了兩個兒子。長子名賈敷，八九歲上死了。只剩了一個次子賈敬，襲了官，如今一味好道，只愛燒丹煉汞，別事一概不管。幸而早年留下一個兒子，名喚賈珍，因他父親一心想作神仙，把官倒讓他襲了。他父親又不肯住在家裡，只在都中城外和那些道士們胡羼。這位珍爺也生了一個兒子，今年纔十六歲，名叫賈蓉。如今敬老爺不管事了。這珍爺那裡幹正事？只一味高樂不了，把那寧國府竟翻過來了，也沒有敢來管他的人。再說榮府你聽：方纔所說異事就出在這裡。自榮公死後，長子賈代善襲了官，娶的是金陵世勳史侯家的小姐為妻，生了兩個兒子：長名賈赦，次名賈政。如今代善早已去世，太夫人尚在。長子賈赦襲了官，為人卻也中平，也不管理家事。惟有次子賈政，自幼酷喜讀書，為人端方正直，祖父鍾愛，原要他從科甲出身；不料代善臨終，遺本一上，皇上憐念先臣，即叫長子襲了官，又問還有幾個兒子，立刻引見，又將這政老爺賜了個額外主事職銜，叫他入部習學，如今現已陞了員外郎。這政老爺的夫人王氏，頭胎生的公子名叫賈珠，十四歲進學，後來娶了妻，生了子，不到二十歲，一病就死了。第二胎生了一位小姐，生在大年初一，就奇了。不想隔了十幾年又生了一位公子，說來更奇：一落胞胎，嘴裡便啣下一塊五彩晶瑩的玉來，還有許多字跡。你道是新聞不是？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村笑道：「果然奇異！只怕這人的來歷不小。」子興冷笑道：「萬人都這樣說，因而他祖母愛如珍寶。那週歲時，政老爺試他將來的志向，便將世上所有的東西擺了無數叫他抓，誰知他一概不取，伸手只把些脂粉釵環抓來玩弄。那政老爺便不喜歡，說將來不過酒色之徒，因此便不甚愛惜。獨那太君還是命根子一般。說來又奇：如今長了十來歲，雖然淘氣異常，但聰明乖覺，百個不及他一個。說起孩子話來也奇。他說：『女兒是水做的骨肉，男子是泥做的骨肉。我見了女兒便清爽，見了男子便覺濁臭逼人！』你道好笑不好笑？將來色鬼無疑了！」雨村罕然厲色道：「非也。可惜你們不知道這人的來歷。大約政老前輩也錯以淫魔色鬼看待了。若非多讀書識事，加以致知格物之功，悟道參玄之力者，不能知也。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興見他說得這樣重大，忙請教其故。雨村道：「天地生人，除大仁大惡，餘者皆無大異。若大仁者，則應運而生；大惡者，則應劫而生。運生世治，劫生世危。堯、舜、禹、湯、文、武、周、召、孔、孟、董、韓、周、程、朱、張，皆應運而生者；蚩尤、共工、桀、紂、始皇、王莽、曹操、桓溫、安祿山、秦檜等，皆應劫而生者。大仁者修治天下，大惡者擾亂天下。清明靈秀，天地之正氣，仁者之所秉也；殘忍乖僻，天地之邪氣，惡者之所秉也。今當運隆祚永之朝，太平無為之世，清明靈秀之氣所秉者，上自朝廷，下至草野，比比皆是。所餘之秀氣，漫無所歸，遂為甘露，為和風，洽然溉及四海。彼殘忍乖僻之邪氣，不能蕩溢於光天化日之下，遂凝結充塞於深溝大壑之中，偶因風蕩，或被雲摧，略有搖動感發之意，一絲半縷，誤而逸出者，值靈秀之氣適過，正不容邪，邪復妒正，兩不相下，如風水雷電，地中相遇，既不能消，又不能讓，必至搏擊掀發後始盡。既然發洩，此氣亦必賦之於人。假使或男或女，偶秉此氣而生者，上則不能為仁人為君子，下亦不能為大凶大惡，置之千萬人之中，其聰俊靈秀之氣，則在千萬人之上；其乖僻邪謬不近人情之態，又在千萬人之下。若生於公侯富貴之家，則為情癡情種；若生於詩書清貧之族，則為逸士高人；縱然生於薄祚寒門，甚至為奇優，為名娼，亦斷不至為走卒健僕，甘遭庸夫驅制。如前之許由、陶潛、阮籍、嵇康、劉伶、王謝二族、顧虎頭、陳後主、唐明皇、宋徽宗、劉庭芝、溫飛卿、米南宮、石曼卿、柳耆卿、秦少游，近日倪雲林、唐伯虎、祝枝山，再如李龜年、黃繙綽、敬新磨、卓文君、紅拂、薛濤、崔鶯、朝雲之流，此皆易地則同之人也。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興道：「依你說，成則公侯，敗則賊了？」雨村道：「正是這意。你還不知，我自革職以來，這兩年遍游各省，也曾遇見兩個異樣孩子，所以方纔你一說這寶玉，我就猜著了八九也是這一派人物。不用遠說，只這金陵城內欽差金陵省體仁院總裁甄家，你可知道？」子興道：「誰人不知！這甄府就是賈府老親。他們兩家來往極親熱的。就是我也和他家往來非止一日了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村笑道：「去歲我在金陵，也曾有人薦我到甄府處館。我進去看其光景，誰知他家那等榮貴，卻是個富而好禮之家，倒是個難得之館。但是這個學生雖是啟蒙，卻比一個舉業的還勞神。說起來更可笑。他說：『必得兩個女兒陪著我讀書，我方能認得字，心上也明白；不然，我心裡自己糊塗。』又常對著跟他的小廝們說：『這『女兒』兩個字，極尊貴極清淨的，比那瑞獸珍禽、奇花異草更覺稀罕尊貴呢。你們這種濁口臭舌，萬萬不可唐突了這兩個字。要緊，要緊！但凡要說的時節，必用淨水香茶嗽了口方可；設若失錯，便要鑿牙穿眼的。』其暴虐頑劣，種種異常。只放了學進去，見了那些女兒們，其溫厚和平、聰敏文雅，竟變了一個樣子。因此，他令尊也曾下死笞楚過幾次，竟不能改。每打的吃疼不過時，他便『姐姐』『妹妹』的亂叫起來。後來聽得裡面女兒們拿他取笑：『因何打急了只管叫「姐妹」作什麼？莫不叫姐妹們去討情，討饒？你豈不愧些？』他回答的最妙。他說：『急疼之時，只叫「姐姐」「妹妹」字樣，或可解疼，也未可知，因叫了一聲，果覺疼得好些，遂得了秘法，每疼痛之極，便連叫「姐妹」起來了。』你說可笑不可笑？為他祖母溺愛不明，每因孫辱師責子，所以我就辭了館出來。這等子弟必不能守祖父基業，從師友規勸的。－－只可惜他家幾個好姊妹都是少有的！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            子興道：「便是賈府中現在三個也不錯。政老爺的長女名元春，因賢孝才德選入宮作女史去了。二小姐乃是赦老爺姨娘所出，名迎春；三小姐，政老爺庶出，名探春；四小姐乃寧府珍爺的胞妹，名惜春。因史老夫人極愛孫女，都跟在祖母這邊一處讀書，聽得個個不錯。」雨村道：「更妙在甄家風俗：女兒之名亦皆從男子之名，不似別人家另外用這些『春』『紅』『香』『玉』等豔字。何得賈府亦落此俗套？」子興道：「不然。只因現今大小姐是正月初一所生，故名元春，餘者都從了『春』字。上一輩的卻也是從弟兄而來的。現有對證：目今你貴東家林公的夫人即榮府中赦政二公的胞妹，在家時名喚賈敏。不信時，你回去細訪可知。」雨村拍手笑道：「是極！我這女學生名叫黛玉。他讀書，凡『敏』字，他皆念作『密』字；寫字，遇著『敏』字亦減一二筆。我心中每每疑惑。今聽你說，是為此無疑矣。怪道我這女學生言語舉止另是一樣，不與凡女子相同！度其母不凡，故生此女；今知為榮府之外孫，又不足罕矣。可惜上月其母竟亡故了！」子興歎道：「老姊妹三個，這是極小的，又沒了。長一輩的姊妹一個也沒了，只看這小一輩的將來的東床何如呢。」雨村道：「正是。方纔說政公已有了一個啣玉之子，又有長子所遺弱孫，這赦老竟無一個不成？」子興道：「政公既有玉兒之後，其妾又生了一個，倒不知其好歹。只眼前現有二子一孫，卻不知將來何如。若問那赦老爺，也有一子，名叫賈璉，今已二十多歲了，親上做親，娶的是政老爺夫人王氏內姪女，今已娶了四五年。這位璉爺身上現捐了個同知，也是不喜正務的。於世路上好機變，言談去得，所以目今在乃叔政老爺家住，幫著料理家務。誰知自娶了這位少奶奶之後，倒上下無一人不稱頌他的夫人，璉爺倒退了一射之地。模樣又極標致，言談又極爽利，心機又極深細，竟是個男人萬不及一的！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村聽了，笑道：「可知我言不謬了。你我方纔所說的這幾個人，只怕都是那『正』『邪』兩賦而來，一路之人，未可知也。」子興道：「正也罷，邪也罷，只顧算別人家的賬，你也吃一杯酒纔好。」雨村道：「只顧說話，就多吃了幾杯。」子興笑道：「說著別人家的閒話，正好下酒，即多吃幾杯何妨？」雨村向窗外看道：「天也晚了，仔細關了城。我們慢慢進城再談，未為不可。」於是二人起身，算還酒錢。方欲走時，忽聽得後面有人叫道：「雨村兄，恭喜了！特來報個喜信的。」雨村忙回頭看時，－－
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            要知是誰，且聽下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi_ocr">
+      <div class="compare-col-head">
+        <span class="badge">程乙本OCR</span>
+        <span class="col-desc">程乙本OCR（欧阳健校注本PDF本地识别）</span>
+        <span>第2回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾夫人仙逝扬州城 冷子兴演说荣国府</h3>
+        
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="fax_chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本影印</span>
+        <span class="col-desc">程乙本校注本影印页（贵州人民出版社PDF）</span>
+        <span>第2回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">贾夫人仙逝扬州城 冷子兴演说荣国府</h3>
+        
+        <div class="fax-view" data-fax="fax_chengyi">
+          <div class="fax-toolbar">
+            <button type="button" class="fax-prev" data-dir="-1">←</button>
+            <span class="fax-page-info">第<span class="fax-cur">1</span>页</span>
+            <button type="button" class="fax-next" data-dir="1">→</button>
+          </div>
+          <div class="fax-stage">
+            <img class="fax-img" alt="影印页">
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

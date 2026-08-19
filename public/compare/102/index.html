@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第102回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="102">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/101" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" >第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" >第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" >第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" >第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" >第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" >第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" >第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" >第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" >第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" selected>第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/103" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/102">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第102回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</h3>
+        
+        
+        <p class="col-para">
+          
+            話說王夫人打發人來喚寶釵，寶釵連忙過來，請了安。王夫人道：“你三妹妹如今要出嫁了，只得你們作嫂子的大家開導開導他，也是你們姊妹之情。況且他也是個明白孩子，我看你們兩個也很合的來。只是我聽見說寶玉聽見他三妹妹出門子，哭的了不的，你也該勸勸他。如今我的身子是十病九痛的，你二嫂子也是三日好兩日不好。你還心地明白些，諸事也別說只管吞著不肯得罪人，將來這一番家事，都是你的擔子。”寶釵答應著。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王夫人又說道：“還有一件事，你二嫂子昨兒帶了柳家媳婦的丫頭來，說補在你們屋里。”寶釵道：“今日平兒才帶過來，說是太太和二奶奶的主意。”王夫人道：“是呦，你二嫂子和我說，我想也沒要緊，不便駁他的回。只是一件，我見那孩子眉眼兒上頭也不是個很安頓的。起先為寶玉房里的丫頭狐狸似的，我攆了幾個，那時候你也知道，不然你怎麼搬回家去了呢。如今有你，自然不比先前了。我告訴你，不過留點神兒就是了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你們屋里就是襲人那孩子還可以使得。”寶釵答應了，又說了幾句話，便過來了。飯後到了探春那邊，自有一番殷勤勸慰之言，不必細說。次日，探春將要起身，又來辭寶玉。寶玉自然難割難分。探春便將綱常大体的話，說的寶玉始而低頭不語，後來轉悲作喜，似有醒悟之意。于是探春放心，辭別眾人，竟上轎登程，水舟車陸而去。先前眾姊妹們都住在大觀園中，後來賈妃薨後，也不修葺。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            到了寶玉娶親，林黛玉一死，史湘雲回去，寶琴在家住著，園中人少，況兼天氣寒冷，李紈姊妹，探春，惜春等俱挪回舊所。到了花朝月夕，依舊相約頑耍。如今探春一去，寶玉病後不出屋門，益發沒有高興的人了。所以園中寂寞，只有幾家看園的人住著，那日尤氏過來送探春起身，因天晚省得套車，便從前年在園里開通宁府的那個便門里走過去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            覺得凄涼滿目，台榭依然，女牆一帶都种作園地一般，心中悵然如有所失，因到家中，便有些身上發熱，扎掙一兩天，竟躺倒了。日間的發燒猶可，夜里身熱异常，便譫語綿綿。賈珍連忙請了大夫看視。說感冒起的，如今纏經，入了足陽明胃經，所以譫語不清，如有所見，有了大穢即可身安。尤氏服了兩劑，并不稍減，更加發起狂來。賈珍著急，便叫賈蓉來打聽外頭有好醫生再請幾位來瞧瞧。賈蓉回道：“前兒這位太醫是最興時的了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只怕我母親的病不是藥治得好的。”賈珍道：“胡說，不吃藥難道由他去罷。”賈蓉道：“不是說不治。為的是前日母親從西府去，回來是穿著園子里走來家的，一到了家就身上發燒，別是撞客著了罷？外頭有個毛半仙，是南方人，卦起的很靈，不如請他來占卦占卦。看有信兒呢，就依著他，要是不中用，再請別的好大夫來。”賈珍聽了，即刻叫人請來。坐在書房內喝了茶，便說：“府上叫我，不知占什麼事？”賈蓉道：“家母有病，請教一卦。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”毛半仙道：“既如此，取淨水洗手，設下香案。讓我起出一課來看就是了。”一時下人安排定了。他便怀里掏出卦筒來，走到上頭恭恭敬敬的作了一個揖，手內搖著卦筒，口里念道：“伏以太极兩儀，絪縕交感。圖書出而變化不窮，神圣作而誠求必應。茲有信官賈某，為因母病，虔請伏羲，文王，周公，孔子四大圣人，鑒臨在上，誠感則靈，有凶報凶，有吉報吉。先請內象三爻。”說著，將筒內的錢倒在盤內，說“有靈的頭一爻就是交。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”拿起來又搖了一搖，倒出來說是單。第三爻又是交。檢起錢來，嘴里說是：“內爻已示，更請外象三爻，完成一卦。”起出來是單拆單。那毛半仙收了卦筒和銅錢，便坐下問道：“請坐，請坐。讓我來細細的看看。這個卦乃是‘未濟’之卦。世爻是第三爻，午火兄弟劫財，晦氣是一定該有的。如今尊駕為母問病，用神是初爻，真是父母爻動出官鬼來。五爻上又有一層官鬼，我看令堂太夫人的病是不輕的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            還好，還好，如今子亥之水休囚，寅木動而生火。世爻上動出一個子孫來，倒是克鬼的。況且日月生身，再隔兩日子水官鬼落空，交到戌日就好了。但是父母爻上變鬼，恐怕令尊大人也有些關礙。就是本身世爻比劫過重，到了水旺土衰的日子也不好。”說完了，便撅著胡子坐著。賈蓉起先聽他搗鬼，心里忍不住要笑，聽他講的卦理明白，又說生怕父親也不好，便說道：“卦是极高明的，但不知我母親到底是什麼病？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”毛半仙道：“据這卦上世爻午火變水相克，必是寒火凝結。若要斷得清楚，揲蓍也不大明白，除非用大六壬才斷得准。”賈蓉道：“先生都高明的么？”毛半仙道：“知道些。”賈蓉便要請教，報了一個時辰。毛先生便畫了盤子，將神將排定。”算去是戌上白虎，這課叫做‘魄化課’。大凡白虎乃是凶將，乘旺象氣受制，便不能為害。如今乘著死神死煞及時令囚死，則為餓虎，定是傷人。就如魄神受驚消散，故名‘魄化’。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這課象說是人身喪鬼，憂患相仍，病多喪死，訟有憂驚。按象有日暮虎臨，必定是傍晚得病的。象內說，凡占此課，必定舊宅有伏虎作怪，或有形響。如今尊駕為大人而占，正合著虎在陽憂男，在陰憂女。此課十分凶險呢。”賈蓉沒有聽完，唬得面上失色道：“先生說得很是。但與那卦又不大相合，到底有妨礙么？”毛半仙道：“你不用慌，待我慢慢的再看。”低著頭又咕噥了一會子，便說“好了，有救星了！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            算出巳上有貴神救解，謂之‘魄化魂歸’。先憂後喜，是不妨事的。只要小心些就是了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈蓉奉上卦金，送了出去，回稟賈珍，說是：“母親的病是在舊宅傍晚得的，為撞著什麼伏尸白虎。”賈珍道：“你說你母親前日從園里走回來的，可不是那里撞著的。你還記得你二嬸娘到園里去，回來就病了。他雖沒有見什麼，後來那些丫頭老婆們都說是山子上一個毛烘烘的東西，眼睛有燈籠大，還會說話，把他二奶奶赶了回來，唬出一場病來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賈蓉道：“怎麼不記得。我還聽見寶叔家的茗煙說，晴雯是做了園里芙蓉花的神了，林姑娘死了半空里有音樂，必定他也是管什麼花兒了。想這許多妖怪在園里，還了得！頭里人多陽氣重，常來常往不打緊。如今冷落的時候，母親打那里走，還不知踹了什麼花兒呢，不然就是撞著那一個。那卦也還算是准的。”賈珍道：“到底說有妨礙沒有呢？”賈蓉道：“据他說，到了戌日就好了。只願早兩天好，或除兩天才好。”賈珍道：“這又是什麼意思？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”賈蓉道：“那先生若是這樣准，生怕老爺也有些不自在。”正說著，里頭喊說“奶奶要坐起到那邊園里去，丫頭們都按捺不住。”賈珍等進去安慰定了。只聞尤氏嘴里亂說：“穿紅的來叫我，穿綠的來赶我。”地下這些人又怕又好笑。賈珍便命人買些紙錢送到園里燒化，果然那夜出了汗，便安靜些。到了戌日，也就漸漸的好起來。由是一人傳十，十人傳百，都說大觀園中有了妖怪。唬得那些看園的人也不修花補樹，灌溉果蔬。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            起先晚上不敢行走，以致鳥獸逼人，甚至日里也是約伴持械而行。過了些時，果然賈珍患病。竟不請醫調治，輕則到園化紙許願，重則詳星拜斗。賈珍方好，賈蓉等相繼而病。如此接連數月，鬧得兩府俱怕。從此風聲鶴唳，草木皆妖。園中出息，一概全蠲，各房月例重新添起，反弄得榮府中更加拮据。那些看園的沒有了想頭，個個要離此處，每每造言生事，便將花妖樹怪編派起來，各要搬出，將園門封固，再無人敢到園中。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            以致崇樓高閣，瓊館瑤台，皆為禽獸所栖。卻說晴雯的表兄吳貴正住在園門口，他媳婦自從晴雯死後，聽見說作了花神，每日晚間便不敢出門。這一日吳貴出門買東西，回來晚了。那媳婦子本有些感冒著了，日間吃錯了藥，晚上吳貴到家，已死在炕上。外面的人因那媳婦子不妥當，便都說妖怪爬過牆吸了精去死的。于是老太太著急的了不得，替另派了好些人將寶玉的住房圍住，巡邏打更。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這些小丫頭們還說，有的看見紅臉的，有的看見很俊的女人的，吵嚷不休。唬得寶玉天天害怕。虧得寶釵有把持的，聽得丫頭們混說，便唬嚇著要打，所以那些謠言略好些。無奈各房的人都是疑人疑鬼的不安靜，也添了人坐更，于是更加了好些食用。獨有賈赦不大很信，說：“好好園子，那里有什麼鬼怪！”挑了個風清日暖的日子，帶了好幾個家人，手內持著器械，到園踹看動靜。眾人勸他不依。到了園中，果然陰氣逼人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈赦還扎掙前走，跟的人都探頭縮腦。內中有個年輕的家人，心內已經害怕，只聽呼的一聲，回過頭來，只見五色燦爛的一件東西跳過去了，唬得噯喲一聲，腿子發軟，便躺倒了。賈赦回身查問，那小子喘噓噓的回道：“親眼看見一個黃臉紅須綠衣青裳一個妖怪走到樹林子後頭山窟窿里去了。”賈赦聽了，便也有些膽怯，問道：“你們都看見么？”有幾個推順水船兒的回說：“怎麼沒瞧見，因老爺在頭里，不敢驚動罷了。奴才們還撐得住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”說得賈赦害怕，也不敢再走，急急的回來，吩咐小子們：“不要提及，只說看遍了，沒有什麼東西。”心里實也相信，要到真人府里請法官驅邪。豈知那些家人無事還要生事，今見賈赦怕了，不但不瞞著，反添些穿鑿，說得人人吐舌。賈赦沒法，只得請道士到園作法事驅邪逐妖。擇吉日先在省親正殿上舖排起壇場，上供三清圣像，旁設二十八宿并馬，趙，溫，周四大將，下排三十六天將圖像。香花燈燭設滿一堂，鐘鼓法器排兩邊，插著五方旗號。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道紀司派定四十九位道眾的執事，淨了一天的壇。三位法官行香取水畢，然後擂起法鼓，法師們俱戴上七星冠，披上九宮八卦的法衣，踏著登雲履，手執牙笏，便拜表請圣。又念了一天的消災驅邪接福的《洞元經》，以後便出榜召將。榜上大書“太乙混元上清三境靈寶符錄演教大法師行文敕令本境諸神到壇聽用。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那日兩府上下爺們仗著法師擒妖，都到園中觀看，都說：“好大法令！呼神遣將的鬧起來，不管有多少妖怪也唬跑了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ”大家都擠到壇前。只見小道士們將旗幡舉起，按定五方站住，伺候法師號令。三位法師，一位手提寶劍拿著法水，一位捧著七星皂旗，一位舉著桃木打妖鞭，立在壇前。只聽法器一停，上頭令牌三下，口中念念有詞，那五方旗便團團散布。法師下壇，叫本家領著到各處樓閣殿亭房廊屋舍山崖水畔灑了法水，將劍指畫了一回，回來連擊牌令，將七星旗祭起，眾道士將旗幡一聚，接下打怪鞭望空打了三下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            本家眾人都道拿住妖怪，爭著要看，及到跟前，并不見有什麼形響。只見法師叫眾道士拿取瓶罐，將妖收下，加上封條。法師朱筆書符收禁，令人帶回在本觀塔下鎮住，一面撤壇謝將。賈赦恭敬叩謝了法師。賈蓉等小弟兄背地都笑個不住，說：“這樣的大排場，我打量拿著妖怪給我們瞧瞧到底是些什麼東西，那里知道是這樣收羅，究竟妖怪拿去了沒有？”賈珍聽見罵道：“糊涂東西，妖怪原是聚則成形，散則成氣，如今多少神將在這里，還敢現形嗎！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            無非把這妖氣收了，便不作祟，就是法力了。”眾人將信將疑，且等不見響動再說。那些下人只知妖怪被擒，疑心去了，便不大驚小怪，往後果然沒人提起了。賈珍等病愈复原，都道法師神力。獨有一個小子笑說道：“頭里那些響動我也不知道，就是跟著大老爺進園這一日，明明是個大公野雞飛過去了，拴兒嚇離了眼，說得活象。我們都替他圓了個謊，大老爺就認真起來。倒瞧了個很熱鬧的壇場。”眾人雖然聽見，那里肯信，究無人住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一日，賈赦無事，正想要叫幾個家下人搬住園中，看守房屋，惟恐夜晚藏匿奸人。方欲傳出話去，只見賈璉進來，請了安，回說今日到他大舅家去聽見一個荒信，“說是二叔被節度使參進來，為的是失察屬員，重征糧米，請旨革職的事。”賈赦聽了吃驚道：“只怕是謠言罷。前兒你二叔帶書子來說，探春于某日到了任所，擇了某日吉時送了你妹子到了海疆，路上風恬浪靜，合家不必挂念。還說節度認親，倒設席賀喜，那里有做了親戚倒提參起來的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且不必言語，快到吏部打聽明白就來回我。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈璉即刻出去，不到半日回來便說：“才到吏部打聽，果然二叔被參。題本上去，虧得皇上的恩典，沒有交部，便下旨意，說是失察屬員，重征糧米，苛虐百姓，本應革職，姑念初膺外任，不諳吏治，被屬員蒙蔽，著降三級，加恩仍以工部員外上行走，并令即日回京。這信是准的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正在吏部說話的時候，來了一個江西引見知縣，說起我們二叔，是很感激的，但說是個好上司，只是用人不當，那些家人在外招搖撞騙，欺凌屬員，已經把好名聲都弄坏了。節度大人早已知道，也說我們二叔是個好人。不知怎麼樣這回又參了。想是忒鬧得不好，恐將來弄出大禍，所以借了一件失察的事情參的，倒是避重就輕的意思也未可知。”賈赦未聽說完，便叫賈璉：“先去告訴你嬸子知道，且不必告訴老太太就是了。”賈璉去回王夫人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未知有何話說，下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>

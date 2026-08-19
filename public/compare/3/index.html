@@ -1,0 +1,7219 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第3回 对照 · 癸酉本石头记</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.compare-body { display: block; }
+
+.compare-shell { max-width: 1600px; margin: 0 auto; padding: 0 24px 80px; }
+
+.compare-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(18px);
+  margin: 0 -24px;
+  padding: 0 clamp(14px, 3vw, 42px);
+  flex-wrap: wrap;
+}
+
+.compare-toolbar h2 { font-size: 16px; margin: 0; color: var(--ink); white-space: nowrap; }
+.compare-toolbar .sub { font-size: 12px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.compare-toolbar .spacer { flex: 1; }
+.compare-toolbar a { color: var(--accent); text-decoration: none; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+.compare-toolbar a:hover { background: var(--accent-soft); }
+.compare-toolbar a.turn { border: 1px solid var(--rule-strong); white-space: nowrap; }
+
+.chapter-select {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 40vw;
+}
+
+/* 多栏并列：所有版本横向排列，各自独立滚动 */
+.compare-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.compare-col {
+  min-width: 0;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.compare-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.compare-col-head .badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.compare-col-head .col-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.8;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.compare-col-body { padding: 18px 22px 48px; }
+
+.col-para {
+  font-size: var(--reader-size);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9em;
+  text-align: justify;
+}
+
+.missing-cell { color: var(--ink-faint); font-style: italic; font-size: 0.9em; }
+
+/* 夹批小字 */
+.ann-inline {
+  font-size: 0.68em;
+  line-height: 1.6;
+  color: var(--ann-color, #a23a2a);
+  opacity: 0.92;
+  padding: 0 0.3em;
+}
+.ann-jia { --ann-color: var(--ann-jia, #a23a2a); }
+.ann-geng { --ann-color: var(--ann-geng, #2f6b8f); }
+.ann-meng { --ann-color: var(--ann-meng, #3d7a4f); }
+.ann-qi { --ann-color: var(--ann-qi, #7a4a8f); }
+.ann-jing { --ann-color: var(--ann-jing, #8a5a2a); }
+.ann-lie { --ann-color: var(--ann-lie, #4a5f7a); }
+.ann-ji { --ann-color: var(--ann-ji, #5a5a5a); }
+.ann-癸 { --ann-color: var(--ann-gui, #a23a2a); }
+
+
+
+.stats {
+  display: inline-flex;
+  gap: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.stats b { color: var(--accent); }
+
+/* 版本勾选器 */
+.version-picker { position: relative; }
+.vp-toggle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  z-index: 50;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+}
+.vp-menu.open { display: block; }
+.vp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.vp-item:hover { background: var(--accent-soft); }
+.vp-item input { accent-color: var(--accent); }
+
+/* 影印视图 */
+.fax-view { display: flex; flex-direction: column; gap: 10px; }
+.fax-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.fax-toolbar button {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+}
+.fax-page-info { font-family: var(--font-ui); font-size: 12px; color: var(--ink-soft); }
+.fax-stage { text-align: center; }
+.fax-img { width: 100%; height: auto; border-radius: 6px; }
+
+@media (max-width: 900px) {
+  .compare-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: 1fr;
+  }
+  .compare-col { max-height: none; }
+}
+</style>
+</head>
+<body class="compare-body" data-num="3">
+<div class="compare-shell">
+
+  <div class="compare-toolbar">
+    <a href="/">&larr; 首页</a>
+    
+    <a class="turn" href="/compare/2" title="上一回">← 上一回</a>
+    
+    <select class="chapter-select" id="chapter-select">
+      
+      <option value="1" >第一回　甄士隱夢幻識通靈　賈雨村風塵懷閨秀</option>
+      
+      <option value="2" >第二回　賈夫人仙逝揚州城　冷子興演說榮國府</option>
+      
+      <option value="3" selected>第三回　金陵城起復賈雨村　榮國府收養林黛玉</option>
+      
+      <option value="4" >第四回　薄命女偏逢薄命郎　葫蘆僧亂判葫蘆案</option>
+      
+      <option value="5" >第五回　開生面夢演紅樓夢　立新場情傳幻境情</option>
+      
+      <option value="6" >第六回　賈寶玉初試雨雲情　劉姥姥一進榮國府</option>
+      
+      <option value="7" >第七回　送宮花周瑞嘆英蓮　談肄業秦鍾結寶玉</option>
+      
+      <option value="8" >第八回　薛寶釵小恙梨香院　賈寶玉大醉絳芸軒</option>
+      
+      <option value="9" >第九回　戀風流情友入家塾　起嫌疑頑童鬧學堂</option>
+      
+      <option value="10" >第十回　金寡婦貪利權受辱　張太醫論病細窮源</option>
+      
+      <option value="11" >第十一回　慶壽辰寧府排家宴　見熙鳳賈瑞起淫心</option>
+      
+      <option value="12" >第十二回　王熙鳳毒設相思局　賈天祥正照風月鑑</option>
+      
+      <option value="13" >第十三回　秦可卿死封龍禁尉　王熙鳳協理寧國府</option>
+      
+      <option value="14" >第十四回　林如海捐館揚州城　賈寶玉路謁北靜王</option>
+      
+      <option value="15" >第十五回　王鳳姐弄權鐵檻寺　秦鯨卿得趣饅頭庵</option>
+      
+      <option value="16" >第十六回　賈元春才選鳳藻宮　秦鯨卿夭逝黃泉路</option>
+      
+      <option value="17" >第十七回　會芳園試才題對額　賈寶玉機敏動諸賓</option>
+      
+      <option value="18" >第十八回　林黛玉誤剪香囊袋　賈元春歸省慶元宵</option>
+      
+      <option value="19" >第十九回　情切切良宵花解語　意綿綿靜日玉生香</option>
+      
+      <option value="20" >第二十回　王熙鳳正言彈妒意　林黛玉俏語謔嬌音</option>
+      
+      <option value="21" >第二十一回　賢襲人嬌嗔箴寶玉　俏平兒軟語救賈璉</option>
+      
+      <option value="22" >第二十二回　聽曲文寶玉悟禪機　制燈迷賈政悲讖語</option>
+      
+      <option value="23" >第二十三回　西廂記妙詞通戲語　牡丹亭豔曲警芳心</option>
+      
+      <option value="24" >第二十四回　醉金剛輕財尚義俠　癡女兒遺帕惹相思</option>
+      
+      <option value="25" >第二十五回　魘魔法姊弟逢五鬼　紅樓夢通靈遇雙真</option>
+      
+      <option value="26" >第二十六回　蜂腰橋設言傳密語　瀟湘館春困發幽情</option>
+      
+      <option value="27" >第二十七回　滴翠亭楊妃戲彩蝶　埋香冢飛燕泣殘紅</option>
+      
+      <option value="28" >第二十八回　蔣玉菡情贈茜香羅　薛寶釵羞籠紅麝串</option>
+      
+      <option value="29" >第二十九回　享福人福深還禱福　癡情女情重愈斟情</option>
+      
+      <option value="30" >第三十回　寶釵借扇機帶雙敲　齡官劃薔癡及局外</option>
+      
+      <option value="31" >第三十一回　撕扇子作千金一笑　因麒麟伏白首雙星</option>
+      
+      <option value="32" >第三十二回　訴肺腑心迷活寶玉　含恥辱情烈死金釧</option>
+      
+      <option value="33" >第三十三回　手足耽耽小動脣舌　不肖種種大承笞撻</option>
+      
+      <option value="34" >第三十四回　情中情因情感妹妹　錯裏錯以錯勸哥哥</option>
+      
+      <option value="35" >第三十五回　白玉釧親嘗蓮葉羹　黃金鶯巧結梅花絡</option>
+      
+      <option value="36" >第三十六回　繡鴛鴦夢兆絳芸軒　識分定情悟梨香院</option>
+      
+      <option value="37" >第三十七回　秋爽齋偶結海棠社　蘅蕪苑夜擬菊花題</option>
+      
+      <option value="38" >第三十八回　林瀟湘魁奪菊花詩　薛蘅蕪諷和螃蟹詠</option>
+      
+      <option value="39" >第三十九回　村老嫗荒談承色笑　癡情子實意覓蹤跡</option>
+      
+      <option value="40" >第四十回　史太君兩宴大觀園　金鴛鴦三宣牙牌令</option>
+      
+      <option value="41" >第四十一回　賈寶玉品茶攏翠庵　劉姥姥醉臥怡紅院</option>
+      
+      <option value="42" >第四十二回　蘅蕪君蘭言解疑語　瀟湘子雅謔補餘香</option>
+      
+      <option value="43" >第四十三回　閒取樂偶攢金慶壽　不了情暫撮土爲香</option>
+      
+      <option value="44" >第四十四回　變生不測鳳姐潑醋　喜出望外平兒理妝</option>
+      
+      <option value="45" >第四十五回　金蘭契互剖金蘭語　風雨夕悶制風雨詞</option>
+      
+      <option value="46" >第四十六回　尷尬人難免尷尬事　鴛鴦女誓絕鴛鴦偶</option>
+      
+      <option value="47" >第四十七回　呆霸王調情遭苦打　冷郎君懼禍走他鄉</option>
+      
+      <option value="48" >第四十八回　濫情人情誤思遊藝　慕雅女雅集苦吟詩</option>
+      
+      <option value="49" >第四十九回　琉璃世界白雪紅梅　脂粉香娃割腥啖羶</option>
+      
+      <option value="50" >第五十回　蘆雪廣爭聯即景詩　暖香塢創制春燈謎</option>
+      
+      <option value="51" >第五十一回　薛小妹新編懷古詩　胡庸醫亂用虎狼藥</option>
+      
+      <option value="52" >第五十二回　俏平兒情掩蝦鬚鐲　勇晴雯病補雀金裘</option>
+      
+      <option value="53" >第五十三回　寧國府除夕祭宗祠　榮國府元宵開夜宴</option>
+      
+      <option value="54" >第五十四回　史太君破陳腐舊套　王熙鳳效戲彩斑衣</option>
+      
+      <option value="55" >第五十五回　辱親女愚妾爭閒氣　欺幼主刁奴蓄險心</option>
+      
+      <option value="56" >第五十六回　敏探春興利除宿弊　識寶釵小惠全大體</option>
+      
+      <option value="57" >第五十七回　慧紫鵑情辭試忙玉　慈姨媽愛語慰癡顰</option>
+      
+      <option value="58" >第五十八回　杏子陰假鳳泣虛凰　茜紗窗真情揆癡理</option>
+      
+      <option value="59" >第五十九回　柳葉渚邊嗔鶯吒燕　絳芸軒裏召將飛符</option>
+      
+      <option value="60" >第六十回　茉莉粉替去薔薇硝　玫瑰露引來茯苓霜</option>
+      
+      <option value="61" >第六十一回　投鼠忌器寶玉情贓　判冤決獄平兒情權</option>
+      
+      <option value="62" >第六十二回　憨湘雲醉眠芍藥裀　呆香菱情解柘榴裙</option>
+      
+      <option value="63" >第六十三回　壽怡紅羣芳開夜宴　死金丹獨豔理親喪</option>
+      
+      <option value="64" >第六十四回　幽淑女悲題五美吟　浪蕩子情遺九龍珮</option>
+      
+      <option value="65" >第六十五回　賈二舍偷娶尤二姨　尤三姐思嫁柳二郎</option>
+      
+      <option value="66" >第六十六回　情小妹恥情歸地府　冷二郎一冷入空門</option>
+      
+      <option value="67" >第六十七回　饋土物顰卿念故里　訊家童鳳姐蓄陰謀</option>
+      
+      <option value="68" >第六十八回　苦尤娘賺入大觀園　酸鳳姐大鬧寧國府</option>
+      
+      <option value="69" >第六十九回　弄小巧用借劍殺人　覺大限吞生金自逝</option>
+      
+      <option value="70" >第七十回　林黛玉重建桃花社　史湘雲偶填柳絮詞</option>
+      
+      <option value="71" >第七十一回　嫌隙人有心生嫌隙　鴛鴦女無意遇鴛鴦</option>
+      
+      <option value="72" >第七十二回　王熙鳳恃強羞說病　來旺婦倚勢霸成親</option>
+      
+      <option value="73" >第七十三回　癡丫頭誤拾繡春囊　懦小姐不問累金鳳</option>
+      
+      <option value="74" >第七十四回　惑奸讒抄揀大觀園　矢孤介杜絕寧國府</option>
+      
+      <option value="75" >第七十五回　開夜宴異兆發悲音　賞中秋新詞得佳讖</option>
+      
+      <option value="76" >第七十六回　凸碧堂品笛感悽清　凹晶館聯詩悲寂寞</option>
+      
+      <option value="77" >第七十七回　俏丫鬟抱屈夭風流　美優伶斬情歸水月</option>
+      
+      <option value="78" >第七十八回　老學士閒徵姽嫿詞　癡公子杜撰芙蓉誄</option>
+      
+      <option value="79" >第七十九回　薛文龍悔娶河東獅　賈迎春誤嫁中山狼</option>
+      
+      <option value="80" >第八十回　懦弱迎春腸回九曲　姣怯香菱病入膏肓</option>
+      
+      <option value="81" >第八十一回　佔旺相四美釣遊魚　奉嚴詞兩番入家塾</option>
+      
+      <option value="82" >第八十二回　老學究講義警頑心　病瀟湘癡魂驚惡夢</option>
+      
+      <option value="83" >第八十三回　省宮闈賈元妃染恙　鬧閨閫薛寶釵吞聲</option>
+      
+      <option value="84" >第八十四回　試文字寶玉始提親　探驚風賈環重結怨</option>
+      
+      <option value="85" >第八十五回　賈存週報升郎中任　薛文起復惹放流刑</option>
+      
+      <option value="86" >第八十六回　受私賄老官翻案牘　寄閒情淑女解琴書</option>
+      
+      <option value="87" >第八十七回　感深秋撫琴悲往事　坐禪寂走火入邪魔</option>
+      
+      <option value="88" >第八十八回　博庭歡寶玉贊孤兒　正家法賈珍鞭悍僕</option>
+      
+      <option value="89" >第八十九回　人亡物在公子填詞　蛇影杯弓顰卿絕粒</option>
+      
+      <option value="90" >第九十回　失綿衣貧女耐嗷嘈　送果品小郎驚叵測</option>
+      
+      <option value="91" >第九十一回　縱淫心寶蟾工設計　佈疑陣寶玉妄談禪</option>
+      
+      <option value="92" >第九十二回　評女傳巧姐慕賢良　玩母珠賈政參聚散</option>
+      
+      <option value="93" >第九十三回　甄家僕投靠賈家門　水月庵掀翻風月案</option>
+      
+      <option value="94" >第九十四回　宴海棠賈母賞花妖　失寶玉通靈知奇禍</option>
+      
+      <option value="95" >第九十五回　因訛成實元妃薨逝　以假混真寶玉瘋顛</option>
+      
+      <option value="96" >第九十六回　瞞消息鳳姐設奇謀　泄機關顰兒迷本性</option>
+      
+      <option value="97" >第九十七回　林黛玉焚稿斷癡情　薛寶釵出閨成大禮</option>
+      
+      <option value="98" >第九十八回　苦絳珠魂歸離恨天　病神瑛淚灑相思地</option>
+      
+      <option value="99" >第九十九回　守官箴惡奴同破例　閱邸報老舅自擔驚</option>
+      
+      <option value="100" >第一百回　破好事香菱結深恨　悲遠嫁寶玉感離情</option>
+      
+      <option value="101" >第百零一回　大觀園月夜感幽魂　散花寺神籤驚異兆</option>
+      
+      <option value="102" >第百零二回　寧國府骨肉病災襟　大觀園符水驅妖孽</option>
+      
+      <option value="103" >第百零三回　施毒計金桂自焚身　昧真禪雨村空遇舊</option>
+      
+      <option value="104" >第百零四回　醉金剛小鰍生大浪　癡公子餘痛觸前情</option>
+      
+      <option value="105" >第百零五回　錦衣軍查抄寧國府　驄馬使彈劾平安州</option>
+      
+      <option value="106" >第百零六回　王熙鳳致禍抱羞慚　賈太君禱天消禍患</option>
+      
+      <option value="107" >第百零七回　散餘資賈母明大義　復世職政老沐天恩</option>
+      
+      <option value="108" >第百零八回　強歡笑蘅蕪慶生辰　死纏綿瀟湘聞鬼哭</option>
+      
+      <option value="109" >第百零九回　候芳魂五兒承錯愛　還孽債迎女返真元</option>
+      
+      <option value="110" >第百一十回　史太君壽終歸地府　王鳳姐力詘失人心</option>
+      
+      <option value="111" >第百十一回　鴛鴦女殉主登太虛　狗彘奴欺天招夥盜</option>
+      
+      <option value="112" >第百十二回　活冤孽妙尼遭大劫　死仇讎趙妾赴冥曹</option>
+      
+      <option value="113" >第百十三回　懺宿冤鳳姐託村嫗　釋舊憾情婢感癡郎</option>
+      
+      <option value="114" >第百十四回　王熙鳳歷幻返金陵　甄應嘉蒙恩還玉闕</option>
+      
+      <option value="115" >第百十五回　惑偏私惜春矢素志　證同類寶玉失相知</option>
+      
+      <option value="116" >第百十六回　得通靈幻境悟仙緣　送慈柩故鄉全孝道</option>
+      
+      <option value="117" >第百十七回　阻超凡佳人雙護玉　欣聚黨惡子獨承家</option>
+      
+      <option value="118" >第百十八回　記微嫌舅兄欺弱女　驚謎語妻妾諫癡人</option>
+      
+      <option value="119" >第百十九回　中鄉魁寶玉卻塵緣　沐皇恩賈家延世澤</option>
+      
+      <option value="120" >第百二十回　甄士隱詳說太虛情　賈雨村歸結紅樓夢</option>
+      
+    </select>
+    
+    <a class="turn" href="/compare/4" title="下一回">下一回 →</a>
+    
+    <span class="spacer"></span>
+    <div class="version-picker">
+      <button class="vp-toggle" id="vp-toggle" type="button">版本 ▾</button>
+      <div class="vp-menu" id="vp-menu">
+        
+        <label class="vp-item">
+          <input type="checkbox" value="gong" data-label="脂评汇校" checked>
+          脂评汇校
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="zdic" data-label="汉典校订本" checked>
+          汉典校订本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengjia" data-label="程甲本" checked>
+          程甲本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi" data-label="程乙本" checked>
+          程乙本
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="chengyi_ocr" data-label="程乙本OCR" checked>
+          程乙本OCR
+        </label>
+        
+        <label class="vp-item">
+          <input type="checkbox" value="fax_chengyi" data-label="程乙本影印" checked>
+          程乙本影印
+        </label>
+        
+      </div>
+    </div>
+    <a href="/chapter/3">阅读版 →</a>
+  </div>
+
+  <div class="compare-grid">
+    
+    <div class="compare-col" data-col="gong">
+      <div class="compare-col-head">
+        <span class="badge">脂评汇校</span>
+        <span class="col-desc">脂评汇校本（庚辰本系为主，参校诸脂本，含脂批）</span>
+        <span>第3回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">金陵城起复贾雨村 荣国府收养甲侧：二字触目凄凉之至！</h3>
+        
+        
+        <p class="col-para">
+          
+            林黛玉戚：我为你持戒，我为你吃斋；我为你百行百计不舒怀，我为你泪眼愁眉难解。无人处，自疑猜，生怕那慧性灵心偷改。宝玉通灵可爱，天生有眼堪穿。万年幸一遇仙缘，从此春光美满。随时喜怒哀乐，远却离合悲欢。地久天长香影连，可意方舒心眼。宝玉衔来，是补天之余，落地已久，得地气收藏，因人而现。其性质内阳外阴，其形体光白温润，天生有眼可穿，故名曰宝玉，将欲得者尽宝爱此玉之意也。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天地循环秋复春，生生死死旧重新。君家著笔描风月，宝玉颦颦解爱人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说雨村忙回头看时，不是别人，乃是当日同僚一案参革的号张如圭
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">盖言如鬼如蜮也，亦非正人正言。</span>
+            
+          
+            者。他本系此地人，革职后家居，今打听都中奏准起复旧员之信，他便四下里寻情找门路，忽遇见雨村，故忙道喜。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">此途宦境，描写的当。</span>
+            
+          
+            二人见了礼，张如圭便将此信告诉雨村，雨村自是欢喜，忙忙的叙了两句，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">画出心事。</span>
+            
+          
+            遂作别各自回家。冷子兴听得此言，便忙献计，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">毕肖赶热灶者。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            令雨村央烦林如海，转向都中去央烦贾政。雨村领其意，作别回至馆中，忙寻邸报看真确了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">细。</span>
+            
+          
+            次日，面谋之如海。如海道：“天缘凑巧，因贱荆去世，都中家岳母念及小女无人依傍教育，前已遣了男女船只来接，因小女未曾大痊，故未及行。此刻正思向蒙训教之恩未经酬报，遇此机会，岂有不尽心图报之理。但请放心，弟已预为筹画至此，已修下荐书一封，转托内兄务为周全协佐，方可稍尽弟之鄙诚，即有所费用之例，弟于内兄信中已注明白，亦不劳尊兄多虑矣。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">要说正文故以此作引，且黛玉路中实无可托之人。</span>
+            
+          
+            文笔逼切得宜。雨村一面打恭，谢不释口，一面又问：“不知令亲大人现居何职？
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">奸险小人欺人语。</span>
+            
+          
+            只怕晚生草率，不敢骤然入都干渎。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">全是假，全是诈。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">借雨村细密心思之语，容容易易转入正文，亦是宦途人之口头心头。</span>
+            
+          
+            最妙！如海笑道：“若论舍亲，与尊兄犹系同谱，乃荣公之孙。大内兄现袭一等将军，名赦，字恩侯，二内兄名政，字存周，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">二名二字皆颂德而来，与子兴口中作证。</span>
+            
+          
+            现任工部员外郎，其为人谦恭厚道，大有祖父遗风，非膏粱轻薄仕宦之流，复醒一笔。故弟方致书烦托。否则不但有污尊兄之清操，即弟亦不屑为矣。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写如海实写政老。</span>
+            
+          
+            所谓此书有不写之写是也。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">作弊者每每偏能如此说。</span>
+            
+          
+            雨村听了，心下方信了昨日子兴之言，于是又谢了林如海。如海乃说：“已择了出月初二日小女入都，尊兄即同路而往，岂不两便？”雨村唯唯听命，心中十分得意。如海遂打点礼物并饯行之事，雨村一一领了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那女学生黛玉，身体大愈，原不忍弃父而往，无奈他外祖母致意务去，且兼如海说：“汝父年将半百，再无续室之意，且汝多病，年又极小，上无亲母教养，下无姊妹兄弟扶持，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">可怜！</span>
+            
+          
+            一句一滴血，一句一滴血之文。今依傍外祖母及舅氏姊妹去，正好减我顾盼之忧，何反云不往？”黛玉听了，方洒泪拜别，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">实写黛玉。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">此一段是不肯使黛玉作弃父乐为远游者。</span>
+            
+          
+            以此可见作者之心宝爱黛玉如己。随了奶娘及第 17 页荣府几个老妇人登舟而去。雨村另有一只船，带两个小童，依附黛玉而行。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">老师依附门生，怪道今时以收纳门生为幸。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">细密如此，是大家风范。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有日到了都中，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">繁中简笔。</span>
+            
+          
+            进入神京，雨村先整了衣冠，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">且按下黛玉以待细写。</span>
+            
+          
+            今故先将雨村安置过一边，方起荣府中之正文也。带了小童，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">至此渐渐好看起来也。</span>
+            
+          
+            拿着宗侄的名帖，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此帖妙极，可知雨村的品行矣。</span>
+            
+          
+            至荣府的门前投了。彼时贾政已看了妹丈之书，即忙请入相会。见雨村相貌魁伟，言语不俗，且这贾政最喜读书人，礼贤下士，济弱扶危，大有祖风，况又系妹丈致意，因此优待雨村，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">君子可欺其方也，况雨村正在王莽谦恭下士之时，虽政老亦为所惑，在作者系指东说西也。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            更又不同，便竭力内中协助，题奏之日，轻轻谋
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">《春秋》字法。</span>
+            
+          
+            了一个复职候缺，不上两个月，金陵应天府缺出，便谋补
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">《春秋》字法。</span>
+            
+          
+            了此缺，拜辞了贾政，择日上任去了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">因宝钗故及之，一语过至下回。</span>
+            
+          
+            不在话下。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">了结雨村。</span>
+            
+          
+            且说黛玉自那日弃舟登岸时，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这方是正文起头处。</span>
+            
+          
+            此后笔墨，与前两回不同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便有荣国府打发了轿子并拉行李的车辆久候了。这林黛玉常听得
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">三字细。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">以“常听见”等字省下多少笔墨。</span>
+            
+          
+            母亲说过，他外祖母家与别家不同。他近日所见的这几个三等仆妇，吃穿用度，已是不凡了，何况今至其家。因此步步留心，时时在意，不肯轻易多说一句话，多行一步路，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">颦颦故自不凡。</span>
+            
+          
+            惟恐被人耻笑了他去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-甲" title="甲侧">写黛玉自幼之心机。</span>
+            
+          
+            辰夹：黛玉自忖之语。自上了轿，进入城中，从纱窗向外瞧了一瞧，其街市之繁华，人烟之阜盛，自与别处不同。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">先从街市写来。</span>
+            
+          
+            又行了半日，忽见街北蹲着两个大石狮子，三间兽头大门，门前列坐着十来个华冠丽服之人。正门却不开，只有东西两角门有人出入。正门之上有一匾，匾上大书“敕造宁国府”五个大字。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">先写宁府，这是由东向西而来。</span>
+            
+          
+            黛玉想道：“这必是外祖之长房了。”想着，又往西行，不多远，照样也是三间大门，方是荣国府了。却不进正门，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">以下写宁国府第，总借黛玉一双俊眼中传来。</span>
+            
+          
+            非黛玉之眼，也不得如此细密周详。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只进了西边角门。那轿夫抬进去，走了一射之地，将转弯时，便歇下退出去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面的婆子们已都下了轿，赶上前来。另换了三四个衣帽周全十七八岁的小厮上来，复抬起轿子。众婆子步下围随至一垂花门前落下。众小厮退出，众婆子上来打起轿帘，扶黛玉下轿。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">以上写款项。</span>
+            
+          
+            林黛玉扶着婆子的手，进了垂花门，两边是抄手游廊，当中是穿堂，当地放着一个紫檀架子大理石的大插屏。转过插屏，小小的三间厅，厅后就是后面的正房大院。正面五间上房，皆雕梁画栋，两边穿山游廊厢房，挂着各色鹦鹉、画眉等鸟雀。台矶之上，坐着几个穿红着绿的丫头，一见他们来了，便忙都笑迎上来，说：“刚才老太太还念呢，可巧就来了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">如见如闻，活现于纸上之笔。</span>
+            
+          
+            好看煞！于是三四人争着打起帘笼，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">真有是事，真有是事！</span>
+            
+          
+            一面听得人回话：“林姑娘到了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">此书得力处，全是此等地方，所谓“颊上三毫”也。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉方进入房时，只见两个人搀着一位鬓发如银的老母迎上来，黛玉便知是他外祖母。方欲拜见时，早被他外祖母一把搂入怀中，心肝儿肉
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">写尽天下疼女儿的神理。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">此一段文字是天性中流出，我读时不觉泪盈双袖。</span>
+            
+          
+            叫着大哭起来。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">几千斤力量写此一笔。</span>
+            
+          
+            当下地下侍立之人，无不掩面涕泣，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">旁写一笔，更妙！</span>
+            
+          
+            黛玉也哭个不住。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">自然顺写一笔。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">逼真。</span>
+            
+          
+            一时众人慢慢解劝住了，黛玉方拜见了外祖母。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">书中正文之人，却如此写出，却是天生地设章法，不见一丝勉强。</span>
+            
+          
+            此即冷子兴所云之史氏太君，贾赦、贾政之母也。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">书中人目太繁，故明注一笔，使观者省眼。</span>
+            
+          
+            当下贾母一一指与黛玉：“这是你大舅母，辰夹：邢氏。这是你二舅母，辰夹：王氏。这是你先珠大哥的媳妇珠大嫂子。辰夹：李纨。”黛玉一一拜见过。贾母又说：“请姑娘们来。今日远客才来，可以不必上学去了。”众人答应了一声，便去了两个。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 18 页不一时，只见三个奶嬷嬷并五六个丫鬟，簇拥着三个姊妹来了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">声势如现纸上。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">从黛玉眼中写三人。</span>
+            
+          
+            第一个肌肤微丰，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">不犯宝钗。</span>
+            
+          
+            合中身材，腮凝新荔，鼻腻鹅脂，温柔沉默，观之可亲。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">为迎春写照。</span>
+            
+          
+            第二个削肩细腰，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">《洛神赋》中云“肩若削成”是也。</span>
+            
+          
+            长挑身材，鸭蛋脸面，俊眼修眉，顾盼神飞，文彩精华，见之忘俗。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">为探春写照。</span>
+            
+          
+            第三个身量未足，形容尚小。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">浑写一笔更妙！</span>
+            
+          
+            必个个写去则板矣。可笑近之小说中有一百个女子，皆是如花似玉一副脸面。其钗环裙袄，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是极。</span>
+            
+          
+            三人皆是一样的妆饰。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">毕肖。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">欲画天尊，先画(纵)[众]神。</span>
+            
+          
+            如此，其天尊自当另有一番高山世外的景象。黛玉忙起身迎上来见礼，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此笔亦不可少。</span>
+            
+          
+            互相厮认过，大家归了坐。丫鬟们斟上茶来。不过说些黛玉之母如何得病，如何请医服药，如何送死发丧。不免贾母又伤感起来，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">妙！</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">层层不露，周密之至。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因说：“我这些儿女，所疼者独有你母，今日一旦先舍我而去，连面也不能一见，今见了你，我怎不伤心！”说着，搂了黛玉在怀，又呜咽起来。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">不禁我也跟他哭起。</span>
+            
+          
+            众人忙都宽慰解释，方略略止住。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">总为黛玉自此不能别往。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人见黛玉年貌虽小，其举止言谈不俗，身体面庞虽怯弱不胜，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写美人是如此笔仗，看官怎得不叫绝称赏！</span>
+            
+          
+            却有一段自然的风流态度，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">为黛玉写照。</span>
+            
+          
+            众人目中，只此一句足矣。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">从众人目中写黛玉。</span>
+            
+          
+            草胎卉质，岂能胜物耶？想其衣裙皆不得不勉强支持者也。便知他有不足之症。因问：“常服何药，如何不急为疗治？”黛玉道：“我自来是如此，从会吃饮食时便吃药，到今日未断，请了多少名医修方配药，皆不见效。那一年我三岁时，听得说
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">文字细如牛毛。</span>
+            
+          
+            来了一个癞头和尚，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">奇奇怪怪一至于此。</span>
+            
+          
+            通部中假借癞僧、跛道二人点明迷情幻海中有数之人也。非袭《西游》中一味无稽、至不能处便用观世音可比。说要化我去出家，我父母固是不从。他又说：‘既舍不得他，只怕他的病一生也不能好的了。若要好时，除非从此以后总不许见哭声，
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">爱哭的偏写出有人不教哭。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">作者既以黛玉为绛珠化生，是要哭的了，反要使人先叫他不许哭。</span>
+            
+          
+            妙！除父母之外，凡有外姓亲友之人，一概不见，方可平安了此一世。’疯疯癫癫，说了这些不经之谈，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是作书者自注。</span>
+            
+          
+            也没人理他。如今还是吃人参养荣丸。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-甲" title="甲侧">人生自当自养荣卫。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">甄英莲乃副十二钗之首，却明写癞僧一点。</span>
+            
+          
+            今黛玉为正十二钗之冠，反用暗笔。盖正十二钗人或洞悉可知，副十二钗或恐观者忽略，故写极力一提，使观者万勿稍加玩忽之意耳。贾母道：“正好，我这里正配丸药呢。叫他们多配一料就是了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-甲" title="甲侧">为后菖菱伏脉。</span>
+            
+          
+            一语未了，只听后院中有人笑声，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">懦笔庸笔何能及此！</span>
+            
+          
+            说：“我来迟了，不曾迎接远客！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">第一笔，阿凤三魂六魄已被作者拘定了，后文焉得不活跳纸上？</span>
+            
+          
+            此等文字非仙助即神助，从何而得此机括耶？
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">另磨新墨，搦锐笔，特独出熙凤一人。</span>
+            
+          
+            未见其人，先使闻声，所谓“绣幡开，遥见英雄俺”也。黛玉纳罕道：“这些人个个皆敛声屏气，恭肃严整如此，这来者系谁，这样放诞无礼？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">原有此一想。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">天下事，不可一概而论。</span>
+            
+          
+            心下想时，只见一群媳妇丫鬟围拥着一个人从后房门进来。这个人打扮与众姑娘不同，彩绣辉煌，恍若神妃仙子：头上戴着金丝八宝攒珠髻，绾着朝阳五凤挂珠钗，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">头。</span>
+            
+          
+            项上戴着赤金盘螭璎珞圈，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">颈。</span>
+            
+          
+            裙边系着豆绿宫绦，双衡比目玫瑰佩，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">腰。</span>
+            
+          
+            身上穿着缕金百蝶穿花大红洋缎窄褃袄，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">大凡能事者，多是尚奇好异，不肯泛泛同流。</span>
+            
+          
+            外罩五彩刻丝石青银鼠褂，下着翡翠撒花洋绉裙。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一双丹凤三角眼，两弯柳叶吊梢眉，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">非如此眼，非如此眉，不得为熙凤。</span>
+            
+          
+            作者读过麻衣相法。身量苗条，体格风骚，粉面含春威不露，丹唇未启笑先闻。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">为阿凤写照。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">试问诸公：从来小说中可有写形追像至此者？</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">英豪本等。</span>
+            
+          
+            黛玉连忙起身接见。贾母笑
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">阿凤一至，贾母方笑，与后文多少笑字作偶。</span>
+            
+          
+            道：“你不认得他，他是我们这里有名的一个泼皮破落户儿，南省俗谓作‘辣子’，你只叫他‘凤辣子’第 19 页就是了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">阿凤笑声进来，老太君打诨，虽是空口传声，却是补出一向晨昏起居，阿凤于太君处承欢应候一刻不可少之人，看官勿以闲文淡文也。</span>
+            
+          
+            黛玉正不知以何称呼，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">想黛玉此时神情，含浑可爱。</span>
+            
+          
+            只见众姊妹都忙告诉他道：“这是琏嫂子。”黛玉虽不识，也曾听见母亲说过，大舅贾赦之子贾琏，娶的就是二舅母王氏之内侄女，自幼假充男儿教养的，学名王熙凤。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">奇想奇文。</span>
+            
+          
+            以女子曰“学名”固奇，然此偏有学名的反倒不识字，不曰学名者反若假。黛玉忙陪笑见礼，以“嫂”呼之。这熙凤携着黛玉的手，上下细细打量了一回，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写阿凤全部传神第一笔也。</span>
+            
+          
+            仍送至贾母身边坐下，因笑道：“天下真有这样标致的人物，我今儿才算见了！
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这方是阿凤言语。</span>
+            
+          
+            若一味浮词套语，岂复为阿凤哉！
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">“真有这样标致人物”出自凤口，黛玉丰姿可知。</span>
+            
+          
+            宜作史笔看。况且这通身的气派，竟不象老祖宗的外孙女儿，竟是个嫡亲的孙女，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">仍归太君，方不失《石头记》文字，且是阿凤身心之至文。</span>
+            
+          
+            怨不得老祖宗天天口头心头一时不忘。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">却是极淡之语，偏能恰投贾母之意。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">以“真有愿不得”五字，写熙凤之口头，真是机巧异常，“愿不得”三字，愚弄了多少聪明特达者。</span>
+            
+          
+            只可怜我这妹妹这样命苦，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这是阿凤见黛玉正文。</span>
+            
+          
+            怎么姑妈偏就去世了！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">若无这几句，便不是贾府媳妇。</span>
+            
+          
+            说着，便用帕拭泪。贾母笑道：“我才好了，你倒来招我。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">文字好看之极。</span>
+            
+          
+            你妹妹远路才来，身子又弱，也才劝住了，快再休提前话！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">反用贾母劝，看阿凤之术亦甚矣。</span>
+            
+          
+            这熙凤听了，忙转悲为喜道：“正是呢！我一见了妹妹，一心都在他身上了，又是喜欢，又是伤心，竟忘记了老祖宗。该打，该打！”又忙携黛玉之手，问：“妹妹几岁了？可也上过学？现吃什么药？在这里不要想家，想要什么吃的，什么玩的，只管告诉我，丫头老婆们不好了，也只管告诉我。”一面又问婆子们：“林姑娘的行李东西可搬进来了？带了几个人来？
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">当家的人事如此，毕肖！</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">三句话不离本行，职任在兹也。</span>
+            
+          
+            你们赶早打扫两间下房，让他们去歇歇。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说话时，已摆了茶果上来，熙凤亲为捧茶捧果。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">总为黛玉眼中写出。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">熙凤后到，为有事，写其势能，先为筹画，写其机巧。</span>
+            
+          
+            摇前映后之笔。又见二舅母问他：“月钱放过了不曾？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">不见后文，不见此笔之妙。</span>
+            
+          
+            熙凤道：“月钱已放完了。才刚带着人到后楼上找缎子，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">接闲文，是本意避繁也。</span>
+            
+          
+            找了这半日，也并没有见昨日太太说的那样的。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">却是日用家常实事。</span>
+            
+          
+            想是太太记错了？”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">陪笔用得灵活，兼能形容熙凤之为人，妙心妙手，故有妙文妙口。</span>
+            
+          
+            王夫人道：“有没有，什么要紧。”因又说道：“该随手拿出两个来给你这妹妹去裁衣裳的，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">仍归前文。</span>
+            
+          
+            妙妙！等晚上想着叫人再去拿罢，可别忘了。”熙凤道：“这倒是我先料着了，知道妹妹不过这两日到的，我已预备下了，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">余知此缎阿凤并未拿出，此借王夫人之语机变欺人处耳。</span>
+            
+          
+            若信彼果拿出预备，不独被阿凤瞒过，亦且被石头瞒过了。等太太回去过了目好送来。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">试看他心机。</span>
+            
+          
+            王夫人一笑，点头不语。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">深取之意。</span>
+            
+          
+            辰夹：很漏凤姐是个当家人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当下茶果已撤，贾母命两个老嬷嬷带了黛玉去见两个母舅。时贾赦之妻邢氏忙亦起身，笑回道：“我带了外甥女过去，倒也便宜。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">以黛玉之来去候安之便，便将荣宁二府的势排描写尽矣。</span>
+            
+          
+            贾母笑道：“正是呢，你也去罢，不必过来了。”邢夫人答应了一声“是”字，遂带了黛玉与王夫人作辞，大家送至穿堂前。出了垂花门，早有众小厮们拉过一辆翠幄青紬车。邢夫人携了黛玉，坐在上面，辰夹：未识黛卿能乘此否。众婆子们放下车帘，方命小厮们抬起，拉至宽处，方驾上驯骡，亦出了西角门，往东过荣府正门，便入一黑油大门中，至仪门前方下来。众小厮退出，方打起车帘，邢夫人搀着黛玉的手，进入院中。黛玉度其房屋院宇，必是荣府中花园隔断过来的。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">黛玉之心机眼力。</span>
+            
+          
+            进入三层仪门，果见正房厢庑游廊，悉皆小巧别致，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">分别得沥沥，可想如见。</span>
+            
+          
+            不似方才那边轩峻壮丽，且院中随处之树木山石皆有。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">为大观园伏脉。</span>
+            
+          
+            试思荣府园今在西，后之大观园偏写在东，何不畏难之若此？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 20 页一时进入正室，早有许多盛妆丽服之姬妾丫鬟迎着，邢夫人让黛玉坐了，一面命人到外面书房去请贾赦。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这一句都是写贾赦，妙在全是指东击西打草惊蛇之笔。</span>
+            
+          
+            若看其写一人即作此一人看，先生便呆了。一时人来回话说：“老爷说了：‘连日身上不好，见了姑娘彼此倒伤心，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">追魂摄魄。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">余久不作此语矣，见此语未免一醒。</span>
+            
+          
+            暂且不忍相见。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">若一见时，不独死板，且亦大失情理，亦不能有此等妙文矣。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">作者绣口锦心，见有见的亲切，不见有不见的亲切，直说横讲，一毫不爽。</span>
+            
+          
+            劝姑娘不要伤心想家，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">亦在情理之内。</span>
+            
+          
+            跟着老太太和舅母，即同家里一样。姊妹们虽拙，大家一处伴着，亦可以解些烦闷。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">赦老亦能作此语，叹叹！</span>
+            
+          
+            或有委屈之处，只管说得，不要外道才是。’”黛玉忙站起来，一一听了。再坐一刻，便告辞。邢夫人苦留吃过晚饭去，黛玉笑回道：“舅母爱惜赐饭，原不应辞，只是还要过去拜见二舅舅，恐领了赐去不恭，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">得体。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">黛玉之为人，必当有如此身分。</span>
+            
+          
+            异日再领，未为不可。望舅母容谅。”邢夫人听说，笑道：“这倒是了。”遂令两三个嬷嬷用方才的车好生送了姑娘过去，于是黛玉告辞。邢夫人送至仪门前，又嘱咐了众人几句，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">又嘱咐了几句，方是舅母的本等。</span>
+            
+          
+            眼看着车去了方回来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一时黛玉进了荣府，下了车。众嬷嬷引着，便往东转弯，穿过一个东西的穿堂，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这一个穿堂是贾母正房之南者，凤姐处所通者则是贾母正房之北。</span>
+            
+          
+            向南大厅之后，仪门内大院落，上面五间大正房，两边厢房鹿顶耳房钻山，四通八达，轩昂壮丽，比贾母处不同。黛玉便知这方是正经正内室，一条大甬路，直接出大门的。进入堂屋中，抬头迎面先看见一个赤金九龙青地大匾，匾上写着斗大的三个大字，是“荣禧堂”，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">真是荣国府。</span>
+            
+          
+            后有一行小字“某年月日，书赐荣国公贾源”，又有“万几宸翰之宝”。大紫檀雕螭案上，设着三尺来高青绿古铜鼎，悬着待漏随朝墨龙大画，一边是金蜼彝，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">蜼，音垒。</span>
+            
+          
+            周器也。一边是玻璃 。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">，音海。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盛酒之大器也。地下两溜十六张楠木交椅。又有一副对联，乃乌木联牌，镶着錾银的字迹，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">雅而丽，富而文。</span>
+            
+          
+            道是：座上珠玑昭日月，堂前黼黻焕烟霞。
+            
+          
+            <span class="ann-inline ann-甲" title="甲夹">实贴。</span>
+            
+          
+            下面一行小字，道是：“同乡世教弟勋袭东安郡王穆莳拜手书。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">先虚陪一笔。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来王夫人时常居坐宴息，亦不在这正室，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">黛玉由正室一段而来，是为拜见政老耳，故进东房。</span>
+            
+          
+            只在这正室东边的三间耳房内。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">若见王夫人，直写引至东廊小正室内矣。</span>
+            
+          
+            于是老嬷嬷引黛玉进东房门来。临窗大炕上铺着猩红洋罽，正面设着大红金钱蟒靠背，石青金钱蟒引枕，秋香色金钱蟒大条褥。两边设一对梅花式洋漆小几。左边几上文王鼎匙箸香盒，右边几上汝窑美人觚——觚内插着时鲜花卉，并茗碗唾壶等物。地下面西一溜四张椅上，都搭着银红撒花椅搭，底下四副脚踏。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            椅之两边，也有一对高几，几上茗碗瓶花俱备。其余陈设，自不必细说。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此不过略叙荣府家常之礼数，特使黛玉一识阶级座次耳，余则繁。</span>
+            
+          
+            老嬷嬷们让黛玉炕上坐，炕沿上却有两个锦褥对设，黛玉度其位次，便不上炕，只向东边椅子上坐了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写黛玉心意。</span>
+            
+          
+            本房内的丫鬟忙捧上茶来。黛玉一面吃茶，一面打量这些丫鬟们，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">借黛玉眼写三等使婢。</span>
+            
+          
+            装饰衣裙，举止行动，果亦与别家不同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            茶未吃了，只见一个穿红绫袄青缎掐牙背心的丫鬟
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">金乎？</span>
+            
+          
+            玉乎？走来笑说道：“太太说，请林姑娘到那边坐罢。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">唤去见，方是舅母，方是大家风范。</span>
+            
+          
+            老嬷嬷听了，于是又引黛玉出来，到了东廊三间小正房内。正房炕上横设一张炕桌，桌上磊着书籍茶具，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">伤心笔，堕泪笔。</span>
+            
+          
+            靠东壁面西设着半旧的青缎靠背引枕。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 21 页王夫人却坐在西边下首，亦是半旧的青缎靠背坐褥。见黛玉来了，便往东让。黛玉心中料定这是贾政之位。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写黛玉心到眼到，伧夫但云为贾府叙坐位，岂不可笑？</span>
+            
+          
+            因见挨炕一溜三张椅子上，也搭着半旧的
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">三字有神。</span>
+            
+          
+            此处则一色旧的，可知前正室中亦非家常之用度也。可笑近之小说中，不论何处，则曰商彝周鼎、绣幕珠帘、孔雀屏、芙蓉褥等样字眼。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">近闻一俗笑语云：一庄农人进京回家，众人问曰：“你进京去可见些个世面否？”</span>
+            
+          
+            庄人曰：“连皇帝老爷都见了。”众罕然问曰：“皇帝如何景况？”庄人曰：“皇帝左手拿一金元宝，右手拿一银元宝，马上捎着一口袋人参，行动人参不离口。一时要屙屎了，连擦屁股都用的是鹅黄缎子，所以京中掏茅厕的人都富贵无比。”试思凡稗官写富贵字眼者，悉皆庄农进京之一流也。盖此时彼实未身经目睹，所言皆在情理之外焉。 又如人嘲作诗者亦往往爱说富丽语，故有“胫骨变成金玳瑁，眼睛嵌作碧琉璃”之诮。余自是评《石头记》，非鄙弃前人也。弹墨椅袱，黛玉便向椅上坐了。王夫人再四携他上炕，他方挨王夫人坐了。王夫人因说：“你舅舅今日斋戒去了，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">点缀宦途。</span>
+            
+          
+            再见罢。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">赦老不见，又写政老。</span>
+            
+          
+            政老又不能见，是重不见重，犯不见犯。作者惯用此等章法。只是有一句话嘱咐你：你三个姊妹倒都极好，以后一处念书认字学针线，或是偶一顽笑，都有尽让的。但我不放心的最是一件：
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">王夫人嘱咐与邢夫人嘱咐，似同的，迥异。</span>
+            
+          
+            儿女累心，我欲代伊哭诉，一面愁苦。我有一个孽根祸胎，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">四字是血泪盈面，不得已无奈何而下。</span>
+            
+          
+            四字是作者痛哭。是家里的‘混世魔王’，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">与“绛洞花王”为对看。</span>
+            
+          
+            今日因庙里还愿去了，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是富贵公子。</span>
+            
+          
+            尚未回来，晚间你看见便知了。你只以后不要睬他，你这些姊妹都不敢沾惹他的。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉亦常听得母亲说过，二舅母生的有个表兄，乃衔玉而诞，顽劣异常，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">与甄家子恰对。</span>
+            
+          
+            极恶读书，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是极恶每日“诗云”“子曰”的读书。</span>
+            
+          
+            最喜在内帏厮混，外祖母又极溺爱，无人敢管。今见王夫人如此说，便知说的是这表兄了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这是一段反衬笔法。</span>
+            
+          
+            黛玉心用“猜度蠢物”等句对着去，方不失作者本旨。因陪笑道：“舅母说的，可是衔玉所生的这位哥哥？在家时亦曾听见母亲常说，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">有曾听得，所以闻言便知不必用心搜求了。</span>
+            
+          
+            这位哥哥比我大一岁，小名就唤宝玉，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">以黛玉道宝玉名，方不失正文。</span>
+            
+          
+            虽
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">“虽”字是有情字，宿根而发，勿得泛泛看过。</span>
+            
+          
+            极憨顽，说在姊妹情中极好的。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">黛玉口中心中早中此。</span>
+            
+          
+            况我来了，自然只和姊妹同处，兄弟们自是别院另室的，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">又登开一笔，妙妙！</span>
+            
+          
+            岂得去沾惹之理？”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">用黛玉反衬一句，更有深味。</span>
+            
+          
+            王夫人笑道：“你不知道原故。他与别人不同，自幼因老太太疼爱，原系同姊妹们一处娇养惯了的。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此一笔收回，是明通部同处原委也。</span>
+            
+          
+            若姊妹们有日不理他，他倒还安静些，纵然他没趣，不过出了二门，背地里拿着他两个小幺儿出气，咕唧一会子就完了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这可是宝玉本性真情，前四十九字迥异之批今始方知。</span>
+            
+          
+            盖小人口碑累累如是。是是非非任尔口角，大都皆然。若这一日姊妹们和他多说一句话，他心里一乐，便生出多少事来。所以嘱咐你别睬他。他嘴里一时甜言蜜语，一时有天无日，一时又疯疯傻傻，只休信他。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉一一的都答应着。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">不写黛玉眼中之宝玉，却先写黛玉心中已早有一宝玉矣，幻妙之至！</span>
+            
+          
+            自冷子兴口中之后，余已极思欲一见，及今尚未得见，狡猾之至！
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">客居之苦，在有意无意中写来。</span>
+            
+          
+            只见一个丫鬟来回：“老太太那里传晚饭了。”王夫人忙携黛玉从后房门
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">后房门。</span>
+            
+          
+            由后廊
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">是正房后廊也。</span>
+            
+          
+            往西，出了角门，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这是正房后西界墙角门。</span>
+            
+          
+            是一条南北宽夹道。南边是倒座三间小小的抱厦厅，北边立着一个粉油大影壁，后有一半大门，小小一所房室。王夫人笑指向黛玉道：“这是你凤姐姐的屋子，回来你好往这里找他来，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">灵活无一漏空。</span>
+            
+          
+            少什么东西，你只管和他说就是了。”这院门上也有
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">二字是他处不写之写也。</span>
+            
+          
+            四五个才总角的小厮，都垂手侍立。王夫人遂携黛玉穿过一个东西穿堂，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">这正是贾母正室后之穿堂也，与前穿堂是一带之屋，中一带乃贾母之下室也。</span>
+            
+          
+            记清。便是贾母的后院了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写得清，一丝不错。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 22 页于是，进入后房门，已有多人在此伺候，见王夫人来了，方安设桌椅。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">不是待王夫人用膳，是恐使王夫人有失侍膳之礼耳。</span>
+            
+          
+            贾珠之妻李氏捧饭，熙凤安箸，王夫人进羹。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">大人家规矩礼法。</span>
+            
+          
+            贾母正面榻上独坐，两边四张空椅，熙凤忙拉了黛玉在左边第一张椅上坐了，黛玉十分推让。贾母笑道：“你舅母你嫂子们不在这里吃饭。你是客，原应如此坐的。”黛玉方告了座，坐了。贾母命王夫人坐了。迎春姊妹三个告了座方上来。迎春便坐右手第一，探春左第二，惜春右第二。旁边丫鬟执着拂尘、漱盂、巾帕。李、凤二人立于案旁布让。外间伺候之媳妇丫鬟虽多，却连一声咳嗽不闻。寂然饭毕，各有丫鬟用小茶盘捧上茶来。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">作者非身履其境过，不能如此细密完足。</span>
+            
+          
+            当日林如海教女以惜福养身，云饭后务待饭粒咽尽，过一时再吃茶，方不伤脾胃。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">夹写如海一派书气，最妙！</span>
+            
+          
+            今黛玉见了这里许多事情不合家中之式，不得不随的，少不得一一改过来，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">幼而学，壮而行者，常情有不得已行权达变，多至于失手者，亦千古用慨，诚可悲夫。</span>
+            
+          
+            因而接了茶。早见人又捧过漱盂来，黛玉也照样漱了口。盥手毕，又捧上茶来，这方是吃的茶。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">总写黛玉以后之事，故只以此一件小事略为一表也。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">余看至此，故想日前所阅“王敦初尚公主，登厕时不知塞鼻用枣，敦辄取而啖之，早为宫人鄙诮多矣”。</span>
+            
+          
+            今黛玉若不漱此茶，或饮一口，不为荣婢所诮乎？观此则知黛玉平生之心思过人。贾母便说：“你们去罢，让我们自在说话儿。”王夫人听了，忙起身，又说了两句闲话，方引凤、李二人去了。贾母因问黛玉念何书。黛玉道：“只刚念了《四书》。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">好极！</span>
+            
+          
+            稗官专用“腹隐五车书”者来看。黛玉又问姊妹们读何书。贾母道：“读的是什么书，不过是认得两个字，不是睁眼的瞎子罢了！”一语未了，只听外面一阵脚步响，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">与阿凤之来相映而不相犯。</span>
+            
+          
+            丫鬟进来笑道：“宝玉来了！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">余为一乐。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">形容出姣养神。</span>
+            
+          
+            黛玉心中正疑惑着：“这个宝玉，不知是怎生个惫懒人物，懵懂顽童？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">文字不反，不见正文之妙，似此应从《国策》得来。</span>
+            
+          
+            倒不见那蠢物
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">这蠢物不是那蠢物，却有个极蠢之物相待。</span>
+            
+          
+            妙极！也罢了。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">从黛玉口中，故反一句则不文，更觉生色。</span>
+            
+          
+            心中想着，忽见丫鬟话未报完，已进来了一位年轻的公子：头上戴着束发嵌宝紫金冠，齐眉勒着二龙抢珠金抹额，穿一件二色金百蝶穿花大红箭袖，束着五彩丝攒花结长穗宫绦，外罩石青起花八团倭锻排穗褂，登着青缎粉底小朝靴。面若中秋之月，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">此非套“满月”，盖人生有面扁而青白色者，则皆可谓之秋月也。</span>
+            
+          
+            用“满月”者不知此意。色如春晓之花。
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">“少年色嫩不坚牢”，以及“非夭即贫”之语，余犹在心。</span>
+            
+          
+            今阅至此，放声一哭。鬓若刀裁，眉如墨画，面如桃瓣，目若秋波。虽怒时而若笑，即嗔视而有情。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">真真写杀。</span>
+            
+          
+            项上金螭璎珞，又有一根五色丝绦，系着一块美玉。黛玉一见，
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">写宝玉只是宝玉，写黛玉只是黛玉，从中用黛玉一惊宝玉之面善等字，文气自然，笼统要分开不得了。</span>
+            
+          
+            便吃一大惊，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">怪甚。</span>
+            
+          
+            心下想道：“好生奇怪，倒象在那里见过一般，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">此一惊，方下文之留连缠绵，不为猛浪，不是淫邪。</span>
+            
+          
+            何等眼熟到如此！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">正是想必在灵河岸上三生石畔曾见过。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只见这宝玉向贾母请了安，贾母便命：“去见你娘来。”宝玉即转身去了。一时回来，再看，已换了冠带：头上周围一转的短发，都结成小辫，红丝结束，共攒至顶中胎发，总编一根大辫，黑亮如漆，从顶至梢，一串四颗大珠，用金八宝坠角，身上穿着银红撒花半旧大袄，仍旧带着项圈、宝玉、寄名锁、护身符等物，下面半露松花撒花绫裤腿，锦边弹墨袜，厚底大红鞋。越显得面如敷粉，唇若施脂，转盼多情，语言常笑。天然一段风骚，全在眉梢，平生万种情思，悉堆眼角。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">总是写宝玉，总是为下文留地步。</span>
+            
+          
+            看其外貌最是极好，却难知其底细。后人有《西江月》二词，批宝玉极恰，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">二词更妙。</span>
+            
+          
+            最可厌野史“貌如潘安”“才如子建”等语。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            其词曰：第 23 页无故寻愁觅恨，有时似傻如狂。纵然生得好皮囊，腹内原来草莽。潦倒不通世务，愚顽怕读文章。行为偏僻性乖张，那管世人诽谤！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富贵不知乐业，贫穷难耐凄凉。可怜辜负好韶光，于国于家无望。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天下无能第一，古今不肖无双。寄言纨袴与膏粱：莫效此儿形状！
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">末二语最紧要。</span>
+            
+          
+            只是纨绔膏粱，亦未必不见笑我玉卿。可知能效一二者，亦必不是蠢然纨绔矣。
+            
+          
+            <span class="ann-inline ann-戚" title="戚夹">纨袴膏粱，此儿形状有意思。</span>
+            
+          
+            当设想其像，合宝玉之来历同看，方不被作者愚弄。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母因笑道：“外客未见，就脱了衣裳，还不去见你妹妹！”宝玉早已看见多了一个姊妹，便料定是林姑妈之女，忙来作揖。厮见毕归坐，细看形容，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">又从宝玉目中细写一黛玉，直画一美人图。</span>
+            
+          
+            与众各别：两弯似蹙非蹙罥烟眉，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">奇眉妙眉，奇想妙想。</span>
+            
+          
+            一双似泣非泣含露目。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">奇目妙目，奇想妙想。</span>
+            
+          
+            态生两靥之愁，娇袭一身之病。泪光点点，娇喘微微。闲静时如姣花照水，行动处似弱柳扶风。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">至此八句是宝玉眼中。</span>
+            
+          
+            心较比干多一窍，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此一句是宝玉心中。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">更奇妙之至！</span>
+            
+          
+            多一窍固是好事，然未免偏僻了，所谓“过犹不及”也。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">写黛玉，也是为下文留地步。</span>
+            
+          
+            病如西子胜三分。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">此十句定评，直抵一赋。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">不写衣裙妆饰，正是宝玉眼中不屑之物，故不曾看见。</span>
+            
+          
+            黛玉之举止容貌，亦是宝玉眼中看、心中评。若不是宝玉，断不能知黛玉是何等品貌。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看罢，因笑
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">黛玉见宝玉写一“惊”字，宝玉见黛玉写一“笑”字，一存于中，一发乎外，可见文于下笔必推敲的准稳，方才用字。</span>
+            
+          
+            道：
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">看他第一句是何话。</span>
+            
+          
+            “这个妹妹我曾见过的。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">疯话。</span>
+            
+          
+            与黛玉同心，却是两样笔墨。观此则知玉卿心中有则说出，一毫宿滞皆无。贾母笑道：“可又是胡说，你又何曾见过他？”宝玉笑道：“虽然未曾见过他，然我看着面善，心里就算是旧相识，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一见便作如是语，宜乎王夫人谓之疯疯傻傻也。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">世人得遇相好者，每曰一见如故，与此一意。</span>
+            
+          
+            今日只作远别重逢，亦未为不可。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">妙极奇语，全作如是等语。</span>
+            
+          
+            无怪人谓曰痴狂。贾母笑道：“更好，更好。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">作小儿语瞒过世人亦可。</span>
+            
+          
+            若如此，更相和睦了。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">亦是真话。</span>
+            
+          
+            宝玉便走近黛玉身边坐下，又细细打量一番，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">与黛玉两次打量一对。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">姣惯处如画。</span>
+            
+          
+            如此亲近，而黛玉之灵心巧性，能不被其缚住，反不是性理。文从宽缓中写来，妙！因问：“妹妹可曾读书？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-甲" title="甲侧">自己不读书，却问到人，妙！</span>
+            
+          
+            黛玉道：“不曾读，只上了一年学，些须认得几个字。”宝玉又道：“妹妹尊名是那两个字？”黛玉便说了名。宝玉又问表字，黛玉道：“无字。”宝玉笑道：“我送妹妹一妙字，莫若‘颦颦’二字极妙。”探春
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">写探春。</span>
+            
+          
+            便问何出。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">借问难说探春，以足后文。</span>
+            
+          
+            宝玉道：“《古今人物通考》上说：‘西方有石名黛，可代画眉之墨。’况这林妹妹眉尖若蹙，用取这两个字，岂不两妙！”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">黛玉泪因宝玉，而宝玉赠曰颦颦，初见时亦定盟矣。</span>
+            
+          
+            探春笑道：“只恐又是你的杜撰。”宝玉笑道：“除《四书》外，杜撰的太多，偏只我是杜撰不成？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">如此等语，焉得怪彼世人谓之怪？</span>
+            
+          
+            只瞒不过批书者。又问黛玉：“可也有玉没有？”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">奇极怪极，痴极愚极，焉得怪人目为痴哉？</span>
+            
+          
+            众人不解其语，黛玉便忖度着：“因他有玉，故问我有也无。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">奇之至，怪之至，又忽将黛玉亦写成一极痴女子，观此初会二人之心，则可知以后之事矣。</span>
+            
+          
+            因答道：“我没有那个。想来那玉是一件罕物，岂能人人有的。”宝玉听了，登时发作起痴狂病来，摘下那玉，就狠命摔去，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">试问石兄：此一摔，比在青埂峰下萧然坦卧何如？</span>
+            
+          
+            骂道：“什么罕物，连人之高低不择，还说‘通灵’不‘通灵’呢！我也不要这劳什子了！”吓的众人一拥争去拾玉。贾母急的搂了宝玉道：“孽障！
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">如闻其声，恨极语却是疼极语。</span>
+            
+          
+            你生气，要打骂人容易，何苦摔那命根子！”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">一字一千斤重。</span>
+            
+          
+            宝玉满面泪痕泣
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">千奇百第 24 页怪，不写黛玉泣，却反先写宝玉泣。</span>
+            
+          
+            道：“家里姐姐妹妹都没有，单我有，我说没趣，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">不是写宝玉狂，(下)[亦]不是写贾母疼，总是要下种在黛玉心里，则下文写黛玉之近宝玉之可知这不是个好东西。”</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            由，作者苦心，妙妙。如今来了这么一个神仙似的妹妹也没有，
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">“不是冤家不聚头”第一场也。</span>
+            
+          
+            贾母忙哄他道：“你这妹妹原有这个来的，因你姑妈去世时，舍不得你妹妹，无法处，遂将他的玉带了去了。一则全殉葬之礼，尽你妹妹之孝心，二则你姑妈之灵，亦可权作见了女儿之意。因此他只说没有这个，不便自己夸张之意。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">不如此说则不为姣养，文灵活之至。</span>
+            
+          
+            你如今怎比得他？还不好生慎重带上，仔细你娘知道了。”说着，便向丫鬟手中接来，亲与他带上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉听如此说，想一想大有情理，也就不生别论了。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">所谓小儿易哄，余则谓“君子可欺以其方”云。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当下，奶娘来请问黛玉之房舍。贾母说：“今将宝玉挪出来，同我在套间暖阁儿里，把你林姑娘暂安置碧纱橱里。等过了残冬，春天再与他们收拾房屋，另作一番安置罢。”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">女死外孙女来，不得不令其近己，移疼女之心疼外孙女者当然。</span>
+            
+          
+            宝玉道：“好祖宗，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">跳出一小儿。</span>
+            
+          
+            我就在碧纱橱外的床上很妥当，何必又出来闹的老祖宗不得安静。”贾母想了一想说：“也罢了。”每人一个奶娘并一个丫头照管，
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">小儿不禁情事，无违，下笔运用有法。</span>
+            
+          
+            余者在外间上夜听唤。一面早有熙凤命人送了一顶藕合色花帐，并几件锦被缎褥之类。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉只带了两个人来：一个是自幼奶娘王嬷嬷，一个是十岁的小丫头，亦是自幼随身的，名唤作雪雁。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">新雅不落套，是黛玉之文章也。</span>
+            
+          
+            贾母见雪雁甚小，一团孩气，王嬷嬷又极老，料黛玉皆不遂心省力的，便将自己身边的一个二等丫头，名唤鹦哥
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">妙极！</span>
+            
+          
+            此等名号方是贾母之文章。最厌近之小说中，不论何处，满纸皆是红娘、小玉、娇红、香翠等俗字。者与了黛玉。外亦如迎春等例，每人除自幼乳母外，另有四个教引嬷嬷，除贴身掌管钗钏盥沐两个丫鬟外，另有五六个洒扫房屋来往使役的小丫鬟。当下，王嬷嬷与鹦哥陪侍黛玉在碧纱橱内。宝玉之乳母李嬷嬷，并大丫鬟名唤袭人
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">奇名新名，必有所出。</span>
+            
+          
+            者，陪侍在外面大床上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来这袭人亦是贾母之婢，本名珍珠。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">亦是贾母之文章。</span>
+            
+          
+            前鹦哥已伏下一鸳鸯，今珍珠又伏下一琥珀矣。以下乃宝玉之文章。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">袭人之情性，不得不点染明白者，为后日旧案。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母因溺爱宝玉，生恐宝玉之婢无竭力尽忠之人，素喜袭人心地纯良，克尽职任，遂与了宝玉。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">贾母爱孙，锡以善人，此诚为能爱人者，非世俗之爱也。</span>
+            
+          
+            宝玉因知他本姓花，又曾见旧人诗句上有“花气袭人”之句，遂回明贾母，更名袭人。这袭人亦有些痴处：
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">只如此写又好极！</span>
+            
+          
+            最厌近之小说中，满纸“千伶百俐”“这妮子亦通文墨”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            等语。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">世人有职任的，能如袭人，则天下幸甚。</span>
+            
+          
+            伏侍贾母时，心中眼中只有一个贾母，如今服侍宝玉，心中眼中又只有一个宝玉。只因宝玉性情乖僻，每每规谏宝玉，心中着实忧郁。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">我读至此，不觉放声大哭。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是晚，宝玉李嬷嬷已睡了，他见里面黛玉和鹦哥犹未安息，他自卸了妆，悄悄进来，笑问：“姑娘怎么还不安息？”黛玉忙让：“姐姐请坐。”袭人在床沿上坐了。鹦哥笑道：“林姑娘正在这里伤心，
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">可知前批不谬。</span>
+            
+          
+            自己淌眼抹泪
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">黛玉第一次哭却如此写来。</span>
+            
+          
+            <span class="ann-inline ann-甲" title="甲眉">前文反明写宝玉之哭，今却反如此写黛玉，几被作者瞒过。</span>
+            
+          
+            这是第一次算还，不知下剩还该多少？的说：‘今儿才来，就惹出你家哥儿的狂病，倘或摔坏了那玉，岂不是因我之过！’
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">所谓宝玉知己，全用体贴功夫。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">我也心疼，岂独颦颦！</span>
+            
+          
+            因此便伤心，我好容易劝好了。”袭人道：“姑娘快休如此，将来只怕比这个更奇怪的笑话儿还有呢！若为他这种行止，你多心伤感，只怕你伤感不了呢。快别多心！”
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">后百十回黛玉之泪，总不能出此二语。</span>
+            
+          
+            “月上窗纱人到堦，窗上影儿先进来”，笔未到而境先到矣。辰夹：应知此非伤感，来还甘露水也。黛玉道：“姐姐们说第 25 页的，我记着就是了。究竟那玉不知是怎么个来历？上面还有字迹？”袭人道：“连一家子也不知来历，上头还有现成的眼儿，听得说，落草时是从他口里掏出来的。
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">癞僧幻术亦太奇矣。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">天生带来美玉，有现成可穿之眼，岂不可爱，岂不可惜！</span>
+            
+          
+            等我拿来你看便知。”黛玉忙止道：“罢了，此刻夜深，明日再看也不迟。”
+            
+          
+            <span class="ann-inline ann-甲" title="甲侧">总是体贴，不肯多事。</span>
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">他天生带来的美玉，他自己不爱惜，遇知己替他爱惜，连我看书的人也着实心疼不了，不觉背人一哭，以谢作者。</span>
+            
+          
+            大家又叙了一回，方才安歇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日起来，省过贾母，因往王夫人处来，正值王夫人与熙凤在一处拆金陵来的书信看，又有王夫人之兄嫂处遣了两个媳妇来说话的。黛玉虽不知原委，探春等却都晓得是议论金陵城中所居的薛家姨母之子姨表兄薛蟠，倚财仗势，打死人命，现在应天府案下审理。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">作者每用牵前摇后之笔。</span>
+            
+          
+            如今母舅王子腾得了信息，故遣他家内的人来告诉这边，意欲唤取进京之意。
+            
+          
+            <span class="ann-inline ann-蒙" title="蒙侧">[扌周]下文。</span>
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            <span class="ann-inline ann-戚" title="戚总评">补不完的是离恨天，所余之石岂非离恨石乎。</span>
+            
+          
+            而绛珠之泪偏不因离恨而落，为惜其石而落。可见惜其石必惜其人，其人不自惜，而知己能不千方百计为之惜乎？所以绛珠之泪至死不干，万苦不怨。所谓“求仁而得仁，又何怨”，悲夫！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第 26 页
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="zdic">
+      <div class="compare-col-head">
+        <span class="badge">汉典校订本</span>
+        <span class="col-desc">1982人民文学出版社校注本（前80回庚辰底本，后40回程甲底本，无脂批）</span>
+        <span>第3回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">金陵城起复贾雨村 荣国府收养甲侧：二字触目凄凉之至！</h3>
+        
+        
+        <p class="col-para">
+          
+            卻說雨村忙回頭看時，不是別人，乃是當日同僚一案參革的號張如圭者。他本系此地人，革後家居，今打聽得都中奏准起复舊員之信，他便四下裏尋情找門路，忽遇見雨村，故忙道喜。二人見了禮，張如圭便將此信告訴雨村，雨村自是歡喜，忙忙的敘了兩句，遂作別各自回家。冷子興聽得此言，便忙獻計，令雨村央煩林如海，轉向都中去央煩賈政。雨村領其意，作別回至館中，忙尋邸報看真确了。次日，面謀之如海。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如海道：「天緣湊巧，因賤荊去世，都中家岳母念及小女無人依傍教育，前已遣了男女船隻來接，因小女未曾大痊，故未及行。此刻正思向蒙訓教之恩未經酬報，遇此机會，豈有不盡心圖報之理。但請放心。弟已預為籌畫至此，已修下荐書一封，轉託內兄務為周全協佐，方可稍盡弟之鄙誠，即有所費用之例，弟於內兄信中已注明白，亦不勞尊兄多慮矣。」雨村一面打恭，謝不釋口，一面又問：「不知令親大人現居何職？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只怕晚生草率，不敢驟然入都干瀆。」如海笑道：「若論舍親，與尊兄猶系同譜，乃榮公之孫：大內兄現襲一等將軍，名赦，字恩侯，二內兄名政，字存周，現任工部員外郎，其為人謙恭厚道，大有祖父遺風，非膏粱輕薄仕宦之流，故弟方致書煩託。否則不但有污尊兄之清操，即弟亦不屑為矣。」雨村聽了，心下方信了昨日子興之言，於是又謝了林如海。如海乃說：「已擇了出月初二日小女入都，尊兄即同路而往，豈不兩便？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」雨村唯唯聽命，心中十分得意。如海遂打點禮物並餞行之事，雨村一一領了。那女學生黛玉，身体方愈，原不忍棄父而往，無奈他外祖母致意務去，且兼如海說：「汝父年將半百，再無續室之意，且汝多病，年又极小，上無親母教養，下無姊妹兄弟扶持，今依傍外祖母及舅氏姊妹去，正好減我顧盼之憂，何反云不往？」黛玉聽了，方灑淚拜別，隨了奶娘及榮府幾個老婦人登舟而去。雨村另有一隻船，帶兩個小童，依附黛玉而行。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有日到了都中，進入神京，雨村先整了衣冠，帶了小童，拿著宗侄的名帖，至榮府的門前投了。彼時賈政已看了妹丈之書，即忙請入相會。見雨村相貌魁偉，言語不俗，且這賈政最喜讀書人，禮賢下士，濟弱扶危，大有祖風，況又系妹丈致意，因此优待雨村，更又不同，便竭力內中協助，題奏之日，輕輕謀了一個复職候缺，不上兩個月，金陵應天府缺出，便謀補了此缺，拜辭了賈政，擇日上任去了。不在話下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且說黛玉自那日棄舟登岸時，便有榮國府打發了轎子並拉行李的車輛久候了。這林黛玉常聽得母親說過，他外祖母家與別家不同。他近日所見的這幾個三等僕婦，吃穿用度，已是不凡了，何況今至其家。因此步步留心，時時在意，不肯輕易多說一句話，多行一步路，惟恐被人恥笑了他去。自上了轎，進入城中從紗窗向外瞧了一瞧，其街市之繁華，人煙之阜盛，自與別處不同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又行了半日，忽見街北蹲著兩個大石獅子，三間獸頭大門，門前列坐著十來個華冠麗服之人。正門卻不開，只有東西兩角門有人出入。正門之上有一匾，匾上大書「敕造宁國府」五個大字。黛玉想道：這必是外祖之長房了。想著，又往西行，不多遠，照樣也是三間大門，方是榮國府了。卻不進正門，只進了西邊角門。那轎夫抬進去，走了一射之地，將轉彎時，便歇下退出去了。後面的婆子們已都下了轎，赶上前來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            另換了三四個衣帽周全十七八歲的小廝上來，复抬起轎子。眾婆子步下圍隨至一垂花門前落下。眾小廝退出，眾婆子上來打起轎帘，扶黛玉下轎。林黛玉扶著婆子的手，進了垂花門，兩邊是抄手游廊，當中是穿堂，當地放著一個紫檀架子大理石的大插屏。轉過插屏，小小的三間廳，廳後就是後面的正房大院。正面五間上房，皆雕梁畫棟，兩邊穿山游廊廂房，挂著各色鸚鵡，畫眉等鳥雀。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            臺磯之上，坐著幾個穿紅著綠的丫頭，一見他們來了，便忙都笑迎上來，說：「剛纔老太太還念呢，可巧就來了。」於是三四人爭著打起帘籠，一面聽得人回話：「林姑娘到了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉方進入房時，只見兩個人攙著一位鬢髮如銀的老母迎上來，黛玉便知是他外祖母。方欲拜見時，早被他外祖母一把摟入怀中，心肝兒肉叫著大哭起來。當下地下侍立之人，無不掩面涕泣，黛玉也哭個不住。一時眾人慢慢解勸住了，黛玉方拜見了外祖母。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此即冷子興所云之史氏太君，賈赦賈政之母也。當下賈母一一指與黛玉：「這是你大舅母，這是你二舅母，這是你先珠大哥的媳婦珠大嫂子。」黛玉一一拜見過。賈母又說：「請姑娘們來。今日遠客纔來，可以不必上學去了。」眾人答應了一聲，便去了兩個。不一時，只見三個奶嬤嬤並五六個丫鬟，簇擁著三個姊妹來了。第一個肌膚微豐，合中身材，腮凝新荔，鼻膩鵝脂，溫柔沉默，觀之可親。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第二個削肩細腰，長挑身材，鴨蛋臉面，俊眼修眉，顧盼神飛，文彩精華，見之忘俗。第三個身量未足，形容尚小。其釵環裙襖，三人皆是一樣的妝飾。黛玉忙起身迎上來見禮，互相廝認過，大家歸了坐。丫鬟們斟上茶來。不過說些黛玉之母如何得病，如何請醫服藥，如何送死發喪。不免賈母又傷感起來，因說：「我這些兒女，所疼者獨有你母，今日一旦先舍我而去，連面也不能一見，今見了你，我怎不傷心！」說著，摟了黛玉在怀，又嗚咽起來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眾人忙都寬慰解釋，方略略止住。眾人見黛玉年貌雖小，其舉止言談不俗，身体面龐雖怯弱不勝，卻有一段自然的風流態度，便知他有不足之症。因問：「常服何藥，如何不急為療治？」黛玉道：「我自來是如此，從會吃飲食時便吃藥，到今日未斷，請了多少名醫修方配藥，皆不見效。那一年我三歲時，聽得說來了一個癩頭和尚，說要化我去出家，我父母固是不從。他又說：既舍不得他，只怕他的病一生也不能好的了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            若要好時，除非從此以後總不許見哭聲，除父母之外，凡有外姓親友之人，一概不見，方可平安了此一世。』瘋瘋癲癲，說了這些不經之談，也沒人理他。如今還是吃人參養榮丸。」賈母道：「正好，我這裏正配丸藥呢。叫他們多配一料就是了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一語未了，只聽後院中有人笑聲，說：「我來遲了，不曾迎接遠客！」黛玉納罕道：「這些人個個皆斂聲屏氣，恭肅嚴整如此，這來者系誰，這樣放誕無禮？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」心下想時，只見一群媳婦丫鬟圍擁著一個人從後房門進來。這個人打扮與眾姑娘不同，彩繡輝煌，恍若神妃仙子：頭上戴著金絲八寶攢珠髻，綰著朝陽五鳳挂珠釵，項上戴著赤金盤螭瓔珞圈，裙邊系著豆綠宮絛，雙衡比目玫瑰佩，身上穿著縷金百蝶穿花大紅洋緞窄褙襖，外罩五彩刻絲石青銀鼠褂，下著翡翠撒花洋縐裙。一雙丹鳳三角眼，兩彎柳葉吊梢眉，身量苗條，体格風騷，粉面含春威不露，丹唇未起笑先開。黛玉連忙起身接見。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈母笑道，「你不認得他，他是我們這裏有名的一個潑皮破落戶兒，南省俗謂作『辣子』，你只叫他『鳳辣子』就是了。」黛玉正不知以何稱呼，只見眾姊妹都忙告訴他道：「這是璉嫂子。」黛玉雖不識，也曾聽見母親說過，大舅賈赦之子賈璉，娶的就是二舅母王氏之內侄女，自幼假充男兒教養的，學名王熙鳳。黛玉忙陪笑見禮，以「嫂」呼之。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這熙鳳攜著黛玉的手，上下細細打諒了一回，仍送至賈母身邊坐下，因笑道：「天下真有這樣標致的人物，我今兒纔算見了！況且這通身的氣派，竟不象老祖宗的外孫女兒，竟是個嫡親的孫女，怨不得老祖宗天天口頭心頭一時不忘。只可怜我這妹妹這樣命苦，怎麼姑媽偏就去世了！」說著，便用帕拭淚。賈母笑道：「我纔好了，你倒來招我。你妹妹遠路纔來，身子又弱，也纔勸住了，快再休提前話。」這熙鳳聽了，忙轉悲為喜道：「正是呢！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我一見了妹妹，一心都在他身上了，又是喜歡，又是傷心，竟忘記了老祖宗。該打，該打！」又忙攜黛玉之手，問：「妹妹幾歲了？可也上過學？現吃什麼藥？在這裏不要想家，想要什麼吃的，什麼玩的，只管告訴我，丫頭老婆們不好了，也只管告訴我。」一面又問婆子們：「林姑娘的行李東西可搬進來了？帶了幾個人來？你們赶早打掃兩間下房，讓他們去歇歇。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說話時，已擺了茶果上來。熙鳳親為捧茶捧果。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又見二舅母問他：「月錢放過了不曾？」熙鳳道：「月錢已放完了。纔剛帶著人到後樓上找緞子，找了這半日，也並沒有見昨日太太說的那樣的，想是太太記錯了？」王夫人道：「有沒有，什麼要緊。」因又說道：「該隨手拿出兩個來給你這妹妹去裁衣裳的，等晚上想著叫人再去拿罷，可別忘了。」熙鳳道：「這倒是我先料著了，知道妹妹不過這兩日到的，我已預備下了，等太太回去過了目好送來。」王夫人一笑，點頭不語。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當下茶果已撤，賈母命兩個老嬤嬤帶了黛玉去見兩個母舅。時賈赦之妻邢氏忙亦起身，笑回道：「我帶了外甥女過去，倒也便宜。」賈母笑道：「正是呢，你也去罷，不必過來了。」邢夫人答應了一聲「是」字，遂帶了黛玉與王夫人作辭，大家送至穿堂前。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            出了垂花門，早有眾小廝們拉過一輛翠幄青紬車，邢夫人攜了黛玉，坐在上面，眾婆子們放下車帘，方命小廝們抬起，拉至寬處，方駕上馴騾，亦出了西角門，往東過榮府正門，便入一黑油大門中，至儀門前方下來。眾小廝退出，方打起車帘，邢夫人攙著黛玉的手，進入院中。黛玉度其房屋院宇，必是榮府中花園隔斷過來的。進入三層儀門，果見正房廂廡游廊，悉皆小巧別致，不似方纔那邊軒峻壯麗，且院中隨處之樹木山石皆在。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一時進入正室，早有許多盛妝麗服之姬妾丫鬟迎著，邢夫人讓黛玉坐了，一面命人到外面書房去請賈赦。一時人來回話說：「老爺說了：『連日身上不好，見了姑娘彼此倒傷心，暫且不忍相見。勸姑娘不要傷心想家，跟著老太太和舅母，即同家裏一樣。姊妹們雖拙，大家一處伴著，亦可以解些煩悶。或有委屈之處，只管說得，不要外道纔是。』」黛玉忙站起來，一一聽了。再坐一刻，便告辭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            邢夫人苦留吃過晚飯去，黛玉笑回道：「舅母愛惜賜飯，原不應辭，只是還要過去拜見二舅舅，恐領了賜去不恭，异日再領，未為不可。望舅母容諒。」邢夫人聽說，笑道：「這倒是了。」遂令兩三個嬤嬤用方纔的車好生送了姑娘過去，於是黛玉告辭。邢夫人送至儀門前，又囑咐了眾人幾句，眼看著車去了方回來。一時黛玉進了榮府，下了車。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眾嬤嬤引著，便往東轉彎，穿過一個東西的穿堂，向南大廳之後，儀門內大院落，上面五間大正房，兩邊廂房鹿頂耳房鑽山，四通八達，軒昂壯麗，比賈母處不同。黛玉便知這方是正經正內室，一條大甬路，直接出大門的。進入堂屋中，抬頭迎面先看見一個赤金九龍青地大匾，匾上寫著斗大的三個大字，是「榮禧堂」，後有一行小字：「某年月日，書賜榮國公賈源」，又有「萬幾宸翰之寶」。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大紫檀雕螭案上，設著三尺來高青綠古銅鼎，懸著待漏隨朝墨龍大畫，一邊是金蜼彝，一邊是玻璃盒。地下兩溜十六張楠木交椅，又有一副對聯，乃烏木聯牌，鑲著鏨銀的字跡，道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            座上珠璣昭日月，堂前黼黻煥煙霞。下面一行小字，道是：「同鄉世教弟勳襲東安郡王穆蒔拜手書」。原來王夫人時常居坐宴息，亦不在這正室，只在這正室東邊的三間耳房內。於是老嬤嬤引黛玉進東房門來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            臨窗大炕上舖著猩紅洋罽，正面設著大紅金錢蟒靠背，石青金錢蟒引枕，秋香色金錢蟒大條褥。兩邊設一對梅花式洋漆小几。左邊几上文王鼎匙箸香盒，右邊几上汝窯美人觚——觚內插著時鮮花卉，並茗碗痰盒等物。地下面西一溜四張椅上，都搭著銀紅撒花椅搭，底下四副腳踏。椅之兩邊，也有一對高几，几上茗碗瓶花俱備。其餘陳設，自不必細說。老嬤嬤們讓黛玉炕上坐，炕沿上卻有兩個錦褥對設，黛玉度其位次，便不上炕，只向東邊椅子上坐了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            本房內的丫鬟忙捧上茶來。黛玉一面吃茶，一面打諒這些丫鬟們，妝飾衣裙，舉止行動，果亦與別家不同。茶未吃了，只見一個穿紅綾襖青緞掐牙背心的丫鬟走來笑說道：「太太說，請林姑娘到那邊坐罷。」老嬤嬤聽了，於是又引黛玉出來，到了東廊三間小正房內。正房炕上橫設一張炕桌，桌上磊著書籍茶具，靠東壁面西設著半舊的青緞靠背引枕。王夫人卻坐在西邊下首，亦是半舊的青緞靠背坐褥。見黛玉來了，便往東讓。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉心中料定這是賈政之位。因見挨炕一溜三張椅子上，也搭著半舊的彈墨椅袱，黛玉便向椅上坐了。王夫人再四攜他上炕，他方挨王夫人坐了。王夫人因說：「你舅舅今日齋戒去了，再見罷。只是有一句話囑咐你：你三個姊妹倒都极好，以後一處念書認字學針線，或是偶一頑笑，都有盡讓的。但我不放心的最是一件：我有一個孽根禍胎，是家裏的『混世魔王』，今日因廟裏還願去了，尚未回來，晚間你看見便知了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你只以後不要睬他，你這些姊妹都不敢沾惹他的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉亦常聽得母親說過，二舅母生的有個表兄，乃銜玉而誕，頑劣异常，极惡讀書，最喜在內幃廝混，外祖母又极溺愛，無人敢管。今見王夫人如此說，便知說的是這表兄了。因陪笑道：「舅母說的，可是銜玉所生的這位哥哥？在家時亦曾聽見母親常說，這位哥哥比我大一歲，小名就喚寶玉，雖极憨頑，說在姊妹情中极好的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            況我來了，自然只和姊妹同處，兄弟們自是別院另室的，豈得去沾惹之理？」王夫人笑道：「你不知道原故：他與別人不同，自幼因老太太疼愛，原系同姊妹們一處嬌養慣了的。若姊妹們有日不理他，他倒還安靜些，縱然他沒趣，不過出了二門，背地裏拿著他兩個小么兒出氣，咕唧一會子就完了。若這一日姊妹們和他多說一句話，他心裏一樂，便生出多少事來。所以囑咐你別睬他。他嘴裏一時甜言蜜語，一時有天無日，一時又瘋瘋傻傻，只休信他。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉一一的都答應著。只見一個丫鬟來回：「老太太那裏傳晚飯了。」王夫人忙攜黛玉從後房門由後廊往西，出了角門，是一條南北寬夾道。南邊是倒座三間小小的抱廈廳，北邊立著一個粉油大影壁，後有一半大門，小小一所房室。王夫人笑指向黛玉道：「這是你鳳姐姐的屋子，回來你好往這裏找他來，少什麼東西，你只管和他說就是了。」這院門上也有四五個纔總角的小廝，都垂手侍立。王夫人遂攜黛玉穿過一個東西穿堂，便是賈母的後院了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            於是，進入後房門，已有多人在此伺候，見王夫人來了，方安設桌椅。賈珠之妻李氏捧飯，熙鳳安箸，王夫人進羹。賈母正面榻上獨坐，兩邊四張空椅，熙鳳忙拉了黛玉在左邊第一張椅上坐了，黛玉十分推讓。賈母笑道：「你舅母你嫂子們不在這裏吃飯。你是客，原應如此坐的。」黛玉方告了座，坐了。賈母命王夫人坐了。迎春姊妹三個告了座方上來。迎春便坐右手第一，探春左第二，惜春右第二。旁邊丫鬟執著拂塵，漱盂，巾帕。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李，鳳二人立於案旁布讓。外間伺候之媳婦丫鬟雖多，卻連一聲咳嗽不聞。寂然飯畢，各有丫鬟用小茶盤捧上茶來。當日林如海教女以惜福養身，云飯後務待飯粒咽盡，過一時再吃茶，方不傷脾胃。今黛玉見了這裏許多事情不合家中之式，不得不隨的，少不得一一改過來，因而接了茶。早見人又捧過漱盂來，黛玉也照樣漱了口。盥手畢，又捧上茶來，這方是吃的茶。賈母便說：「你們去罷，讓我們自在說話兒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」王夫人聽了，忙起身，又說了兩句閒話，方引鳳，李二人去了。賈母因問黛玉念何書。黛玉道：「只剛念了《四書》。」黛玉又問姊妹們讀何書。賈母道：「讀的是什麼書，不過是認得兩個字，不是睜眼的瞎子罷了！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一語未了，只聽外面一陣腳步響，丫鬟進來笑道：「寶玉來了！」黛玉心中正疑惑著：「這個寶玉，不知是怎生個憊懶人物，懵懂頑童？」倒不見那蠢物也罷了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心中想著，忽見丫鬟話未報完，已進來了一位年輕的公子：頭上戴著束髮嵌寶紫金冠，齊眉勒著二龍搶珠金抹額，穿一件二色金百蝶穿花大紅箭袖，束著五彩絲攢花結長穗宮絛，外罩石青起花八團倭鍛排穗褂，登著青緞粉底小朝靴。面若中秋之月，色如春曉之花，鬢若刀裁，眉如墨畫，面如桃瓣，目若秋波。雖怒時而若笑，即瞋視而有情。項上金螭瓔珞，又有一根五色絲絛，繫著一塊美玉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉一見，便吃一大驚，心下想道：「好生奇怪，倒象在那裏見過一般，何等眼熟到如此！」只見這寶玉向賈母請了安，賈母便命：「去見你娘來。」寶玉即轉身去了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一時回來，再看，已換了冠帶：頭上周圍一轉的短髮，都結成小辮，紅絲結束，共攢至頂中胎髮，總編一根大辮，黑亮如漆，從頂至梢，一串四顆大珠，用金八寶墜角，身上穿著銀紅撒花半舊大襖，仍舊帶著項圈，寶玉，寄名鎖，護身符等物，下面半露松花撒花綾褲腿，錦邊彈墨襪，厚底大紅鞋。越顯得面如敷粉，唇若施脂，轉盼多情，語言常笑。天然一段風騷，全在眉梢，平生萬种情思，悉堆眼角。看其外貌最是极好，卻難知其底細。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            後人有《西江月》二詞，批寶玉极恰，其詞曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            無故尋愁覓恨，有時似傻如狂。縱然生得好皮囊，腹內原來草莽。潦倒不通世務，愚頑怕讀文章。行為偏僻性乖張，那管世人誹謗！富貴不知樂業，貧窮難耐凄涼。可怜辜負好韶光，於國於家無望。天下無能第一，古今不肖無雙。寄言紈绔與膏粱：莫效此兒形狀！賈母因笑道：「外客未見，就脫了衣裳，還不去見你妹妹！」寶玉早已看見多了一個姊妹，便料定是林姑媽之女，忙來作揖。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            廝見畢歸坐，細看形容，與眾各別：兩灣似蹙非蹙罥煙眉，一雙似泣非泣含露目。[2]態生兩靨之愁，嬌襲一身之病。淚光點點，嬌喘微微。閒靜時如姣花照水，行動處似弱柳扶風。心較比干多一竅，病如西子勝三分。寶玉看罷，因笑道：「這個妹妹我曾見過的。」賈母笑道：「可又是胡說，你又何曾見過他？」寶玉笑道：「雖然未曾見過他，然我看著面善，心裏就算是舊相識，今日只作遠別重逢，亦未為不可。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」賈母笑道：「更好，更好，若如此，更相和睦了。」寶玉便走近黛玉身邊坐下，又細細打量一番，因問：「妹妹可曾讀書？」黛玉道：「不曾讀，只上了一年學，些須認得幾個字。」寶玉又道：「妹妹尊名是那兩個字？」黛玉便說了名。寶玉又問表字。黛玉道：「無字。」寶玉笑道：「我送妹妹一妙字，莫若『顰顰』二字极妙。」探春便問何出。寶玉道：「《古今人物通考》上說：『西方有石名黛，可代畫眉之墨。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            』況這林妹妹眉尖若蹙，用取這兩個字，豈不兩妙！」探春笑道：「只恐又是你的杜撰。」寶玉笑道：「除《四書》外，杜撰的太多，偏只我是杜撰不成？」又問黛玉：「可也有玉沒有？」眾人不解其語，黛玉便忖度著因他有玉，故問我有也無，因答道：「我沒有那個。想來那玉是一件罕物，豈能人人有的。」寶玉聽了，登時發作起痴狂病來，摘下那玉，就狠命摔去，罵道：「什麼罕物，連人之高低不擇，還說『通靈』不『通靈』呢！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            我也不要這勞什子了！」嚇的眾人一擁爭去拾玉。賈母急的摟了寶玉道：「孽障！你生氣，要打罵人容易，何苦摔那命根子！」寶玉滿面淚痕泣道：「家裏姐姐妹妹都沒有，單我有，我說沒趣，如今來了這們一個神仙似的妹妹也沒有，可知這不是個好東西。」賈母忙哄他道：「你這妹妹原有這個來的，因你姑媽去世時，舍不得你妹妹，無法處，遂將他的玉帶了去了：一則全殉葬之禮，盡你妹妹之孝心，二則你姑媽之靈，亦可權作見了女兒之意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因此他只說沒有這個，不便自己夸張之意。你如今怎比得他？還不好生慎重帶上，仔細你娘知道了。」說著，便向丫鬟手中接來，親與他帶上。寶玉聽如此說，想一想大有情理，也就不生別論了。當下，奶娘來請問黛玉之房舍。賈母說：「今將寶玉挪出來，同我在套間暖閣兒裏，把你林姑娘暫安置碧紗櫥裏。等過了殘冬，春天再與他們收拾房屋，另作一番安置罷。」寶玉道：「好祖宗，我就在碧紗櫥外的床上很妥當，何必又出來鬧的老祖宗不得安靜。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」賈母想了一想說：「也罷了。」每人一個奶娘並一個丫頭照管，餘者在外間上夜聽喚。一面早有熙鳳命人送了一頂藕合色花帳，並幾件錦被緞褥之類。黛玉只帶了兩個人來：一個是自幼奶娘王嬤嬤，一個是十歲的小丫頭，亦是自幼隨身的，名喚作雪雁。賈母見雪雁甚小，一團孩氣，王嬤嬤又极老，料黛玉皆不遂心省力的，便將自己身邊的一個二等丫頭，名喚鸚哥者與了黛玉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            外亦如迎春等例，每人除自幼乳母外，另有四個教引嬤嬤，除貼身掌管釵釧盥沐兩個丫鬟外，另有五六個灑掃房屋來往使役的小丫鬟。當下，王嬤嬤與鸚哥陪侍黛玉在碧紗櫥內。寶玉之乳母李嬤嬤，並大丫鬟名喚襲人者，陪侍在外面大床上。原來這襲人亦是賈母之婢，本名珍珠。賈母因溺愛寶玉，生恐寶玉之婢無竭力盡忠之人，素喜襲人心地純良，克盡職任，遂與了寶玉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉因知他本姓花，又曾見舊人詩句上有「花氣襲人」之句，遂回明賈母，更名襲人。這襲人亦有些痴處：伏侍賈母時，心中眼中只有一個賈母，如今服侍寶玉，心中眼中又只有一個寶玉。只因寶玉性情乖僻，每每規諫寶玉，心中著實憂郁。是晚，寶玉李嬤嬤已睡了，他見裏面黛玉和鸚哥猶未安息，他自卸了妝，悄悄進來，笑問：「姑娘怎麼還不安息？」黛玉忙讓：「姐姐請坐。」襲人在床沿上坐了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            鸚哥笑道：「林姑娘正在這裏傷心，自己淌眼抹淚的說：『今兒纔來，就惹出你家哥兒的狂病，倘或摔坏了那玉，豈不是因我之過！』因此便傷心，我好容易勸好了」。襲人道：「姑娘快休如此，將來只怕比這個更奇怪的笑話兒還有呢！若為他這种行止，你多心傷感，只怕你傷感不了呢。快別多心！」黛玉道：「姐姐們說的，我記著就是了。究竟那玉不知是怎麼個來歷？上面還有字跡？
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            」襲人道：「連一家子也不知來歷，上頭還有現成的眼兒，聽得說，落草時是從他口裏掏出來的。等我拿來你看便知。」黛玉忙止道：「罷了，此刻夜深，明日再看也不遲。」大家又敘了一回，方纔安歇。次日起來，省過賈母，因往王夫人處來，正值王夫人與熙鳳在一處拆金陵來的書信看，又有王夫人之兄嫂處遣了兩個媳婦來說話的。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉雖不知原委，探春等卻都曉得是議論金陵城中所居的薛家姨母之子姨表兄薛蟠，倚財仗勢，打死人命，現在應天府案下審理。如今母舅王子騰得了信息，故遣他家內的人來告訴這邊，意欲喚取進京之意。畢竟怎的，下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengjia">
+      <div class="compare-col-head">
+        <span class="badge">程甲本</span>
+        <span class="col-desc">程甲本（1791程伟元/高鹗活字本，120回）</span>
+        <span>第3回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">金陵城起复贾雨村 荣国府收养甲侧：二字触目凄凉之至！</h3>
+        
+        
+        <p class="col-para">
+          
+            𨚫說雨村忙囘頭看時，不是别人，乃是當日同僚一案叅革的張如圭。他係此地人，革後家居，今打聼得都中奏准起復舊員之信，他便四下裡𡬶情找門路，忽遇見雨村，故忙道喜。二人見了禮，張如圭便將此信告知雨村，雨村歡喜，忙忙叙了兩句，各自别去囘家。冷子興𦗟得此言，便忙献計，令雨村央求林如海，轉向都中去央煩賈政。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村領其意而别。囘至館中，忙𡬶邸報看眞確了。次日，面謀之如海。如海道：「天緣凑巧，因賤荆去世，都中家岳母念及小女無人依傍，前已遣了男女船隻來接，因小女未曾大痊，故尙未行，此刻正思送女進京。因向𫎇教訓之恩，未經酬報，遇此機會，豈有不盡心圖報之理，弟已預籌之，修下荐書一封，托内兄務爲周全，方可稍盡弟之鄙誠。卽有所費，弟于内家信中註明，不勞吾兄多慮。」雨村一面打恭，謝不釋口，一面又問：「不知令親大人現居何職？只怕晚生草率，不敢進謁。」如海笑道：「若論舍親，與尊兄猶係一家，乃榮公之孫：大内兄現襲一等將軍之職，名赦，字恩候。二内兄名政，字存周，現任工部員外郎，其爲人謙恭厚道，大有祖父遺風，非膏粱輕薄之流，故弟致書煩托。否則不但有汚尊兄淸操，卽弟亦不屑爲矣。」雨村𦗟了，心下方信了昨日子興之言，于是又謝了林如海。如海又說：「擇了出月初二日小女入都，吾兄卽同路而徃，豈不兩便？」雨村唯唯𦗟命，心中十分得意。如海遂打㸃禮物並餞行之事，雨村一一領了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那女學生原不忍棄父而去，無奈他外祖母必欲其往，且兼如海說：「汝父年已半百，再無續室之意，且汝多病，年又極小，上無親母教養，下無姊妹扶持，今去依傍外祖母及舅氏姊妹，正好减我内顧之憂，如何不去？」黛玉聽了，方洒淚拜别，隨了奶娘及榮府中幾個老婦登舟而去。兩村另有一隻船，帶兩個小童，依附黛玉而行。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一日到了京都，雨村先整了衣冠，帶了小童，拿了「宗姪」的名帖，至榮府門上投了。彼時賈政已看了妹丈之書，卽忙請入相會，見雨村像貌魁偉，言談不俗，且這賈政最喜的是讀書人，禮賢下士，拯溺救危，大有祖風。况又係妹丈致意，因此優待雨村，更又不同，便極力帮𦔳，題奏之日，謀了一箇復職，不上二月，便選了金陵應天府，辭了賈政，擇日到任去了，不在話下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且說黛玉自那日棄舟登岸時，便有榮府打發轎子並拉行李車輛伺候。這林黛玉嘗𦗟得母親說，他外祖母家與别家不同，他近日所見的這幾箇三等的僕婦，穿吃用度，已是不凡，何况今至其家，多要歩歩留心，時時在意，不要多說一句話，不可多行一歩路，恐被人耻笑了去。自上了轎，進了城，從紗𥦗中瞧了一瞧，其街市之繁華，人烟之阜盛，自與别處不同。又行了半日，忽見街北蹲着兩個大石獅子，三間獸頭大門，門前列坐着十來個華冠麗服之人。正門不開，只東西兩角門有人出入。正門之上有一匾，匾上大書「勅造寧國府」五箇大字。黛玉想道：「這是外祖的長房了。」又往西不遠，照樣也是三間大門，方是「榮國府」，却不進正門，只由西角門而進。轎子抬着走了一箭之遠，將轉灣時，便歇了轎，後面的婆子也都下來了，另換了四箇衣㡌周全的十七八歲的小厮上來抬着轎子，衆婆子歩下跟隨，至一垂花門前落下，衆小厮又退了出去，衆婆子上前打起轎簾，扶黛玉下了轎。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            林黛玉扶着婆子手進了垂花門，兩邊是超手遊廊，正中是穿堂，當地放着一箇紫檀架子大理石屏風。轉過屏風，小小三間廳房，廳後便是正房大院。正面五間上房，皆是雕梁畫棟，兩邊穿山遊廊廂房，掛着各色鸚鵡畫眉等雀鳥。台階上坐着幾箇穿紅着緑的丫頭，一見他們來了，都笑迎上來，說道：「剛纔老太太還念呢，可巧就來了。」于是三四人争着打簾子，一面𦗟得人說：「林姑娘來了！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉方進房，只見兩個人扶着一位鬂髮如銀的老母迎上來，黛玉知是外祖母了，正欲下拜，早被外祖母抱住，摟入懷中，「心肝兒肉」呌着大哭起來。當下侍立之人，無不下涙，黛玉也哭箇不休。衆人慢慢解勸住了，黛玉方拜見了外祖母。當下賈母一一指與黛玉：「這是你大舅母，這是二𠢎母，這是你先珠大哥的媳婦珠大嫂。」黛玉一一拜見了。賈母又請姑娘們來：「今日遠客初來，可以不必上學去。」衆人答應了一聲，便去了兩個。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不一時，只見三個奶媽並五六個丫鬟擁着三位姑娘來了：第一個肌膚微豐，身材合中，腮凝新荔，鼻膩鵝𮌖，温柔沉黙，觀之可親。第二個削肩細腰，長挑身材，鴨蛋臉兒，俊眼修眉，顧盼神飛，文彩精華，見之忘俗。第三個身量未足，形容尙小。其釵𤨔裙袄，三人皆是一樣的粧束。黛玉忙起身𨒖上來見禮，互相厮認。歸了坐位，丫環送上茶來。不過叙些黛玉之母，如何得病，如何請醫服藥，如何送死發喪。不免賈母又傷感起來，因說：「我這些女兒，所疼者獨有你母，今一旦先我而逝，不得見一面，教我怎不傷心！」說著携了黛玉的手又哭起來，家人忙相勸慰，方略畧止住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            衆人見黛玉年貌雖小，其舉止言談不俗，身体面龐雖弱不勝衣，𨚫有一叚風流態度，便知他有不足之症，因問：「常服何藥？如何不治好了？」黛玉道：「我自來如此，從會吃飯時便吃藥，到如今了，經過多少名醫，總未見效。那一年我纔三歲，記得來了一個癩頭和尙，說要化我去出家，我父母固是不從。他又說：『旣捨不得他，但只怕他的病一生也不能好的。若要好時，除非從此以後總不許見哭聲，除父母之外，凡有外親，一槩不見，方可平安了此一生。』這和尙瘋瘋癲癲說了這些不經之談，也没人理他。如今還是吃人參養榮丸。」賈母道：「這正好，我這裡正配丸藥呢，呌他們多配一料就是了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一語未休，只聽後院中有笑語聲，說：「我來遲了，不曾迎接遠客！」黛玉思忖道：「這些人個個皆歛聲屏氣如此，這來者是誰，這様放誕無禮？」心下想時，只見一羣媳婦了鬟擁着一個麗人，從後房進來。這個人打扮與姑娘們不同，彩繡輝煌，恍若神𡚱仙子：頭上戴着金絲八寶攢珠髻，綰着朝陽五鳯掛珠釵，項上戴着赤金盤螭纓絡圈，身上穿着縷金百蠂穿花大紅雲縀窄褃袄，外罩五彩刻絲石靑銀鼠褂，下着翡翠撒花洋縐裙。一雙丹鳯三角眼，兩灣柳葉掉稍眉，身量苗條，體格風騷，粉面含春威不露，丹唇未啟笑先聞。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉連忙起身接見，賈母笑道：「你不認得他，他是我們這裡有名的一個潑辣貨，南京所謂『辣子』，你只呌他『鳯辣子』就是了。」黛玉正不知以何稱呼，衆姊妹都忙告訴黛玉道：「這是璉嫂子。」黛玉雖不曾識面，𦗟見他母親說過，大舅賈赦之子賈璉，娶的就是二舅母王氏之内姪女。自㓜假充男兒教養的，學名呌做王熙鳯。黛玉忙陪笑見禮，以「嫂」呼之。這熙鳯擕着黛玉的手，上下細細打量了一囘，便仍送至賈母身邊坐下，因笑道：「天下眞有這樣標緻人物，我今日纔𮅕見了！况且這通身的氣𣲖，竟不像老祖宗的外孫女兒，竟是個嫡親的孫女，怨不得老祖宗天天口頭心頭一刻不忘。只可憐我這妹妹這樣命苦，怎麽姑媽偏就去世了！」說着便用帕拭淚，賈母笑道：「我纔好了，你倒來招我。你妹妹遠路纔來，身子又弱，也纔勸住了，快休再題前話。」這熙鳯𦗟了，忙轉悲爲喜道：「正是呢！我一見了妹妹，一心都在他身上，又是喜歡，又是傷心，竟忘記了老祖宗，該打，該打！」又忙擕黛玉之手問：「妹妹幾歲了？可也上過學？現吃什麽藥？在這裡不要想家，要什麼吃的、什麼頑的，只𬋩告訴我。丫頭老婆們不好，也只管告訴我。」一面又問婆子們：「林姑娘的行李東西可搬進來了？帶了幾個人來？你們趕早打掃兩間下房讓他們去歇歇。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說話時，已擺了茶菓上來，熙鳯親爲捧茶捧菓。又見二舅母問他：「月錢放完了不曾？」熙鳯道：「月錢也放完了。剛纔帶了人到後樓上找縀子，找了半日，也没見昨日太太說的那樣，想是太太記錯了。」王夫人道：「有没有，什麼要𦂳。」因又說道：「該隨手拿出兩個來給你這妹妹裁衣裳的，等晚上想着再呌人去拿罷。」熙鳯道：「倒是我先料着了，知道妹妹這兩日到的，我已預備下了。等太太囘去過了目，好送來。」王夫人一笑，㸃頭不語。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當下茶菓已撤，賈母命兩個老嬤嬤帶了黛玉去見兩個舅𠢎去。維時賈赦之妻邢氏忙起身笑囘道：「我帶了外孫女過去，到底便宜些。」賈母笑道：「正是呢，你也去罷，不必過來了。」那邢夫人答應了，遂帶了黛玉與王夫人作辞，大家送至穿堂。垂花門前早有衆小厮拉過一輛翠幄靑油車來，邢夫人携了黛玉坐上，衆婆娘們放下車簾，方命小厮們抬起，拉至寛處，方駕上馴騾，亦出了西角門往東，過榮府正門，入一黑油大門内，至儀門前，方下車來。邢夫人挽了黛玉的手進入院中，黛玉度其處必是榮府中之花園隔斷過來的。進入三層儀門，果見正房、厢廡、遊廊，悉皆小巧别緻，不似那邊的軒峻壯麗。且院中隨處之樹木山石皆好。及進入正室，早有許多盛粧麗服之姫妾丫鬟迎着。邢夫人讓黛玉坐了，一靣令人到外書房中請賈赦。一時來囘說：「老爺說了：『連日身上不好，見了姑娘彼此傷心，暫且不忍相見。勸姑娘不耍傷懷想家，跟著老太太和𠢎母，是同家裡一樣。姊妹們雖拙，大家一處伴著，亦可以解些煩悶。或有委曲之處，只管說得，不要外道才是。』」黛玉忙站起身來一一𦗟了。再坐一刻，便告辭，邢夫人苦留吃過飯去，黛玉笑囘道：「舅母愛惜賜飯，原不應辭，只是還要過去拜見二舅舅，恐遲去不恭，異日再領，望舅母容諒。」邢夫人道：「這也罷了。」遂命兩個嬤嬤用方纔坐來的車子送了過去。于是黛玉告辭。邢夫人送至儀門前，又嘱咐了衆人幾句，眼看着車去了方囘來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一時黛玉進入榮府，下了車，衆嬤嬤引著便往東轉灣，走過一座東西的穿堂，向南大廳之後，儀門内大院落，上面五間大正房，兩邊廂房鹿頂耳門鑽山，四通八達，軒昂壯麗，比賈母處不同，黛玉便知這方是正内室。一条大甬路，直接出大門的。進入堂屋，抬頭迎面先見一個赤金九龍靑地大匾，匾上寫着斗大三箇字，是：「榮禧堂」。後有一行小字：「某年月日書賜榮國公賈源」，又有「萬幾宸翰」之寶。大紫檀雕螭案上設着三尺來高靑綠古銅鼎，懸著待漏隨朝墨龍大畵，一邊是鏨金彜，一邊是玻璃盒，地下兩溜十六張楠木椅子，又有一副對聯，乃是烏木聯牌，鑲着鏨銀字跡，道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            座上珠璣昭日月，堂前黼黻煥煙霞。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            下面一行小字，道是：「鄉世教弟勲襲東安郡王穆蒔拜書手。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來王夫人時常居坐宴息亦不在這正室，只在東邊的三間耳房内。于是老嬷嬤引黛玉進東房門來，臨𥦗大炕上舖着猩紅洋毯，正面設着大紅金錢蟒引枕，秋香色金錢蟒大條褥。兩邊設一對梅花式洋𣾰小几，左邊上文王鼎，匙箸香盒，右邊几上汝窑美人觚，内挿着時鮮花卉，並茗盌茶具等物。地下面西一溜四張椅上，都搭着銀紅撒花椅搭，底下四副脚踏。兩邊又有一對高几，几上茗碗瓶花俱偹。其餘陳設，不必細說。老嬤嬤讓黛玉上炕坐，炕沿上却也有兩箇錦褥對設，黛玉度其位次，便不上炕，只就東邊椅上坐了。本房的了鬟忙捧上茶來，黛玉一面吃了，打量這些了鬟們粧飾衣裙，舉止行動，果與别家不同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            茶未吃了，只見一個穿紅綾袄靑紬掐牙背心的一個了鬟走來笑道：「太太說，請林姑娘到那邊坐罷。」老嬷嬤𦗟了，于是又引黛玉出來，到了東廊三間小正房内，正面炕上橫設一張炕桌，上面堆著書籍茶具，靠東壁面西設著半舊的靑縀靠背引枕。王夫人却坐在西邊下首，亦是半舊青縀靠背坐褥。見黛玉來了，便往東讓。黛玉心中料定這是賈政之位，因見挨炕一溜三張椅子上也搭着半舊的弹花椅袱，黛玉便向椅上坐了。王夫人再三讓他上炕，他方挨王夫人坐了。王夫人乃說：「你𠢎𠢎今日齋戒去了，再見罷。只是有一句話嘱咐你：三個姊妹倒都極好，以後一處念書認字，學針線，或偶一頑笑，都有個儘讓的。但我最不放心的𨚫有一件：我一有個孽根禍胎，是家裡的『混世魔』，今日因廟裡還愿去，尙未囘來，晚間你看見便知道了。你以後只不要採他，你這些姊妹都不敢沾惹他的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉素聞母親說過，有個内姪乃啣玉而生，頑劣異常，不喜讀書，最喜在内幃厮混。外祖母又溺愛，無人敢管。今見王夫人所說，便知是這位表兄了，因陪笑道：「舅母所說的，可是啣玉而生的這位表兄？在家時記得母親常說，這位哥哥比我大一歲，小名就呌寶玉，性雖憨頑，說待姊妹們極好的。况我來了，自然和姊妹同一處，兄弟們自另院别室的，豈有得沾惹之理？」王夫人笑道：「你不知道原故：他與别人不同，自㓜因老太太疼愛，原係同姊妹們一處嬌養慣的。若姊妹們不理他，他倒還安靜些。若一日姊妹們和他多說了一句話，他心上一喜，便生出許多事來。所以囑咐你别採他，他嘴裡一時甜言𮔉語，一時有天無日，瘋瘋儍儍，只休信他。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉一一的都答應着。忽見一個丫鬟來說：「老太太那裡傳晚飯了。」王夫人忙擕了黛玉從後房門，由後廊西往，出了角門，是一条南北甬道，南邊是倒座三間小小抱厦廳，北邊立着一個粉油大影壁，後有一半大門，小小一所房室，王夫人笑指向黛玉道：「這是你鳯姐姐的屋子，囘來你好向這裡找他去，少什麽東西只管和他說就是了。」這院門上也有幾個纔總角的小厮，都垂手侍立。王夫人遂擕黛玉穿過一箇東西穿堂，便是賈母的後院了，于是進入後房門，已有多人在此伺候，見王夫人來了，方安設桌椅。賈珠之妻李氏捧飮，熙鳯安箸，王夫人進𡙡。賈母正面榻上獨坐，兩旁四張空椅，熙鳯忙拉黛玉在左邉第一張椅子上坐下，黛玉十分推讓，賈母笑道：「你舅母和嫂子們左右不在這裡吃飯。你是客，原該如此坐的。」黛玉方告了坐，就坐了。賈母命王夫人也坐了。迎春姊妹三個告了坐方上來，𨒖春坐右手第一，探春左第二，惜春右第二。旁邊丫鬟執着拂塵漱盂巾帕，李、鳯二人立于案旁播讓。外間伺候之媳婦丫鬟雖多，𨚫連一聲咳𠻳不聞。飯𭺾，各各有丫鬟用小茶盤捧上茶來。當日林家教女以惜福養身，每飮後必過片時方吃茶，不傷脾胃。今黛玉見了這裡許多規矩，不似家中，亦只得隨和着些，接了茶。又有人捧過漱盂來，黛玉也漱了口，又盥手𭺾。然後又捧上茶來，這方是吃的茶。賈母便說：「你們去罷，讓我們自在說話兒。」王夫人聼了，忙起身，說了兩句閒話，方引李、鳯二人去了。賈母因問黛玉念何書，黛玉道：「剛念了《四書》。」黛玉又問姊妹們讀何書，賈母道：「讀什麽書，不過認幾個字罷了！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一語未了，只聼外面一陣脚歩响，丫鬟進來報道：「寶玉來了。」黛玉心中想：「這個寶玉不知是怎生個憊𢤿人物！」及至進來，原是一個輕年公子，頭上戴着束髮嵌寶紫金冠，齊眉勒着二龍搶珠金抹額，一件二色金百蠂穿花大紅箭袖，束着五彩絲攢花結長穗宫縧，外罩石青起花八團倭縀排穗褂，登着靑縀粉底小朝靴。面若中秋之月，色如春曉之花，髩若刀裁，眉如墨畵，鼻如懸胆，睛若秋波，雖怒時而似笑，卽瞋視而有情。項上金螭纓絡，又有一根五色絲縧，繫着一塊美玉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉一見便吃一大驚，心中想道：「好生竒怪，到像在那裡見過的，何等眼熟！」只見這寶玉向賈母請了安，賈母便命：「去見你娘來。」卽轉身去了。一囘再來時，已換了冠帶，頭上週圍一轉的短髮，卽結成小辮，紅絲結束，共攢至頂中胎髮，總編一根大辮，黑亮如𣾰，從頂至稍，一串四顆大珠，用金八寶墜脚。身上穿着銀紅撒花半舊大袄，仍舊帶着項圈、寶玉、𭔃名鎻、䕶身符等物；下面半露松花撒花綾褲，錦邊弹墨襪，厚底大紅鞋。越顯得面如傅粉，唇若施𮌖；轉盻多情，語言若笑。天然一叚風韻，全在眉稍；平生萬種情思，悉堆眼角。看其外貌，最是極好，却難知其底細，後人有作《西江月》二詞批寶玉極確，其詞曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            無故𡬶愁覔恨，有時似儍如狂。縱然生得好皮囊，腹内原來草莽。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            潦倒不通庻務，愚頑怕讀文章。行爲偏僻性乖張，那管世人誹謗！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富貴不知樂業，貧窮難耐凄凉。可憐辜負好韶光，于國于家無望。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            天下無能第一，古今不肖無雙。寄言紈袴與膏梁：莫效此兒形狀！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却說賈母笑道：「外客未見就脫了衣裳！還不去見你妹妹。」寶玉早已看見了一個姊妹，便料定是林姑娘之女，忙來作揖，相見𭺾歸坐，細看形容，與衆各别：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            兩灣似慼非慼籠烟眉，一雙似喜非喜含情目。態生兩靨之愁，嬌襲一身之病。涙光㸃㸃，嬌喘微㣲。閑靜似嬌花照水，行動似弱柳扶風。心較比干多一竅，病如西子勝三分。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看罷，笑道：「這個姊妹我曾見過的。」賈母笑道：「可又是胡說，你何曾見過他？」寳玉笑道：「雖然未曾見過他，然看着靣善，心裡倒像是舊相認識，恍若遠别重逢的一般。」賈母笑道：「好，好！若如此更相和睦了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉便走向黛玉身邊坐下，又細細打諒一畨，因問：「妹妹可曾讀書？」黛玉道：「不曾讀書，只上了一年學，些須認得幾個字。」寳玉又道：「妹妹尊名？」黛玉便說了名，寶玉又道：「表字？」黛玉道：「無字。」寶玉笑道：「我送妹妹一字，莫若『顰顰』二字極妙。」探春便道：「何處出典？」寳玉道：「《古今人物通考》上說：『西方有石名黛，可代畫眉之墨。』况這妹妹眉尖若慼，用取這兩個字豈不甚美？」探春笑道：「只恐又是杜撰。」寶玉笑道：「除《四書》，杜撰的太多，偏是我是杜撰不成？」又問黛玉：「可有玉没有？」衆人都不解，黛玉便忖度着：「因他有玉，故問我有無。」因答道：「我没有。那玉亦是件罕物，豈能人人皆有？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉𦗟了，登時發作起狂病來，摘下那玉，就狠命摔去，罵道：「什麼罕物！人的高下不識，還說靈不靈呢！我也不要這勞什子。」嚇的地下衆人一擁争去拾玉，賈母急的摟了寶玉道：「孽障！你生氣要打罵人容易，何苦摔那命根子！」寶玉滿面淚痕泣道：「家裡姐姐妹妹都没有，单我有，我說没趣，如今來了這個神仙似的妹妹也没有，可知這不是個好東西。」賈母忙哄他道：「這妹妹原有玉來的，因你姑媽去世時，捨不得你妹妹，無法可處，遂將他的玉帶了去，一則全殉𦵏之禮，盡你妹妹之孝心。二則你姑媽之灵亦可權作見了你妹妹之意。因此他只說没有玉，也是不便自己𧩊張之意。你如今怎比得他，還不好生慎重帶上，仔細你娘知道了。」說着便向丫鬟手中接來，親與他帶上。寶玉𦗟如此說，想一想，也就不生别論了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當下奶娘來問黛玉房舍，賈母便說：「將寶玉挪出來，同我在套間煖閣裡。把你林姑娘暫安置碧紗厨裡，等過了殘冬，春天再與他們收拾房屋，另作一畨安置罷。」寶玉道：「好祖宗！我就在碧紗厨外的床上狠妥當，又何必出來，閙你老祖宗不得安靜？」賈母想了一想，說：「也罷了。」每人一個奶娘並一個丫頭照管，餘者在外間上夜𦗟喚。一面早有熙鳯命人送了一頂藕合色花帳並錦被縀褥之類。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉只帶了兩個人來：一個是自己的奶娘王嬷嬷，一個是十歲的小丫頭，名喚雪雁。賈母見雪雁甚小，一團孩氣，王嬤又極老，料黛玉皆不遂心，將自己身邉一個二等丫頭名喚鸚哥的與了黛玉。亦如迎春等一般，每人除自㓜乳母外，另有四個教引嬷嬷。除貼身掌管釵釧盥沐兩個丫頭外，另有四五個洒掃房屋來往使役的小丫頭。當下王嬤嬤與鸚哥陪侍黛玉在碧紗厨内，寳玉之乳母李嬤嬷並大丫鬟名喚襲人者陪侍在外大床上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來這襲人亦是賈母之婢，本名珍珠，賈母因溺愛寶玉，生恐寶玉之婢不中任使，素知襲人心地純良，遂與寶玉。寳玉因知他本姓花，又曾見舊人詩句有「花氣襲人」之句，遂囬明賈母，卽更名襲人。這襲人有些癡處：伏侍賈母時，心中眼中只有一個賈母。今跟了寶玉，心中眼中又只有一個寶玉。只因寳玉性情乖僻，每每規諫，寶玉不𦗟，心中着實憂欝。是晚寳玉李嬷已𪾶了，他見裡面黛玉鸚哥猶未安歇，他自卸了妝，悄悄的進來，笑問：「姑娘怎麼還不安歇？」黛玉忙笑讓：「姐姐請坐。」襲人在床沿上坐了，鸚哥笑道：「林姑娘在這裡傷心，自己淌眼抹淚的，說：『今兒纔來了，就惹出你家哥兒的病，倘或摔壊了那玉，豈不是因我之過！』所以傷心，我好容易勸好了。」襲人道：「姑娘快休如此，將來只怕比這更竒怪的笑話兒還有呢。若爲他這種行狀，你多心傷感，只怕你還傷感不了呢，快别多心！」黛玉道：「姐姐們說的，我記着就是了。」又叙了一囘，方纔安歇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次早起來，省過賈母，因往王夫人處來，正值王夫人與熙鳯在一處拆金陵來的書信，又有王夫人之兄嫂處遣來的兩個媳婦兒來說話的。雖黛玉不知原委，探春等𨚫曉得是議論金陵城中居住的薛家姨母之子，表兄薛蟠，𠋣財仗𫝑，打死人命，現在應天府案下審理，如今母舅王子騰得了信，遣人來告訴這邉，意欲喚取近京之意。𭺾竟怎的，下囬分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本</span>
+        <span class="col-desc">程乙本（1792程伟元/高鹗重订本，120回）</span>
+        <span>第3回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">金陵城起复贾雨村 荣国府收养甲侧：二字触目凄凉之至！</h3>
+        
+        
+        <p class="col-para">
+          
+            卻說雨村忙回頭看時，不是別人，乃是當日同僚一案參革的張如圭。他係此地人，革後家居。今打聽得都中奏准起復舊員之信，他便四下裡尋情找門路，忽遇見雨村，故忙道喜。二人見了禮，張如圭便將此信告知雨村。雨村歡喜。忙忙敘了兩句，遂作別各自回家。冷子興聽得此言，便忙獻計，令雨村央求林如海，轉向都中去央煩賈政。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雨村領其意而別，回至館中，忙尋邸報看真確了。次日，面謀林如海。如海道：「天緣湊巧：因賤荊去世，都中家岳母念及小女無人依傍，前已遣了男女船隻來接，因小女未曾大痊，故未及行，此刻正思送女進京。因向蒙教誨之恩，未經酬報，遇此機會，豈有不盡心圖報之理！弟已預籌之，修下薦書一封，託內兄務為周全，方可稍盡弟之鄙誠。即有所費，弟於內家信中寫明，不勞吾兄多慮。」雨村一面打恭，謝不釋口，一面又問：「不知令親大人現居何職？只怕晚生草率，不敢進謁。」如海笑道：「若論舍親，與尊兄猶係一家，乃榮公之孫。大內兄現襲一等將軍之職，名赦，字恩侯。二內兄名政，字存周，現任工部員外郎。其為人謙恭厚道，大有祖父遺風，非膏粱輕薄之流，故弟致書煩託。否則不但有污尊兄清操，即弟亦不屑為矣。」雨村聽了，心下方信了昨日子興之言，於是又謝了林如海。如海又說：「擇了出月初二日小女入都，吾兄即同路而往，豈不兩便？」雨村唯唯聽命，心中十分得意。如海遂打點禮物並餞行之事，雨村一一領了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那女學生原不忍離親而去，無奈他外祖母必欲其往，且兼如海說：「汝父年已半百，再無續室之意；且汝多病，年又極小，上無親母教養，下無姊妹扶持：今去依傍外祖母及舅氏姊妹，正好減我內顧之憂，如何不去？」黛玉聽了，方灑淚拜別，隨了奶娘及榮府中幾個老婦，登舟而去。雨村另有一隻船，帶了兩個小童，依附黛玉而行。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一日，到了京都，雨村先整了衣冠，帶著童僕，拿了「宗姪」的名帖，至榮府門上投了。彼時賈政已看了妹丈之書，即忙請入相會。見雨村相貌魁偉，言談不俗。且這賈政最喜的是讀書人，禮賢下士，拯溺救危，大有祖風，況又係妹丈致意，因此優待雨村，更又不同，便極力幫助。題奏之日，謀了一個復職。不上兩月，便選了金陵應天府，辭了賈政，擇日到任去了。不在話下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            且說黛玉自那日棄舟登岸時，便有榮府打發轎子並拉行李的車輛伺候。這黛玉嘗聽得母親說他外祖母家與別人家不同，他近日所見的這幾個三等的僕婦，吃穿用度，已是不凡，何況今至其家。因此步步留心，時時在意，不多說一句話，不多行一步路，恐被人恥笑了去。自上了轎，進了城，從紗窗向外瞧了一瞧，其街市之繁華，人煙之阜盛，自非別處可比。又行了半日，忽見街北蹲著兩個大石獅子，三間獸頭大門，門前列坐著十來個華冠麗服之人。正門不開，只東西兩角門有人出入。正門之上有一匾，匾上大書「敕造寧國府」五個大字。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉想道：「這是外祖的長房了。」又往西不遠，照樣也是三間大門，方是榮國府，卻不進正門，只由西角門而入。轎子抬著走了一射之地，將轉彎時，便歇了轎，後面的婆子也都下來了。另換了四個眉目秀潔十七八歲的小廝上來抬著轎子，眾婆子步下跟隨。至一垂花門前落下，眾小廝俱肅然退出，眾婆子上前打起轎簾，扶黛玉下了轎。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉扶著婆子的手，進了垂花門。兩邊是超手遊廊，正中是穿堂，當地放著一個紫檀架子大理石屏風。轉過屏風，小小三間廳房，廳後便是正房大院。正面五間上房，皆是雕梁畫棟。兩邊穿山遊廊廂房，掛著各色鸚鵡畫眉等雀鳥。台階上坐著幾個穿紅著綠的丫頭，一見他們來了，都笑迎上來，道：「剛纔老太太還念著呢，可巧就來了。」於是三四人爭著打簾子。一面聽得人說：「林姑娘來了！」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉方進房，只見兩個人扶著一位鬢髮如銀的老母迎上來。黛玉知是外祖母，正欲下拜，早被外祖母抱住，摟入懷中，「心肝兒肉」叫著大哭起來。當下侍立之人無不落淚，黛玉也哭個不休。待眾人慢慢勸解住了，那黛玉方拜見了外祖母，賈母方一一指與黛玉道：「這是你大舅母。這是二舅母。這是你先前珠大哥的媳婦珠大嫂子。」黛玉一一拜見了。賈母又叫：「請姑娘們來。今日遠客來了，可以不必上學去。」眾人答應了一聲，便去了兩個。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不一時，只見三個奶媽並五六個丫鬟擁著三位姑娘來了：第一個，肌膚微豐，身材合中，腮凝新荔，鼻膩鵝脂，溫柔沉默，觀之可親；第二個，削肩細腰，長挑身材，鴨蛋臉兒，俊眼修眉，顧盼神飛，文彩精華，見之忘俗；第三個，身量未足，形容尚小。其釵環裙襖，三人皆是一樣的粧束。黛玉忙起身迎上來見禮，互相廝認。歸了坐位，丫鬟送上茶來。不過敘些黛玉之母如何得病，如何請醫服藥，如何送死發喪。不免賈母又傷感起來，因說：「我這些女孩兒，所疼的獨有你母親，今一旦先我而亡，不得見面，怎不傷心！」說著，攜了黛玉的手，又哭起來。眾人都忙相勸慰，方略略止住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眾人見黛玉年紀雖小，其舉止言談不俗，身體面貌雖弱不勝衣，卻有一段風流態度，便知他有不足之症。因問：「常服何藥？為何不治好了？」黛玉道：「我自來如此，從會吃飯時便吃藥到如今了。經過多少名醫，總未見效。那一年，我纔三歲，聽說來了一個癩頭和尚，說要化我去出家，我父母自是不從。他又說：『既捨不得他，但只怕他的病一生也不能好的！若要好時，除非從此以後總不許見哭聲，除父母之外，凡有外親一概不見，方可平安了此一生。』這和尚瘋瘋癲癲說了這些不經之談，也沒人理他。如今還是吃人參養榮丸。」賈母道：「這正好，我這裡正配丸藥呢，叫他們多配一料就是了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一語未完，只聽後院中有笑語聲，說：「我來遲了，沒得迎接遠客！」黛玉思忖道：「這些人個個皆斂聲屏氣如此，這來者是誰，這樣放誕無禮？……」心下想時，只見一群媳婦丫鬟擁著一個麗人從後房門進來。這個人打扮與姑娘們不同：彩繡輝煌，恍若神妃仙子。頭上戴著金絲八寶攢珠髻，綰著朝陽五鳳掛珠釵；項上戴著赤金盤螭纓絡圈；身上穿著縷金百蝶穿花大紅雲緞窄裉襖，外罩五彩刻絲石青銀鼠褂；下著翡翠撒花洋縐裙。一雙丹鳳三角眼，兩彎柳葉弔梢眉。身量苗條，體格風騷。粉面含春威不露，丹唇未啟笑先聞。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉連忙起身接見。賈母笑道：「你不認得他。他是我們這裡有名的一個『潑辣貨』，南京所謂『辣子』你只叫他鳳辣子就是了。」黛玉正不知以何稱呼，眾姊妹都忙告訴黛玉道：「這是璉二嫂子。」黛玉雖不曾識面，聽見他母親說過：「大舅賈赦之子賈璉娶的就是二舅母王氏的內姪女，自幼假充男兒教養，學名叫做王熙鳳。」黛玉忙陪笑見禮，以「嫂」呼之。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            這熙鳳攜著黛玉的手，上下細細打量一回，便仍送至賈母身邊坐下，因笑道：「天下真有這樣標致人兒！我今日纔算看見了！況且這通身的氣派竟不像老祖宗的外孫女兒，竟是個嫡親的孫女兒似的。怨不得老祖宗天天嘴裡心裡放不下。－－只可憐我這妹妹這麼命苦：怎麼姑媽偏就去世了呢！」說著，便用手帕拭淚。賈母笑道：「我纔好了，你又來招我。你妹妹遠路纔來，身子又弱，也纔勸住了。快別再提了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            熙鳳聽了，忙轉悲為喜道：「正是呢。我一見了妹妹，一心都在他身上，又是歡喜，又是傷心，竟忘了老祖宗了。該打，該打。」又忙拉著黛玉的手問道：「妹妹幾歲了？可也上過學？現吃什麼藥？在這裡別想家。要什麼吃的，什麼玩的，只管告訴我。丫頭老婆們不好，也只管告訴我。」黛玉一一答應。一面熙鳳又問人：「林姑娘的東西可搬進來了？帶了幾個人來？你們趕早打掃兩間下房，讓她們去歇歇。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            說話時，已擺了茶果上來。熙鳳親自佈讓。又見二舅母問他：「月錢放完了沒有？」熙鳳道：「放完了。剛纔帶了人到後樓上找緞子，找了半日，也沒見昨兒太太說的那個，想必太太記錯了。」王夫人道：「有沒有，什麼要緊！」因又說道：「該隨手拿出兩個來給你這妹妹裁衣裳啊。等晚上想著再叫人去拿罷。」熙鳳道：「我倒先料著了。知道妹妹這兩日必到，我已經預備下了，等太太回去過了目好送來。」王夫人一笑，點頭不語。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當下茶果已撤，賈母命兩個老嬤嬤帶黛玉去見兩個舅舅去。賈赦之妻邢氏忙起身笑回道：「我帶了外甥女兒過去，到底便宜些。」賈母笑道：「正是呢。你也去罷，不必過來了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那邢夫人答應了，遂帶著黛玉和王夫人作辭。大家送至穿堂垂花門前。早有眾小廝拉過一輛翠幄清油車來，邢夫人攜了黛玉坐上。眾婆子放下車簾，方命小廝們抬起，拉至寬處，駕上馴騾，出了西角門，往東過榮府正門，入一黑油漆大門內，至儀門前，方下了車。邢夫人挽著黛玉的手進入院中。黛玉度其處必是榮府中之花園隔斷過來的。進入三層儀門，果見正房廂房遊廊，悉皆小巧別致，不似那邊的軒峻壯麗，且院中隨處之樹木山石皆好。及進入正室，早有許多艷粧麗服之姬妾丫鬟迎著。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            邢夫人讓黛玉坐了，一面令人到外書房中請賈赦。一時回來說：「老爺說了：『連日身上不好，見了姑娘，彼此傷心，暫且不忍相見。勸姑娘不必傷懷想家，跟著老太太和舅母是和家裡一樣的。姐妹們雖拙，大家一處作伴，也可以解些煩悶。或有委屈之處，只管說，別外道了纔是。』」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉忙站起身來一一答應了，再坐一刻，便告辭。邢夫人苦留吃過飯纔去，黛玉笑回道：「舅母愛惜賜飯，原不應辭，只是還要過去拜見二舅舅，恐去遲了不恭。異日再領，望舅母容諒。」邢夫人笑道：「這倒是了。」遂命兩個嬤嬤用方纔坐來的車送過去。於是黛玉告辭。邢夫人送至儀門前，又囑咐了眾人幾句，眼看著車去了方回來。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一時，黛玉進入榮府，下了車，只見一條大甬路，直接出大門來。眾嬤嬤引著，便往東轉彎，走過一座東西穿堂，向南大廳之後，至儀門內大院落。上面五間大正房，兩邊廂房，鹿頂耳門鑽山，四通八達，軒昂壯麗，比各處不同。黛玉便知這方是正內室。進入堂屋，抬頭迎面先見一個赤金九龍青地大匾，匾上寫著斗大三個字是「榮禧堂」。後有一行小字：「某年月日書賜榮國公賈源」，又有「萬機宸翰」之寶。大紫檀雕螭案上設著三尺多高青綠古銅鼎，懸著待漏隨朝墨龍大畫。一邊是鏨金彝，一邊是玻璃盆。地下兩溜十六張楠木圈椅。又有一副對聯，乃是烏木聯牌，鑲著鏨金字跡，道是：「座上珠璣昭日月，堂前黼黻煥煙霞。」下面一行小字是：「世教弟勳襲東安郡王穆蒔拜手書。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來王夫人時常居坐宴息也不在這正室中，只在東邊的三間耳房內。於是嬤嬤們引黛玉進東房門來。臨窗大炕上鋪著猩紅洋毯，正面設著大紅金錢蟒引枕，秋香色金錢蟒大條褥。兩邊設一對梅花式洋漆小几：左邊几上擺著文王鼎，鼎旁匙箸香盒；右邊几上擺著汝窯美人觚，裡面插著時鮮花卉。地下面，西一溜四張大椅都搭著銀紅撒花椅搭，底下四副腳踏；兩邊又有一對高几，几上茗碗瓶花俱備。其餘陳設不必細說。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            老嬤嬤讓黛玉上炕坐。炕沿上卻也有兩個錦褥對設。黛玉度其位次，便不上炕，只就東邊椅上坐了。本房的丫鬟忙捧上茶來。黛玉一面吃茶，一面打量這些丫鬟們，粧飾衣裙，舉止行動，果與別家不同。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            茶未吃了，只見一個穿紅綾襖青緞掐牙背心的丫鬟走來笑道：「太太說，請林姑娘到那邊坐罷。」老嬤嬤聽了，於是又引黛玉出來，到了東南三間小正房內。正面炕上橫設一張炕桌，上面堆著書籍茶具，靠東壁面西設著半舊的青緞靠背引枕。王夫人卻坐在西邊下首，－－亦是半舊青緞靠背坐褥－－見黛玉來了，便往東讓。黛玉心中料定這是賈政之位，因見挨炕一溜三張椅子上也搭著半舊的彈墨椅袱，黛玉便向椅上坐了。王夫人再三讓他上炕，他方挨王夫人坐下。王夫人因說：「你舅舅今日齋戒去了，再見罷。只是有一句話囑咐你：你三個姐妹倒都極好，以後一處念書，認字，學針線，或偶一頑笑，都有個儘讓的。我就只一件不放心：我有一個孽根禍胎，是家裡的『混世魔王』，今日因往廟裡還願去，尚未回來，晚上你看見就知道了。你只以後不要睬他，你這些姐姐妹妹都不敢沾惹他的。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉素聞母親說過，「有個內姪，乃啣玉而生，頑劣異常，不喜讀書，最喜在內幃廝混，外祖母又溺愛，無人敢管。」今見王夫人所說，便知是這位表兄，一面陪笑道：「舅母所說，可是那位啣玉而生的哥哥？在家時記得母親常說，這位哥哥比我大一歲，小名就叫寶玉，性雖憨頑，說待姊妹們卻是極好的。況我來了，自然和姊妹們一處，弟兄們是另院別房，豈有沾惹之理？」王夫人笑道：「你不知道原故。他和別人不同，自幼因老太太疼愛，原係和姐妹們一處嬌養慣了的。若姐妹們不理他，他倒還安靜些；若一日姐妹們和他多說了一句話，他心上一喜，便生出許多事來：所以囑咐你別理會他。他嘴裡一時甜言蜜語，一時有天沒日，瘋瘋傻傻，只休信他。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉一一的都答應著。忽見一個丫鬟來說：「老太太那裡傳晚飯了。」王夫人忙攜了黛玉出後房門，由後廊往西出了角門，是一條南北甬路，南邊是倒座三間小小抱廈廳，北邊立著一個粉油大影壁，後有一個半大門，小小一所房屋。王夫人笑指向黛玉道：「這是你鳳姐姐的屋子，回來你好往這裡找他去。少什麼東西，只管和他說就是了。」這院門上也有幾個纔總角的小廝，都垂手侍立。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王夫人遂攜黛玉穿過一個東西穿堂，便是賈母的後院了，於是進入後房門。已有許多人在此伺候，見王夫人來，方安設桌椅。賈珠之妻李氏捧杯，熙鳳安箸，王夫人進羹。賈母正面榻上獨坐，兩旁四張空椅。熙鳳忙拉黛玉在左邊第一張椅子上坐下，黛玉十分推讓。賈母笑道：「你舅母和嫂子們是不在這裡吃飯的，你是客，原該這麼坐。」黛玉方告了坐，就坐了。賈母命王夫人也坐了。迎春姊妹三個告了坐方上來，迎春坐右手第一，探春左第二，惜春右第二。旁邊丫鬟執著拂塵漱盂巾帕。李紈鳳姐立於案旁佈讓。外間伺候的媳婦丫鬟雖多，卻連一聲咳嗽不聞。飯畢，各各有丫鬟用小茶盤捧上茶來。當日林家教女以惜福養身，每飯後必過片時方吃茶，不傷脾胃。今黛玉見了這裡許多規矩不似家中，也只得隨和著些。接了茶，又有人捧過漱盂來，黛玉也漱了口。又盥手畢，然後又捧上茶來，這方是吃的茶。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            賈母便說：「你們去罷，讓我們自在說說話兒。」王夫人遂起身，又說了兩句閒話兒，方引李鳳二人去了。賈母因問黛玉念何書，黛玉道：「剛念了《四書》。」黛玉又問姊妹們讀何書，賈母道：「讀什麼書！不過認幾個字罷了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一語未了，只聽外面一陣腳步響，丫鬟進來報道寶玉來了。黛玉心想：「這個寶玉不知是怎樣個憊懶人呢。……」及至進來一看，卻是位青年公子。頭上戴著束髮嵌寶紫金冠，齊眉勒著二龍戲珠金抹額；一件二色金百蝶穿花大紅箭袖，束著五彩絲攢花結長穗宮絛，外罩石青起花八團倭緞排穗褂；登著青緞粉底小朝靴。面若中秋之月，色如春曉之花，鬢若刀裁，眉如墨畫，鼻如懸膽，睛若秋波。雖怒時而似笑，即瞋視而有情。項上金螭纓絡，又有一根五色絲絛，繫著一塊美玉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉一見便吃一大驚，心中想道：「好生奇怪！倒像在那裡見過的？何等眼熟！……」只見這寶玉向賈母請了安，賈母便命：「去見你娘來。」即轉身去了。一回再來時，已換了冠帶。頭上周圍一轉的短髮，都結成小辮，紅絲結束，共攢至頂中胎髮，總編一根大辮，黑亮如漆，從頂至梢，一串四顆大珠，用金八寶墜腳。身上穿著銀紅撒花半舊大襖，仍舊戴著項圈、寶玉、寄名鎖、護身符等物；下面半露松綠撒花綾褲，錦邊彈墨襪，厚底大紅鞋。越顯得面如敷粉，唇若施脂，轉盼多情，語言若笑。天然一段風韻，全在眉梢；平生萬種情思，悉堆眼角。－－看其外貌是極好，卻難知其底細。後人有《西江月》二詞，批的極確。詞曰：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            無故尋愁覓恨，有時似傻如狂。縱然生得好皮囊，腹內原來草莽。潦倒不通世務，愚頑怕讀文章。行為偏僻性乖張，那管世人誹謗？又曰：富貴不知樂業，貧窮難耐淒涼。可憐辜負好時光，於國於家無望。天下無能第一，古今不肖無雙。寄言紈袴與膏粱：莫效此兒形狀！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卻說賈母見他進來，笑道：「外客沒見就脫了衣裳了？－－還不去見你妹妹呢。」寶玉早已看見了一個嬝嬝婷婷的女兒，便料定是林姑媽之女，忙來見禮。歸了座，細看時，真是與眾各別。只見：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            兩彎似蹙非蹙籠煙眉，一雙似喜非喜含情目。態生兩靨之愁，嬌襲一身之病。淚光點點，嬌喘微微。閒靜似嬌花照水，行動如弱柳扶風。心較比干多一竅，病如西子勝三分。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉看罷，笑道：「這個妹妹，我曾見過的。」賈母笑道：「又胡說了。你何曾見過？」寶玉笑道：「雖沒見過，卻看著面善，心裡倒像是舊相認識，恍若遠別重逢的一般。」賈母笑道：「好，好！這麼更相和睦了。」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉便走向黛玉身邊坐下，又細細打量一番，因問：「妹妹可曾讀書？」黛玉道：「不曾讀書，只上了一年學，些須認得幾個字。」寶玉又道：「妹妹尊名？」黛玉便說了名。寶玉又道：「表字？」黛玉道：「無字。」寶玉笑道：「我送妹妹一字，莫若『顰顰』二字，極妙。」探春便道：「何處出典？」寶玉道：「《古今人物通考》上說：『西方有石名黛，可代畫眉之墨。』況這妹妹，眉尖若蹙，取這個字，豈不甚美？」探春笑道：「只怕又是杜撰！」寶玉笑道：「除了《四書》，杜撰的也太多呢。」因又問黛玉：「可有玉沒有？」眾人都不解。黛玉便忖度著「因他有玉，所以纔問我的」，便答道：「我沒有玉。你那玉也是件稀罕物兒，豈能人人皆有？」
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寶玉聽了，登時發作起狂病來，摘下那玉，就狠命摔去，罵道：「什麼罕物！人的高下不識，還說靈不靈呢！我也不要這勞什子！」嚇的地下眾人一擁爭去拾玉。賈母急的摟了寶玉，道：「孽障！你生氣，要打罵人容易，何苦摔那命根子！」寶玉滿面淚痕，哭道：「家裡姐姐妹妹都沒有，單我有，我說沒趣兒；如今來了這個神仙似的妹妹也沒有，可知這不是個好東西。」賈母忙哄他道：「你這妹妹原有玉來著，因你姑媽去世時，捨不得你妹妹，無法可處，遂將他的玉帶了去：一則全殉葬之禮，盡你妹妹的孝心；二則你姑媽的陰靈兒也可權作見了你妹妹了。因此，他說沒有，也是不便誇張的意思啊。你還不好生帶上，仔細你娘知道！」說著，便向丫鬟手中接來，親與他帶上。寶玉聽如此說，想了一想，也就不生別論。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當下奶娘來問黛玉房舍。賈母便說：「將寶玉挪出來，同我在套間暖閣裡，把林姑娘暫且安置在碧紗櫥裡。等過了殘冬，春天再給他們收拾房屋，另作一番安置罷。」寶玉道：「好祖宗！我就在碧紗櫥外的床上很妥當，又何必出來鬧的老祖宗不得安靜呢？」賈母想一想，說：「也罷了。」每人一個奶娘並一個丫頭照管，餘者在外間上夜聽喚。一面早有熙鳳命人送了一頂藕合色花帳並錦被緞褥之類。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉只帶了兩個人來：一個是自己的奶娘王嬤嬤，一個是十歲的小丫頭，名喚雪雁。賈母見雪雁甚小，一團孩氣，王嬤嬤又極老，料黛玉皆不遂心，將自己身邊一個二等小丫頭，名喚鸚哥的，與了黛玉。亦如迎春等一般：每人除自幼乳母外，另有四個教引嬤嬤；除貼身掌管釵釧盥沐兩個丫頭外，另有四五個灑掃房屋來往使役的小丫頭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            當下王嬤嬤與鸚哥陪侍黛玉在碧紗櫥內；寶玉乳母李嬤嬤並大丫頭名喚襲人的陪侍在外面大床上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原來這襲人亦是賈母之婢，本名蕊珠。賈母因溺愛寶玉，恐寶玉之婢不中使，素喜蕊珠心地純良，遂與寶玉。寶玉因知他本姓花，又曾見舊人詩句有「花氣襲人」之句，遂回明賈母，即把蕊珠更名襲人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            卻說這襲人倒有些癡處：伏侍賈母時，心中只有賈母；如今跟了寶玉，心中又只有寶玉了。只因寶玉性情乖僻，每每規諫，見寶玉不聽，心中著實憂鬱。是晚，寶玉李嬤嬤已睡了。他見裡面黛玉鸚哥猶未安歇，他自卸了粧，悄悄的進來，笑問：「姑娘怎麼還不安歇？」黛玉忙笑讓：「姐姐請坐。」襲人在床沿上坐了。鸚哥笑道：「林姑娘在這裡傷心，自己淌眼抹淚的說：『今兒纔來了，就惹出你家哥兒的狂病來。倘或摔壞了那玉，豈不是因我之過？』所以傷心。我好容易勸好了。」襲人道：「姑娘快別這麼著！將來只怕比這更奇怪的笑話兒還有呢。若為他這種行狀，你多心傷感，只怕你還傷感不了呢。快別多心！」黛玉道：「姐姐們說的，我記著就是了。」又敘了一回，方纔安歇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次早起來，省過賈母，因往王夫人處來。正值王夫人與熙鳳在一處拆金陵來的書信，又有王夫人的兄嫂處遣來的兩個媳婦兒來說話。黛玉雖不知原委，探春等卻曉得是議論金陵城中居住的薛家姨母之子－－表兄薛蟠，倚財仗勢打死人命，現在應天府案下審理。如今舅舅王子騰得了信，遣人來告訴這邊，意欲喚取進京之意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            畢竟怎的，下回分解。
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="chengyi_ocr">
+      <div class="compare-col-head">
+        <span class="badge">程乙本OCR</span>
+        <span class="col-desc">程乙本OCR（欧阳健校注本PDF本地识别）</span>
+        <span>第3回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">金陵城起复贾雨村 荣国府收养甲侧：二字触目凄凉之至！</h3>
+        
+        
+        <p class="col-para">
+          
+            贾雨村黄缘①复旧职 林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却说雨村忙回头看时，不是别人，乃是当日同僚一案参革的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            号张如圭者。他本系此地人，革后家居，今打听得都中奏起
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            复②旧员之信，他便四下里寻情找门路，忽遇见村，故忙道
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            喜。二人见了礼，张如圭便将此信告诉雨村，雨村自是欢喜，忙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            忙的叙了两何，遂作别各自回家。冷子兴听得此言，便忙献计，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            令雨村央烦林如海，转向都中去央烦费政。雨村领其意，作别回
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            至馆中，忙寻邸报③看真确了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日，面谋之如海。如海道：“天缘凑巧，因贱荆④去世，都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中家岳母念及小女无人依傍教育，前已遣了男女船只来接，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            因小女未曾大痊，故未及行。此刻正思向蒙训教之恩未经酬报，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①黄(yin 寅)缘一一攀附权要以求升进。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            职，守孝期满而复用者叫“起复”。“起复”和“开复”在习惯用法上没有严格区别。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③邸报一一邸（di底)：本为来朝诸侯王或上京办事宫僚的居处，后用以泛称
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王候和大官僚的府第。邸报：又名“邸钞”、“宫门钞”，是邸中给诸藩官僚的书面报
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            导，内容包括传钞的诏令、奏章和其它新闻记事等，是我国最早的一一种报纸。起于汶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            代。后世亦称政府官报为邸报。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④荆一一荆：指“荆钗布裙”。语出《列女传》。旧时谦称自己的妻子为贱
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            荆、拙荆、山荆等。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ? 男女指仆人。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 85
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第三
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            遇此机会，岂有不尽心图报之理。但请放心。弟已预为筹画至
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此，已修下荐书一封，转托内兄务为周全协佐，方可稍尽弟之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            诚，即有所费用之例，弟于内兄信中已注明白，亦不劳尊兄多虑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            矣。”雨村面打恭，谢不释口，面又问：“不知令亲大人现居何
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            职？只怕晚生草率，不敢骤然入都干渎①。”如海笑道：“若论舍
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亲，与尊兄犹系同谱，乃荣公之孙：大内兄现袭一一等将军，名赦，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            字恩侯；二内兄名政，字存周，现任工部员外郎，其为人谦恭厚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道，大有祖父遗风，非齊粱轻薄仕宦之流，故弟方致书烦托。否
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            则不但有污尊兄之清操，即弟亦不屑为矣。”雨村听了，心下方信
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了昨日子兴之言，于是又谢了林如海。如海乃说：“已择了出月
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            初二白小女入都，尊克即同路而往，岂不两便？”雨村唯唯听命，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            心中十分得意。如海遂打点礼物并饯行之事，雨村一一领了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那女学生黛玉，身体方愈，原不忍弃父而往；无奈他外祖母
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            致意务去，且兼如海说：“汝父年将半百，再无续室之意；耳汝多
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            病，年又极小，上无亲母教养，下无姊妹兄弟扶持，今依傍外祖母
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            及舅氏姊妹去，正好减我顾盼之忧，何反云不往？”黛玉听了，方
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            洒泪拜别，随了奶娘及荣府几个老妇人登舟而去。雨村另有一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            只船，带两个小童，依附黛玉而行。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有日到了都中，进入神京②，雨村先整了衣冠，带了小童，拿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着宗侄的名帖③，至荣府的门前投了。彼时贾政已看了妹丈之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            .①干渎(di读)一一又作&#34;千購”。冒犯的意思。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②都中、神京一一这里说的“都中”包括京徽，即京城周围地区。神京：即京
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            城。皇帝所居，故称神京。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③名帖一一即名片。旧时在纸片上书写自已的姓名、籍贯、官职、爵位，拜访
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            时，投以通名。始行汉代，最早用削平的木条写上姓名单居。两汉时叫“谌”，汉末叫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “刺”，后代虽用纸制，亦相沿称“名刺”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            36
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾雨村黄缘复旧职林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书，即忙请入相会。见雨村相貌魁伟，言语不俗，且这贾政最喜
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            读书人，礼贤下士，济弱扶危，大有祖风；况又系妹丈致意，因此
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            优待雨村，更又不同，便竭力内中协助。题奏之日，轻轻谋了一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个复职候缺，不上两个月，金陵应天府缺出，便谋补了此缺，拜辞
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了贾政，择日上任去了。不在话下。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ·且说黛玉自那日弃舟登岸时，便有荣国府打发了轿子并拉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            行李的车辆久候了。这林黛玉常听得母亲说过，他外祖母家与
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            别家不同。他近日所见的这几个三等仆妇，吃穿用度，已是不凡
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            厂，何况今至其家。因此步步留心，时时在意，不肯轻易多说一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            句话，多行一步路，惟恐被人耻笑了他去。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            自上了轿，进入城中，从纱窗向外瞧了二一瞧，其街市之繁华，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人烟之阜盛，自与别处不同。又行了半日，忽见街北跨着两个大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            石狮子，三间兽头大门，门前列坐着十来个华冠丽服之人。正门
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            却不开，只有东西两角门有人出入。正门之上有一匾，匾上大书
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “造①宁国府”五个大字。黛玉想道：“这必是外祖之长房
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。”想着，又往西行，不多远，照样也是三间大门，方是荣国府
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。却不进正门，只进了西边角门。那轿夫抬进去，走了一射之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            地，将转弯时，便歇下退出去了。后面的婆子们已都下了轿，赶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上前来。另换了三四个衣帽周全十七八岁的小上来，复抬起
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            轿子。众婆子步下围随至一垂花门②前落下。众小厮退出，众
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            婆子上来打起轿帘，扶黛玉下。林黛玉扶着婆子的手，进了垂
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①敕造一一奉皇帝之命建造。敕（chi斥）：本为自上命下之词，南北朝以前，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            通用于长官对下属，长辈对晚辈，之后，则为皇帝发布诏令的专称。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②垂花门一一旧家宅院，进入大门之后，内院院门例有雕刻的垂花，倒悬于门
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            额两侧，门上边盖有宫殿式的小屋顶，称垂花门。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            37
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            花门，两边是抄手游廊①，当中是穿堂②，当地放着一个紫檀架子
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大理石的大插屏③。转过插屏一]，小小的三间厅，厅后就是后
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面的正房大院。正面五间上房，皆雕梁画栋，两边穿山游廊④
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            湘房，挂着各色雞鹉、画眉等鸟雀。舍矶之上，坐着几个穿红着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            绿的丫头，一见他们来了，便忙都笑迎上来，说：“刚才老太太还
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            念呢，可巧就来了。”于是三四人争着打起帘笼，一面听得人回
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话：“林姑娘到了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉方进入房时，只见两个人换着一位鬓发如银的老母迎
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上来，黛玉便知是他外祖母。方欲拜见时，早被他外祖母把楼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            入怀中，心肝儿肉叫着大哭起来。当下地下侍立之人，无不掩面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            涕泣，黛玉也哭个不住。一时众人慢解劝住了，黛玉方拜见了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            外祖母。一一此即冷子兴所云之史氏太君，贾赦贾政之母也。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当下贾母一一指与黛玉：“这是你大舅母；这是你二舅母；这是你
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            先珠天哥的媳妇珠大嫂子。”黛玉一一拜见过。贾母文说：“请姑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            娘们来。今日远客才来，可以不必上学去了。”众人答应了一声，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便去了两个。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不一时，只见三个奶嬷嬷并五六个丫蔓，簇拥着三个娣妹来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。第个肌肤微羊，合中身材，腮凝新荔，鼻腻鹅脂，温柔沉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            默，观之可亲。第二个削肩细腰，长挑身材，鸭蛋脸面，俊眼修
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眉，顾盼神飞，文彩精华，见之俗。第三个身量未足，形容尚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抄手游廊一一院门内两侧环抱的走廊。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            穿堂一一座落在前后两个院落之间可以穿行的厅堂。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大插屏一一放在穿堂中的大屏风，除作装饰外，还可以遮蔽视线，以免进入
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            穿堂，直见正房。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④穿山游廊一一山：指山，房子两侧的墙。“穿山游廊”是从山墙开门接起
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的游廊。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            88
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾雨村寅缘复旧职林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            小。其环裙袄，三人皆是一样的妆饰。黛玉忙起身迎上莱见
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            礼，互相厮认过，大家归了坐。丫们上茶来。不过说些黛玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            之母如何得病，如何请医服药，如何送死发丧。不免贾母又伤感
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            起来，因说：“我这些儿女，所疼者独有你母，今日一旦先舍我而
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            去，连面也不能一一见，今见了你，我怎不伤心！”说着，楼了黛玉在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            怀，又鸣咽起来。众人忙都宽慰解释，方略略止住。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人见黛玉年貌虽小，其举止言谈不俗，身体面庞虽怯弱不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            胜,却有一段自然的风流态度,便知他有不足之症①。因问：“常
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            服何药，如何不急为疗治？”黛玉道：“我自来是如此，从会吃饮食
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            时便吃药，到今日未断，请了多少名医修方配药，皆不见效。那
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一年我三岁时，听得说来了一个癫头和尚，说要化我去出家，我
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            父母固是不从。他又说：“既舍不得他，只怕他的病一生也不能
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好的了。若要好时，除非从此以后总不许见哭声；除父母之外，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凡有外姓亲友之人，一概不见，方可平安了此一世。”疯疯癫癫，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说了这些不经之谈，也没人理他。如今还是吃人参养荣丸。”贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母道：“正好，我这里正配丸药呢。叫他们多配一料就是了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一语未了，只听后院中有人笑声，说：“我来迟了，不曾迎接
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            远客！”黛玉纳罕道：“这些人个个皆敛声屏气，恭肃严整如此，这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来者系谁，这样放诞无礼？”心下想时，只见一群媳妇丫鬓围
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            拥着一个人从后房门进来。这个人打扮与众姑娘不同：彩绣辉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            煌，恍若神妃仙子。头上戴着金丝八宝珠髻②，缩着朝阳五
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ·不足之症一一中医病症名。由身体虚弱引起。如脾胃虚弱，叫中气不足；
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            气血虚弱，叫正气不足。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①金丝八宝揽（cuain）珠馨一一用金丝穿绕珍珠和镶嵌八宝（玛瑙、碧玉之类）
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            制成的珠花的发墨。摄：凑聚。用金丝或银丝把珍珠穿扭成各种花样叫“揽珠
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            花”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            39
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤挂珠钗①；项上带着赤金盘蟀璎珞圈②；裙边系着豆绿宫絲，双·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            衡比目玫瑰[二)③;身上穿着缕金百蝶穿花大红洋缎(三]窄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            袄④,外罩五彩刻丝石青银鼠褂③；下着翡翠撒花洋裙@。一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            双丹凤三角眼,两弯柳叶吊梢眉[四}①,身量苗条，体格风骚。粉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面含春威不露，丹唇未启笑先闻。黛玉连忙起身接见。贾母笑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“你不认得他，他是我们这里有名的一个泼皮破落户儿③，南
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            省俗谓作“辣子”，你只叫他“凤辣子”就是了。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉正不知以何称呼，只见众娣妹都忙告诉他道：“这是琏
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            嫂子。”黛玉虽不识，也曾听见母亲说过，大舅贾赦之子贾琏，娶
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的就是二舅母王氏之内侄女，自幼假充男儿教养的，学名王熙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤。黛玉忙陪笑见礼，以“嫂”呼之。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这熙凤携着黛玉的手，上下细细打谅了一回，仍送至贾母身
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①朝阳五凤挂珠钗→一种长钗，样子是一支钗上分出五股，每股一支凤凰，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            口衔一串珍珠。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②赤金盘蟀（chi吃）珞圈一螨：古代传说中的无角龙。珞：联缀起来的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            珠玉。圈:项圈。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③双衡比目玫瑰-—一：玉佩。古代贵族佩带的玉器，常球成各种形状。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            比自：鱼名，传说这种鱼成双而行。“比目玫瑰”是攻瑰色的玉片雕球成双鱼形的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉佩。衡：亦作“”（heng横），佩玉上部的小横杠，用以系饰物。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④缕金百蝶穿花大红洋缎窄梢（ken垦去声）袄一指在大红洋缎的衣面上用
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            金线绣成百蝶穿花图案的紧身袄。补：上衣前后两幅在腋下合缝的部分。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ·①五彩刻丝石青银鼠褂—一石青色的衣面上有各种彩色刻丝、衣里是银鼠皮
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的褂子。刻丝：在丝织品上用丝平织成的图案，与凸出的绣花不同。石青：淡灰青
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            色。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③翡翠撒花洋绝裙一一翡翠：翠绿色。撒花：在绸缎上用散碎小花点组成的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            花样或图案。洋：极薄而软的平纹春绸，微带自然皱纹。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①丹凤三角眼、柳叶吊梢眉--一眼角向上微翘，俗称“丹凤眼”。柳叶吊梢眉：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            形容眉梢斜飞人的样子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③泼皮破落户儿一-原指没有正当生活来源的无赖。这里形容风姐泼辣，是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            戏的称谓。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            40
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾雨村寅缘复旧职林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            边坐下，因笑道：“天下真有这样标致的人物，我今儿才算见了！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            况且这通身的气派，竟不像老祖宗的外孙女儿，竟是个亲的孙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            女，怨不得老祖宗天天口头心头一时不忘。可怜我这妹妹这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            样命苦，怎么姑妈偏就去世了！”说着，便用帕拭泪。贾母笑道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “我才好了，你倒来招我。你妹妹远路才来，身子又弱，也才劝住
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，快再体提前话。这熙凤听了，忙转悲为喜道：“正是呢！我一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见了妹妹，一心都在他身上了，又是喜欢，又是伤心，竟忘记了老
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            祖宗。该打，该打！”又忙携黛玉之手，问：*妹妹岁了？可也上
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过学？现吃什么药？在这里不要想家，想要什么吃的、什么玩
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的，只管告诉我；丫头老婆们不好了，也只管告诉我。”一面又间
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            赶早打扫两间下房，让他们去歇歇。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说话时，已摆了茶果上来。熙凤亲为捧茶捧果。又见二舅
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母问他：“月钱①放过了不曾？”熙凤道：“月钱已放完了。才刚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            带着人到后楼上找缎子，找了这半日，也并没有见昨日太太说的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            那样的，想是太太记错了？”王夫人道：“有没有，什么要紧。”因又
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            说道：“该随手拿出两个来给你这妹妹去裁衣裳的，等晚上想着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            叫人再去拿罢，可别忘了。”熙凤道：“这倒是我先料着了，知道妹
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妹不过这两日到的，我已预备下了；等太太回去过了自好送来。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王夫人一笑，点头不语。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当下茶果已撤，贾母命两个老嬷嬷带了黛玉去见两个母舅。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            时贾赦之妻邢氏忙亦起身，笑回道：“我带了外甥女过去，倒也便
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宜②。”贾母笑道【五}：“正是呢，你也去罢，不必过来了。”邢夫人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            月钱-每月按身份等级发给家中上下人等供零用的钱。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便(bian)宜—这里是方便之意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 41
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第三
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            答应了一声“是学，遂带了黛玉与王夫人作辞。大家送至穿堂
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            前。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            出了垂花门，早有众小斯们拉过一辆翠青车①，邢夫人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            携了黛玉，坐在上面，众婆子们放下车帘，方命小厮们抬起，拉至
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宽处，方驾上驯骤，亦出了西角门，往东过荣府正门，便入一黑油
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            大门中，至仪门②前方下来。众小厮退出，方打起车帘，邢夫人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            挣着黛玉的手，进入院中。黛玉度其房屋院宇，必是荣府中花园
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            隔断过来的。进入三层仪门，果见正房厢房游廊，悉皆小巧别
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            致，不似方才那边轩峻壮丽；且院中随处之树木山石皆在。一时
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            进入正室，卓有许多盛妆丽服之姬妾丫翼迎着，邢夫人让黛玉坐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，一面命人到外面书房去请贾赦。一一时人来回话说：“老爷说
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了：“连日身上不好，见了姑娘彼此倒伤心，暂且不忍相见。劝姑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            娘不要伤心想家，跟着老太太和舅母，即同家里一样。娣妹们虽
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            拙，大家一处伴着，亦可以解些烦闷。或有委屈之处，只管说得，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不要外道才是。”黛玉忙站起来，一一听了。再坐一刻，便告辞。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ：邢夫人苦留吃过晚饭去，黛玉笑回道：“寡母爱惜赐饭，原不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            应辞，只是还要过去拜见二舅舅，恐领了赐去不恭，异日再领，未
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            为不可。望舅母容谅。”邢夫人听说，笑道：“这倒是了。”遂令两
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            三个嬷嬷用方才的车好生送了姑娘过去。于是黛玉告辞。邢夫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人送至仪门前，又嘱了众人几句，眼看着车去了方回来。！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一时黛玉进了荣府，下了车。众嬷嬷引着，便往东转弯，穿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①.翠槿（wo握)青细车-…翠：指用粗厚的绿色绸类作的轿车车帐。青
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （细即绸字）：这里指用青色绸作的车帘。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②仪门一旧时官衙、府第的大门之内的门，取有仪可象之意，又具装饰作
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            用。说，旁门也可称仪门，系油“门”（即官署的旁门）转而来。见《在阔新知
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            录)。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            42
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾雨村黄缘复旧职林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            过一个东西的穿堂，向南大厅之后，仪门内大院落，上面五间大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正房，两边厢房鹿顶耳房钻山①，四通八达，轩昂壮丽，比贾母处
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不同。黛玉便知这方是正经正内室，一条大甬路②，直接出大门
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的。进入堂屋中，抬头迎面先看见一个赤金九龙青地大匾，匾上
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            写着斗大的三个大学，是“荣禧堂”，后有一行小字：“某年月日，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书赐荣国公贾源”，又有“万几宸翰之宝”③。大紫檀雕螨案上，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            设着三尺来高青绿古铜鼎，悬着待漏随朝墨龙大画④，一边是金
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            雌彝③，一边是玻璃盒@。地下两十六张楠术交椅，又有-一副
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            对联，乃乌木联牌，镶着鑫银②的字迹，道是：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            座上珠玑昭日月，堂前焕烟霞。③
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①两边厢房鹿耳房钻山一一两边的厢房用钻山的方式与鹿顶的耳房相连
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            接。厢房：指四合院中东西两边的房子。鹿顶：一作盘顶，此语首见于宋《营造法
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            式》，单独用时指平屋顶。耳房：连接在正房两侧的小房子。钻山：指山墙上开门或
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            开洞，与相邻的房子或游廊相接。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②甬路一庭院中间的通道，多用砖石铺砌雨成。·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③万几宸(chen辰)翰之宝这是皇帝印章上的文字。几：同机。“万机”即
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            万事，形容皇帝政务繁多，“日理万几”的意思。宸：北衰，即北极星。皇帝坐北朝南，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            故以北宸代指皇帝。翰：墨迹、书法。宸翰：皇帝的笔迹。宝：皇帝的印玺。：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            待漏随朝墨龙大画一一待漏：封建时代大臣要在五更前到朝房里等待上朝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的时刻。漏：指“铜壶滴漏”，古代计时器，代指时间。随朝：按照大臣的班列朝见皇
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            帝。墨龙大画：巨龙在云雾海潮中隐现的大辐水墨画。因旧时以龙象征帝王，又画
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中之“潮”与朝见之“朝”谐音。隐寓上朝陛见君王之意。贵族家中悬挂此画以示身
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            份地位之荣耀。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ?金彝（weiyi伟夷)一一原为有雄形图案的青铜祭器，后作贵重陈设品。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ：-种长尾猿。彝：古代青铜器中礼器的通称。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盒(hai 海)--—盛酒器。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            (zan赞）银种银雕工艺。鑫：雕刻。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “座上”一联一珠玑：珍珠，兼喻诗文之美。戳：古代宫僚贵族礼服上绣
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的花纹。（f府）：半黑半白的斧形图案。藏（服）：“亞”形图案。两句形容座中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人和堂上客的衣饰华贵：佩带的珠玉如日月般光彩照人，衣服的图饰如烟霞般绚丽
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            夺目。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            43
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            下面一行小字，道是：“同乡世教弟勋袭东安郡王穆拜手书”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来王夫人时常居坐宴息，亦不在这正室，只在这正室东边
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的三间耳房内。于是老嬷嬷引黛玉进东房门来。临窗大炕上铺
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着[六]猩红洋廚①，正面设着大红金钱蟒靠背，石青金钱蟒引
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            枕②，秋香色③金钱蟒大条褥。两边设一对梅花式洋漆小几。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            左边几上文王鼎匙箸香盒①;右边几上汝窑美人③—内
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            插着时鲜花卉，并茗碗痰盒等物。地下面西一溜四张椅上，都搭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            着银红撒花椅搭@，底下四副脚踏。·椅之两边，也有一对高几，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            几上茗碗瓶花俱备。其饶陈设，自不必细说。···！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            老嬷嬷们让黛玉炕上坐，炕沿上却有两个锦褥对设，黛玉度
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            其位次，便不上炕，只向东边椅子上坐了。本房内的丫忙捧上
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            茶来。黛玉一面吃茶，～面打谅这些丫们，妆饰衣裙，举止行
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            动，果亦与别家不同。茶未吃了，只见个穿红绫袄青缎掐牙①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            背心的丫翼走来笑说道：“太太说，请林姑娘到那边坐罢。”老嫉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            嬷听了，于是又引黛玉出来，到了东廊三间小正房内。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            正房炕上横设一张炕桌，桌上磊③着书籍茶具，靠东壁面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            西设着半旧的青缎靠背引枕。王夫人却坐在西边下首，亦是半
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            罚（i计）一毛织的毯子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            引枕一一坐时搭扶胳膊的一种測墩形的倚枕。：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            秋香色一一淡黄绿色。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①文王鼎匙箸香盒—文王鼎：指周代的传国国鼎，此处说的是小型仿古香
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            炉，内烧粉状檀香之类的香料。匙著：拔弄香灰的用具。香盒：盛香料的盒子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            汝窑美人（gu孤）一一宋代河南汝州密烧制的一种仿古瓷器。：古代
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            盛酒器，长身细腰，形如美人，敌称。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            椅搭一一搭在椅上的一种长方形的绣花呢缎饰物。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②掐牙一一锦缎双叠成细条，嵌在衣服或背心的夹边上，仅露少许，作为装
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            饰，叫掐牙。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            磊(luo洛)叠放。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾雨村黄缘复旧职林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            旧的青缎靠背坐褥。见黛玉来了，便往东让。黛玉心中料定这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是贾政之位。因见挨炕一溜三张椅子上，也搭着半旧的弹墨椅
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①，黛玉便向椅上坐了。王夫人再四携他上炕，他方挨王夫人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            坐了。王夫人因说：“你舅舅今日斋戒②去了，再见罢。只是有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一句话瞩你：你三个姊妹倒都极好，以后一处念书认字学针
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            线，或是偶一顽笑，都有尽让的。但我不放心的最是一件：我有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            个孽根祸胎，是家里的‘混世魔王’，今日因庙里还愿去了，尚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            未回来，晚间你看见便知了。你只以后不要踩他，你这些娣妹都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不敢沾惹他的。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉亦常听得母亲说过，二舅母生的有个表兄，乃衔玉而
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            诞，顽劣异常，极恶读书，最喜在内炜③混；外祖母又极溺爱，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无人敢管。今见主夫人如此说，便知说的是这表兄了。因陪笑
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“舅母说的，可是衔玉所生的这位哥哥？在家时亦曾听见母
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亲常说，这位哥哥比我大一一岁，小名就唤宝玉，虽极憨顽，说在娣
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妹情中极好的。况我来了，自然只和姊妹同处，克弟们自是别院
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            另室的，岂得去沾惹之理？”王夫人笑道：“你不知道原故：他与别
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人不同，自幼因老太太疼爱，原系同娣妹们一处娇养惯了的。若
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            姊妹们有日不理他，他倒还安静些，纵然他没趣，不过出了二门，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            背地里拿着他两个小幺儿④出气[七],咕唧一会子就完了。若&#39;
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这一日妹们和他多说一句话，他心里一乐，便生出多少事来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①弹椅狱一一以纸剪镂空图案覆于织品上，用墨色或其它颜色弹或成各
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            种图案花样，叫弹墨。椅狱用棉、缎之类做成的椅套。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②斋戒一一古人在祭祀、礼佛或举行隆重大典前，沐浴、吃素、静养至三日，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            除杂念，以示诚敬，叫斋戒。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③内韩一一即内室，女子的居处。《周礼·天官·官正》：“辨外内而时禁。”疏：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “外人谓男子，内人谓妇女。”韩：幕帐。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④小么（yαo妖）儿一一身边使唤的小仆人。么幼小。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            45
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            所以瞩时你别踩他。他嘴里一时甜言蜜语，一时有天无日，-时
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            又疯疯傻傻，只休信他。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉一一的都答应着。只见一个丫蔓来回：“老太太那里传晚
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            饭了。”王夫人忙携黛玉从后房门由后廊往西，出了角门，是一条南
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            北宽夹道。南边是倒座三间小小的抱厦厅①，北边立着一个粉油大
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            影壁②，后有一半大门，小小一所房室。王夫人笑指向黛玉道：“这
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是你凤姐姐的屋子，回来你好往这里找他来，少什么东西，你只管和
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他说就是了。”这院门上也有四五个才总角③的小厮，都垂手侍立。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            王夫人遂携黛玉穿过一个东西穿堂，便是贾母的后院了。：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            于是，进入后房门，已有多人在此伺候，见王夫人来了，方安
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            设桌椅。贾珠之妻李氏捧饭，熙凤安箸，王夫人进葵。贾母正面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            榻上独坐，两边四张空椅，熙凤忙拉了黛玉在左边第一张椅上坐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了，黛玉十分推让。贾母笑道：“你舅母你嫂子们不在这里吃饭。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你是客，原应如此坐的。”黛玉方告了座，坐了。贾母命王夫人坐
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。迎春姊妹三个告了座方上来。迎春便坐右手第一，探春左
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第二八),惜春右第二(九)。旁边丫执着拂尘①、漱孟、巾帕。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            李、凤二人立于案旁布让③。外间伺候之媳妇丫虽多，却连一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            声咳嗽不闻。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寂然饭华，各有丫用小茶盘捧上茶来。当日林如海教女
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①倒座、抱厦厅“倒座”是与正房相对、朝向相反的房子。抱厦厅：回绕堂屋
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            后面的侧室。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②影壁一一俗称照墙。于门内或门外用作屏或装饰。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③总角一儿童向上分开的两个发馨。代指儿童时代。《诗经·齐风·甫田》豌：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “总聚其发，以为两角。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③，拂尘一一形如马尾，后有持柄，用以拂拭尘土，或驱赶蚊，俗称“蝇甩子”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            舌时多用兽之尾制成，故又称尾。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ?布让一一宴席间向客人敬菜、劝餐叫布让。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            46
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾雨村黄缘复旧职林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            以惜福养身，云饭后务待饭粒咽尽；过时再吃茶，方不伤脾胃。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            今黛玉见了这里许多事情不合家中之式，不得不随的，少不得一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一改过来，因而接了茶。早见人又捧过漱孟来，黛玉也照样漱了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            口。手毕，又捧上茶来，这方是吃的茶。贾母便说：“你们去
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            罢，让我们自在说话儿。”王夫人听了，忙起身，又说了两句闲话，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            方引凤、李二人去了。贾母因问黛玉念何书。黛玉道：“只刚念
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了《四书》①。”黛玉又问姊妹们读何书。贾母道：“读的是什么
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书，不过是认得两个字，不是静眼的瞎子罢了！”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一语未了，只听外面一阵脚步响，丫鬟进来笑道：“宝玉来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了！”黛玉心中正疑惑着：“这个宝玉，不知是怎生个崽②人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            物，槽懂顽童？”一一倒不见那物也罢了。心中想着，忽见丫
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            话未报完，已进来了一位年轻的公子：．
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            头上戴着束发嵌宝紫金冠，齐眉勒着二龙抢珠金抹
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            额③；穿一件二色金百蝶穿花大红箭袖④，束着五彩丝花
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            结长穗宫絲③，外罩石青起花八团倭缎排穗褂@；登着青缎
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①《四书》一一《大学》、《中》《论语》《孟子）合称为《四书》，朱代朱熹把它
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            们编在一起，作（四书章句集注》，故有此称。是元、明、清三代科举考试的必读之
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②惫(bei lai 备赖)一一涎皮赖脸的意思。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③嵌宝紫金冠、二龙抢珠金抹额一一紫金冠：把头发束扎在顶部的-一种髻冠，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            上面插戴各种饰物或镶嵌珠玉。抹额：围扎在额前，用以压发、束额。二龙抢珠：是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抹额上的装饰图案。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ④二色金百蝶穿花大红箭袖一一用两色金线绣成的百蝶穿花图案的大红窄
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            袖衣服。箭袖：原为便于射箭穿的窄袖衣服，这里指男子穿的一一种服式。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ·五彩丝揽花结长穗宫缘（tao滔）一一长穗富絲：指系在腰间的带。长穗：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是带端部下垂的穗子。五彩丝揽花结：用五彩丝聚成花朵的结子，指带上的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            装饰花样。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ?石青起花八团倭缎排穗褂一团：圆形团花。因其凸出，故云“起花”。楼
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            缎：又称东洋缎。排穗：排缀在衣服下面边缘的彩穗。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            47
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第．
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            粉底小朝靴①。.面若中秋之月，色如春晓之花，翼若刀裁，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            眉如墨画，面如桃瓣，自若秋波。虽怒时而若笑，即视而
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            有情。项上金螨璎珞，又有一根五色丝絲，系着一块美
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉一见，便吃一大惊，心下想道“好生奇怪【一○},倒像在那里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见过-一般，何等眼熟到如此！”只见这宝玉向贾母请了安②，贾母
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便命：“去见你娘来。”宝玉即转身去了。一时回来，再看；已换了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            冠带：头上周围一转的短发，都结成小辫，红丝结束，共揽至顶中
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            胎发，总编一根大辫，黑亮如漆，从顶至梢，一串四颗大珠，用金
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            八宝坠角③；身上穿着银红撒花半旧大袄，仍旧带着项圈、宝玉、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寄名锁、护身符④等物；下面半露松花撒花绫裤腿，锦边弹墨
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            袜，厚底大红鞋。越显得面如敷粉，唇若施脂；转盼多情，语言常
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笑。天然-段风骚，全在眉梢；平生{—}万种情思，悉堆眼角。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看其外貌最是极好，却难知其底细。后人有《西江月》二词，批宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉极恰，其词旦：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            无故寻愁觅恨，有时似傻如狂。纵然生得好皮囊，腹内
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来草葬。 療倒不通世务，愚顽怕读文章。行为偏僻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            性乖张，那管世人谤！
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①青缎、朝靴一一青缎：黑色的缎子。朝靴：古代百官穿的“鸟皮履”。这里指
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黑色缎面、白色厚底、半高筒的靴子。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②请安一一即问安。清代的请安礼节是，男子打干，即右膝半跪，较隆重时双
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            膝跪下，女子双手扶左膝，右腿微屈，往下谢身，口称请某人安”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ·③坠角一一用于朝珠、床帐等下端起下垂作用的小装饰品，这里是指辩子梢
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            部所坠的饰物。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            寄名锁、护身符一一一旧时怕幼儿天亡，给寺院或道观一定财物，让幼儿当
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “寄名”弟子，并在幼儿的项下系一小金锁，名“寄名锁”。护身符：是从道观领来的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            种符，带在身上，避祸免灾。皆为迷信习俗。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            48
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾雨村黄缘复旧职林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富贵不知乐业，贫穷难耐凄凉。可岭辜负好韶光，于国
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            于家无望。 天下无能第一，古今不肖无双。寄膏绒
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            与膏梁：莫效此儿形状!①
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾母因笑道：“外客未见，就脱了衣裳，还不去见你妹妹！”宝
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            玉早已看见多了一个娣妹，便料定是林姑妈之女，忙来作揖。斯
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见毕归坐，细看形容，与众各别：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            两弯似盛非感實烟眉②，一双似泣非泣含露目【一二]。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            态生两之愁,娇袭一身之病③。泪光点点,娇喘微徽。闲
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            静时如姣花照水，行动处似弱柳扶风。心较比于多一窍，病
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            如西子胜三分④。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉看罢，因笑道：“这个妹妹我曾见过的。”贾母笑道：“可又是
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            胡说，你又何曾见过他？”宝玉笑道：“虽然未曾见过他，然我看着
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            面善，心里就算是旧相识，今目只作远别重逢，亦未为不可。”贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母笑道：“更好，更好，若如此，更相和睦了。”宝玉便走近黛玉身
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            边【一三]坐下，又细细打量一番，因问：“妹妹可曾读书？&#34;黛玉道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①《西江月》二词一一这两首词用似贬实赛、寓衰于贬的手法揭采了贾宝玉的
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            性格。皮囊：一作“皮袋”，指人的躯壳。草葬：丛生的杂草，喻不学无术。文章：此指
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            四书五经及时文八股之类。乐业：这里是满意、安于富贵的意思。榜（同裤）：代指·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            富家子弟。：素色细绢。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ② 胃(juan 缉)烟眉-形容眉毛像一抹轻烟。胃:挂的意思。．·
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③态生两屠(yé夜)之愁，娇袭一身之病一意思是妩媚的风韵生于含愁的面
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            容，娇祛的情态出于馨弼的病体。态：情态，风韵。：面颊上的酒涡。袭：承继，由
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            而来。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①心较比于多一窍，病如西子胜三分一一一比于：商（般）代王的叔父。《史
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            记-殷本纪》载：王淫乱，“比干日：为人臣者，不得不以死争。酒（乃）强谏。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            怒日：吾闻圣人吃有七。“比于，观其心。”古人认为心跨越多越有智慧。上句极
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            言林黛玉聪明颖悟。西子：即西施，相传“西施病心而眸（通“辈”，皱冠）”，益增妩媚。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            见（庄子·天运》。下句是说黛玉病弱娇美胜过西施。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 49
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第·三···国
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “不曾读，只上了一年学，些须认得儿个学。”宝玉又道：“妹妹尊
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            名是那两个字？”黛玉便说了名。宝玉又间表字。黛玉道：“无
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            字。”宝玉笑道：“我送妹妹一妙学，莫若“聲”二学极妙。”探春
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            便问何出。宝玉道“《古今人物通考》①上说：“西方有石名黛，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            可代画眉之墨。况这林妹妹眉尖若，用取这两个字，岂不两
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妙！”探春笑道：“只恐又是你的杜撰。”宝玉笑道：“除《四书》外，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            杜撰的太多，偏只我是杜撰不成？”又问黛玉：“可也有玉没有？”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            众人不解其语，黛玉便村度着因他有玉，故问我有也无，因答道：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “我没有那个。想来那玉是一件罕物，岂能人人有的。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉听了，登时发作起痴狂病来，摘下那玉，就狠命摔去，骂
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            道：“什么罕物，连人之高低不择，还说“通灵&#39;不“通灵“呢！我也
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            不要这劳什子②了！”吓的众人一拥争去拾玉。贯母急的了
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            宝玉道：“障！你生气，要打骂人容易，何苦摔那命根子！”宝玉
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            满面泪痕泣道：“家里姐姐妹妹都没有，单我有，我说没趣；如今
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来了这们一个神仙似的妹妹也没有，可知这不是个好东西。”贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母忙哄他道：“你这妹妹原有这个来的，因你姑妈去世时，舍不得
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你妹妹，无法处，遂将他的玉带了去了：一则全殉葬③之礼，尽
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            你妹妹之孝心；二则你姑妈之灵，亦可权作见了女儿之意。因此
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他只说没有这个，不便自已夸张之意。你如今怎比得他？还不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            好生慎重带上，仔细你娘知道了。”说着，便向丫手中接来，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            亲与他带上。宝玉听如此说，想一想大有情理，也就不生别论
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            《古今人物通考》—&#34;未详。从下文来看，可能是宝玉的杜撰。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            劳什子一一如同说“东西”、“玩意”，含有厌恶之意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            殉葬一一古代把活人或器物随同死者理在墓中明“葬”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾雨村黄缘复旧职林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            当下，奶娘来请问黛玉之房舍。贾母说：“今将宝玉挪出来，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            同我在套间暖阁儿①·里，把你林姑娘暂安置碧纱橱②里。等过
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了残冬，春天再与他们收拾房屋，另作一番安置罢。”宝玉道：“好
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            祖宗，我就在碧纱橱外的床上很妥当，何必又出来闹的老祖宗不
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            得安静。”贾母想了一想说：“也罢了。”每人一个奶娘并个丫头
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            照管，饶者在外间上夜听唤。一面早有熙凤命人送了顶藕合
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            色花帐，并几件锦被缎褥之类。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            黛玉只带了两个人来：个是自幼奶娘玉嬷嬷，一一个是十岁
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的小丫头，亦是自幼随身的，名唤作雪雁。贾母见雪雁甚小，一
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            团孩气，王嬷嬷又极老，料黛玉皆不遂心省力的，便将自已身边
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的一个二等丫头，名唤鹦哥者与了黛玉。外亦如迎春等例，每人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            除自幼乳母外，另有四个教引嬷嬷③，除贴身掌管钗钊盟沐两个
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            丫翼外，另有五六个洒扫房屋来往使役的小丫。当下，王嬷嬷
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            与鹦哥陪侍黛玉在碧纱橱内。宝玉之乳母李嬷嬷，并大丫名
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            唤袭人者，陪侍在外面大床上。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            原来这袭人亦是贾母之婢，本名珍珠。贾母因溺爱宝玉，生
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            恐宝玉之婢无竭力尽忠之人，素喜袭人心地纯良，克尽职任，遂
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ①套间、暖阁儿一套间：与正房相连的两侧房间。暖阁：是指在套间内再隔
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            断成为小房间，内设炕，两边安有隔扇，上边有一横眉，形成床帐的样子，称“暖
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            阁&#34;。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②碧纱橱一-是清代建筑内檐装修中隔断的一种，亦称隔扇门、格门。清代
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            《装修作则例》中写作“隔扇碧纱橱”。用以隔断开间，中间两扇可以开关。格心多灯
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            笼框式样，灯笼心上常糊以纸，纸上画花或题字，宫殿或富贵人家常在隔心处安装玻
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            璃或糊各色纱，故叫“碧纱橱”，俗称“格扇”。参见刘致平《中国建筑类型及结构》。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            这重的“纱橱里”；是指以碧纱橱隔开的里间。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③教引嬷嬷一一清代皇子一落生，即有保母、乳母各八人；断乳后，增“谱达”，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “凡欲食、言语、行步、礼节皆教之。”（见《清弹类钞》贵族家庭的“教引嬷嫂”，其职务
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            与皇宫的&#34;谱达&#34;近似。：&#34;
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆 51
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            第。三
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            与了宝玉。宝玉因知他本姓花，又曾见旧人诗句上有“花气袭
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            人”之句①，遂回明贾母，更名袭人。这袭人亦有些痴处：伏侍贾
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            母时，心中眼中只有一个贾母；如今服侍宝玉，心中眼中文具有
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一个宝玉。只因宝玉性情乖僻，每每规谏宝玉，心中着实忧郁。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是晚，宝玉季嬷嬷已睡了，他见里面黛玉和鹦哥犹未安息，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            他自卸了妆，悄悄进来，笑问：“姑娘怎么还不安息？”黛玉忙让：
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “姐姐请坐。”袭人在床沿上坐了。哥笑道：“林姑娘正在这里
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            伤心，自已尚眼抹泪的说：“今儿才来，就惹出你家儿的狂病，
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            倘或摔坏了那玉，岂不是因我之过！”因此便伤心，我好容易劝好
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            了。”袭人道：“姑娘快休如此，将来只怕比这个更奇怪的笑话儿
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            还有呢！若为他这种行止，你多心伤感，只怕你伤感不了呢。快
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            别多心！”黛玉道：“姐妞们说的，我记着就是了。究竟那玉不知
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            是怎么个来历？上面还有字迹？”袭人道：“连一家子也不知来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            历，上头还有现成的眼儿，听得说，落草②时是从他口里掏出来
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            的。等我拿来你看便知。”黛玉忙正道：“罢了，此刻夜深，明日再
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            看也不迟。”大家又叙了一回，方才安歇。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            次日起来，省③过贾母，因往王夫人处来，正值王夫人与熙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            凤在一处拆金陵来的书信看，又有王夫人之兄嫂处遣了两个媳
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            妇来说话的。黛玉虽不知原委，探春等却都晓得是议论金陵城
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            书》。意思悬花香扑人，知道天气骤然和暖了。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ②落草一一“妇人分娩日坐草”见清昊翌《灯窗丛录》引《魏志》。引申其义
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            小儿落生叫“落草”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ③省（xing醒）一一家庭日常礼节。子女对父母早上问安叫省”，晚上服侍就
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            瘦叫“定”。见《礼记·曲礼上》：“凡为人子之礼，冬温而夏清（jing净），昏定而最省。”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            52 抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            贾雨村黄缘复旧职林黛玉抛父进京都
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            中所居的薛家姨母之子姨表兄薛蟠，倚财仗势，打死人命，现在
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            应天府案下审理。如今母舅王子腾得了信息，故遣他家内的人
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            来告诉这边，意欲唤取进京之意。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            校记
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “转过插屏”，原无，从已卵、甲成、蒙府、戚序本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “双衡比目玫瑰”，“比目”源作“皆”，从已卵、梦稿、甲戌、蒙
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            府本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [3] “洋缎”，原作“萍缎”，已卯、梦稿、甲辰、舒序本均同。从甲戌、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            蒙府、戚序本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ，，，【
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            底本通用，此处“帛”是。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [五] 】“笑回道”至“贾母”共十七字，原无。各本均存，唯文字少异。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            此从已卯、蒙府、戚序、舒序本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【六】“上铺着”，原无，从蒙府、甲辰本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【七】“拿着他两个小么儿出气”“小幺儿”原作“小优儿”，又点改为
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “小子”；“拿着他”旁添为“拿着跟他的”。诸本各异。从原文，并据已卿、
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            甲戌、舒序本改优”为“么”。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            ，二，“，【
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            &#34;&#34;)。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            手第二”。已卵、梦稿本作“惜春右边第二”。饶各本均作“惜春右第二”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            从改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            一○】“好生奇怪”，原作“这生奇怪”，似经两次点改：第一次改为
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “这么奇怪”，第二次改为“奇怪呀”。从各本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            【一】“平生”，原作“半生”，从各本改。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            半整鹅眉，一对多情否杏眼”。各本均异，且大多残。唯甲辰本较完整，作
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “两湾似遵非避笼烟眉，一双似喜非喜含情目”。“笼烟”已卯本作“冒烟”
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            （蒙府、贼序本作“罩烟”，梦稿、甲戌本（原文）作“冒烟”，最初似亦为“臀
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            烟&#34;)。今取甲辰本并改“胃”字。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            [-三] “更好”至“坐下”几句，原仅作“更好好的坐下”，又旁添为
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            “更胡说了，你好好的坐下罢。宝玉坐下”。从各本补。
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            54
+            
+          
+        </p>
+        
+        <p class="col-para">
+          
+            抚琴居红楼梦图书馆
+            
+          
+        </p>
+        
+        
+      </div>
+    </div>
+    
+    <div class="compare-col" data-col="fax_chengyi">
+      <div class="compare-col-head">
+        <span class="badge">程乙本影印</span>
+        <span class="col-desc">程乙本校注本影印页（贵州人民出版社PDF）</span>
+        <span>第3回</span>
+      </div>
+      <div class="compare-col-body">
+        <h3 class="col-title">金陵城起复贾雨村 荣国府收养甲侧：二字触目凄凉之至！</h3>
+        
+        <div class="fax-view" data-fax="fax_chengyi">
+          <div class="fax-toolbar">
+            <button type="button" class="fax-prev" data-dir="-1">←</button>
+            <span class="fax-page-info">第<span class="fax-cur">1</span>页</span>
+            <button type="button" class="fax-next" data-dir="1">→</button>
+          </div>
+          <div class="fax-stage">
+            <img class="fax-img" alt="影印页">
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var num = parseInt(document.body.dataset.num || '1', 10);
+
+  // 回目选择跳转
+  var sel = document.getElementById('chapter-select');
+  if (sel) sel.addEventListener('change', function () {
+    location.href = '/compare/' + sel.value + (sel.value !== num ? '' : '');
+  });
+
+  // 版本勾选器
+  var toggle = document.getElementById('vp-toggle');
+  var menu = document.getElementById('vp-menu');
+  if (toggle && menu) {
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('open'); });
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    // 勾选变化 -> 更新 URL
+    var boxes = menu.querySelectorAll('input[type=checkbox]');
+    // 记录哪些版本可用（当前栏）
+    var allKeys = Array.prototype.map.call(boxes, function (b) { return b.value; });
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        // 收集勾选
+        var checked = [];
+        boxes.forEach(function (x) { if (x.checked) checked.push(x.value); });
+        // 至少保留一个
+        if (checked.length === 0) { this.checked = true; return; }
+        var base = '/compare/' + num;
+        location.href = base + '?v=' + checked.join(',');
+      });
+    });
+  }
+
+  // 影印版翻页
+  document.querySelectorAll('.fax-view').forEach(function (view) {
+    var key = view.getAttribute('data-fax');
+    var img = view.querySelector('.fax-img');
+    var cur = view.querySelector('.fax-cur');
+    var page = 1;
+    var start = 1, end = 1;
+    // 获取该回页码范围
+    fetch('/fax/' + key + '/' + num)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        start = data.start || 1;
+        end = data.end || 1;
+        load();
+      });
+    function load() {
+      if (img) img.src = '/fax/' + key + '/' + num + '/' + page;
+      if (cur) cur.textContent = page;
+    }
+    view.querySelector('.fax-prev').addEventListener('click', function () {
+      if (page > start) { page--; load(); }
+    });
+    view.querySelector('.fax-next').addEventListener('click', function () {
+      if (page < end) { page++; load(); }
+    });
+  });
+
+  // 双栏同步滚动
+  var cols = document.querySelectorAll('.compare-col');
+  var last = null;
+  function sync(src) {
+    if (last === src) return;
+    last = src;
+    var ratio = src.scrollTop / (src.scrollHeight - src.clientHeight || 1);
+    cols.forEach(function (c) {
+      if (c !== src) c.scrollTop = ratio * (c.scrollHeight - c.clientHeight);
+    });
+    setTimeout(function () { last = null; }, 50);
+  }
+  cols.forEach(function (c) {
+    c.addEventListener('scroll', function () { sync(c); }, { passive: true });
+  });
+})();
+</script>
+</body>
+</html>
