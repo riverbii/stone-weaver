@@ -480,6 +480,53 @@ def world_character(request: Request, cid: int, version: str = "gongban_rb"):
     )
 
 
+@app.get("/engine/{num}", response_class=HTMLResponse)
+def engine_chapter(request: Request, num: int):
+    """自家版本（引擎重建）阅读页。"""
+    db = get_db()
+    try:
+        from ..models import GeneratedChapter
+
+        ch = (
+            db.query(GeneratedChapter)
+            .filter(GeneratedChapter.num == num)
+            .first()
+        )
+        all_chs = (
+            db.query(GeneratedChapter.num, GeneratedChapter.title)
+            .order_by(GeneratedChapter.num)
+            .all()
+        )
+    finally:
+        db.close()
+    if ch is None:
+        return templates.TemplateResponse(
+            request=request,
+            name="not_found.html",
+            context={"num": num},
+            status_code=404,
+        )
+    prev = next_ = None
+    for n, t in all_chs:
+        if n == num - 1:
+            prev = (n, t)
+        elif n == num + 1:
+            next_ = (n, t)
+    paragraphs = [p for p in ch.content.split("\n") if p.strip()]
+    return templates.TemplateResponse(
+        request=request,
+        name="engine_chapter.html",
+        context={
+            "chapter": ch,
+            "paragraphs": paragraphs,
+            "all_chapters": all_chs,
+            "prev": prev,
+            "next": next_,
+            "total": len(all_chs),
+        },
+    )
+
+
 @app.get("/compare/{num}", response_class=HTMLResponse)
 def compare(request: Request, num: int, v: str = ""):
     db = get_db()

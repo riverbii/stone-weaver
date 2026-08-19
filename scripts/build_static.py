@@ -35,6 +35,18 @@ def _all_character_ids() -> list[int]:
     return ids
 
 
+def _all_engine_nums() -> list[int]:
+    from stone_weaver.ingest.text import make_session
+    from stone_weaver.models import GeneratedChapter
+
+    db = make_session(str(ROOT / "data" / "db" / "stone.db"))
+    try:
+        nums = [n for (n,) in db.query(GeneratedChapter.num).order_by(GeneratedChapter.num)]
+    finally:
+        db.close()
+    return nums
+
+
 def main() -> int:
     if PUBLIC.exists():
         shutil.rmtree(PUBLIC)
@@ -65,6 +77,10 @@ def main() -> int:
                 PUBLIC / "world" / "character" / str(cid) / "index.html",
             )
             for cid in _all_character_ids()
+        ],
+        *[
+            ("/engine/%d" % n, PUBLIC / "engine" / str(n) / "index.html")
+            for n in _all_engine_nums()
         ],
     ]:
         r = client.get(path)

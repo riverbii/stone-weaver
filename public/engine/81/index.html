@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第81回　第81回（引擎重建） · 自家版本</title>
+<script>
+try {
+  const saved = JSON.parse(localStorage.getItem("stone-weaver-preferences") || "{}");
+  if (["zhu", "bamboo", "begonia", "night"].includes(saved.theme)) document.documentElement.dataset.theme = saved.theme;
+  if (Number.isFinite(saved.fontSize)) document.documentElement.style.setProperty("--reader-size", saved.fontSize + "px");
+} catch (_) {}
+</script>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body data-view="reader" data-current="81" data-total="1">
+
+<div class="reader-shell">
+
+  <aside class="toc-panel" aria-label="回目">
+    <header class="toc-head">
+      <span class="toc-word">回 目</span>
+      <button class="control-button toc-close" id="toc-close" type="button" aria-label="收起回目">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <ol class="toc-list">
+      
+      <li>
+        <a class="toc-link is-active" href="/engine/81" aria-current="true">
+          <span class="toc-number">081</span>
+          <span class="toc-title">第81回（引擎重建）</span>
+        </a>
+      </li>
+      
+    </ol>
+    <footer class="toc-foot">
+      
+      <span class="control-button toc-prev" aria-disabled="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></span>
+      
+      <span class="toc-current">第81回</span>
+      
+      <span class="control-button toc-next" aria-disabled="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+      
+    </footer>
+  </aside>
+
+  <main class="reader-main">
+    <header class="reader-toolbar" id="reader-toolbar">
+      <div class="reading-progress"><span id="progress-bar"></span></div>
+      <div class="reader-toolbar-inner">
+        <div class="toolbar-left">
+          <button class="control-button" id="toc-toggle" type="button" aria-label="回目">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          </button>
+          <a class="control-button" href="/" aria-label="封面">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V4l12-2v18M4 20l12-2M4 4l12-2M16 18V2"/></svg>
+          </a>
+        </div>
+        <button class="chapter-jump" id="chapter-jump" type="button" title="打开回目">
+          <span class="cj-num">第81回</span>
+          <span class="cj-title">第81回（引擎重建）</span>
+        </button>
+        <div class="toolbar-right">
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <button class="control-button font-smaller" id="font-smaller" type="button" aria-label="减小字号">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20l6-16M11 20l6-16M8 12h6M3 20h4M17 20h4"/></svg>
+          </button>
+          <span class="font-value" id="font-size-value" aria-live="polite">21</span>
+          <button class="control-button font-larger" id="font-larger" type="button" aria-label="增大字号">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l6-16M10 20l6-16M7 12h6"/></svg>
+          </button>
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <button class="control-button theme-toggle" id="theme-toggle" type="button" aria-label="主题" aria-expanded="false">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-14 3 3 0 0 0 0-4z"/></svg>
+          </button>
+          <div class="theme-popover" id="theme-popover" role="radiogroup" aria-label="主题选择">
+            <button class="theme-option" type="button" role="radio" data-theme-value="zhu" aria-checked="true"><span class="theme-swatch swatch-zhu"></span><span>朱砂笺</span></button>
+            <button class="theme-option" type="button" role="radio" data-theme-value="bamboo" aria-checked="false"><span class="theme-swatch swatch-bamboo"></span><span>潇湘竹</span></button>
+            <button class="theme-option" type="button" role="radio" data-theme-value="begonia" aria-checked="false"><span class="theme-swatch swatch-begonia"></span><span>海棠春</span></button>
+            <button class="theme-option" type="button" role="radio" data-theme-value="night" aria-checked="false"><span class="theme-swatch swatch-night"></span><span>松烟夜</span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <article class="article-stage">
+      <header class="chapter-header">
+        <h2 class="chapter-title">第81回</h2>
+        <p class="chapter-subtitle">第81回（引擎重建）</p>
+        <p class="engine-badge">⚙️ 引擎重建 · draft</p>
+        <div class="chapter-rule" aria-hidden="true"><span></span></div>
+      </header>
+      <div class="prose">
+        
+        <p>话说这日午后，怡红院中静悄悄的，帘外芭蕉叶上犹带宿雨，一滴滴坠在青石阶上，点点滴滴，似有无限心事。宝玉午睡方醒，正歪在榻上，看麝月拈线绣那白绫子肚兜，忽听得院外一阵聒噪，夹杂着婆子们粗声大气，又有一个细细的哭声，如雏莺被风折了翅子，呜呜咽咽的。</p>
+        
+        <p>宝玉便有些坐不住，趿了鞋往外走。麝月忙撂下针线道：“二爷又做什么去？外头风凉，才刚出了汗，仔细吹着。”宝玉也不答，一径掀帘出来。只见廊下几个婆子围作一团，中间那五儿，不过十四五岁，一张小脸涨得通红，手里犹攥着个纸包儿，里头露出些玫瑰露的胭脂色来，洒了满襟。那婆子们七嘴八舌的，有的说“贼星照命”，有的说“撵了出去才干净”，五儿只是哭，一句话也说不出。</p>
+        
+        <p>宝玉见那光景，心下早软了半边，忙分开众人，道：“你们闹什么？她一个女孩儿家，纵有些不是，也值当这样吆五喝六的？她母亲病着，想是熬不过，偷些个给母亲吃，也是孝心。这玫瑰露原是吃不得的东西，又不是金贵的，便赏了她也罢。”说着，便向那婆子道：“你们散了吧，这事我回太太去。”</p>
+        
+        <p>婆子们见宝玉出头，虽不情愿，也只得讪讪的散了。宝玉便带了五儿往王夫人上房来。王夫人正坐在炕上，手里捻着一串佛珠，见宝玉进来，又见五儿低眉垂首跟在后面，泪痕未干，心下早明白了七八分，便道：“你又来做什么？这丫头偷了东西，自然该由管家奶奶们处置，你只管好好念你的书是正经。”</p>
+        
+        <p>宝玉陪笑道：“太太不知，她母亲病着，家里又穷，一时糊涂也是有的。她素日还算老实，这回饶了她，也是积福的事。”王夫人听了，把脸一沉，道：“你倒会做好人！咱们家规矩，最要紧的是上下尊卑。今儿她偷玫瑰露，明儿就敢偷银子，后儿还不把房子拆了？你纵容下人，倒来跟我讲什么积福！你只知护着她们，可知我管这一大家子，若都像你这样，还成个体统么？”</p>
+        
+        <p>宝玉见王夫人动气，心里那股子痴性便涌了上来，因冷笑道：“太太说的体统，不过是些规矩罢了。可这世上最要紧的，是人心。她为母亲偷东西，是孝心；太太为体统罚她，是正理。只是不知这体统，比人命还重么？”一句话未了，王夫人已将佛珠往炕几上一拍，厉声道：“你越发胡涂了！什么孝心人心，你只知这些混账话，几时见你念书用功，博个功名来光宗耀祖？如今倒学得满嘴歪理，来顶撞你母亲了！”</p>
+        
+        <p>宝玉见王夫人动了真气，心下又委屈又气恼，待要再辩，又知说不通，只得咬牙，一转身便大步出去了。麝月、袭人忙要跟时，早被他甩开。只见他头也不回，直往大观园那边去了。那五儿还跪在阶下，哭得越发可怜。</p>
+        
+        <p>此时天边乌云渐起，一阵风过，把廊下的湘帘吹得乱飞。王夫人看着宝玉的背影，半晌，叹了口气，又捻起佛珠来，口中念念有词。那佛珠一颗颗的，在暮色里泛着沉沉的光。</p>
+        
+        <p>话说王夫人这日正在佛前诵罢《金刚经》，方欲起身，只见邢夫人扶着丫头缓缓走来。二人叙了寒温，邢夫人便叹道：“如今园中姑娘们渐渐大了，我冷眼瞧着，那些丫头们未免忒淘气了些。前儿东府里珍哥儿媳妇还说，见咱们园里几个小丫头子，成日家描鸾绣凤的，倒比主子还自在呢。”王夫人听了，半晌不语，只将手中的十八子念珠慢慢捻着。</p>
+        
+        <p>正说着，忽见贾环从外面一溜烟跑进来，先给二位夫人请了安，便垂手立在旁边。王夫人因问：“环儿，这会子不在学里，又跑来作什么？”贾环见问，便做出欲言又止的光景，半晌方嗫嚅道：“儿子方才打园子里过，瞧见……瞧见……”邢夫人笑道：“瞧见什么？只管说。”贾环得了这句话，便道：“儿子瞧见怡红院里的五儿，在那边山子石后头，同宝玉哥哥拉拉扯扯的，还听见说什么‘今儿晚上’的话。儿子不敢走近，只远远瞧了一眼就跑来了。”</p>
+        
+        <p>王夫人听了，登时变了颜色，将念珠往桌上一搁，道：“这还了得！我素日只说宝玉还小，不过同姊妹们玩笑，谁知竟闹出这样没脸的事来！”邢夫人忙劝道：“太太且别动气，环儿小孩子家，许是看错了也未可知。”贾环忙跪道：“儿子若有一字虚谎，天打雷劈！实实在在瞧见那五儿把手帕子往宝玉哥哥怀里塞呢。”王夫人气得浑身乱战，立刻命人传周瑞家的来，道：“你去告诉管事的婆子们，把潇湘馆、怡红院两处的丫头们严严的查一查，有那轻狂的，立刻撵了出去！再吩咐园门上的婆子，好生看着宝玉，不许他私自往丫头们房里去。”周瑞家的答应着去了。</p>
+        
+        <p>这里王夫人又对邢夫人道：“嫂子不知，那五儿原是她母亲求了恩典才进园当差的，我瞧她倒还稳重，谁知也是这样不正经的货！”说着又叹道：“如今凤丫头病着，园子里越发没个管束了。”邢夫人道：“太太且请宽心，依我说，倒不如趁此把园门锁了，只留角门出入，也叫那些丫头们知道规矩。”王夫人点头称是。贾环见计已售，眼中掠过一丝得意，却仍跪着道：“太太若不信，只等晚间悄悄的瞧，那五儿必还要往怡红院去呢。”王夫人挥手道：“知道了，你且去罢。这话若传出去，仔细你的皮！”贾环诺诺连声，退出房来，一溜烟往自己屋里去了。正是：谗言三至，慈母投杼；园柳青青，乌鹊乱语。</p>
+        
+        <p>话说这日晨光熹微，潇湘馆外竹影参差，露珠犹在叶尖滚颤。宝玉自怡红院来，也不叫人跟随，只独自踅进门来。只见黛玉斜倚在引枕上，面前书案摊着一卷《楚辞》，却未翻动，只怔怔望着窗外凤尾森森。紫鹃正用小银铫子煨药，见宝玉来了，忙起身让座。</p>
+        
+        <p>宝玉见黛玉面色比往日更淡，两颊似有潮红，心中早酸了一半，却强笑道：“妹妹今儿可好些？我昨儿听焙茗说，城外庙里有个和尚，专治咳症，已叫人去问了。”黛玉微微摇头，道：“你又信那些混账话。我自己的病，自己知道，何苦白费银子。”说着，将手炉往怀里拢了拢，指尖微微发颤。</p>
+        
+        <p>宝玉挨着榻边坐下，半晌不语，只低头看那药炉上袅袅青烟。黛玉见他神色郁郁，便知又有事，因笑道：“你又受什么气了？这般丧眉耷眼的。”宝玉叹了口气，道：“今儿早起在老太太处，听见环儿和几个小厮在廊下说话，什么‘外头如今都叫咱们家是空架子’、‘那府里珍大哥又欠了人家几千两’——我听着，心里竟不知是什么滋味。咱们家几时落到这般田地了？”黛玉听了，默然片刻，方道：“你素日最不耐烦这些俗务，如今倒留意起来。依我说，你只当没听见罢了。老太太年岁大了，经不得这些烦心事。”</p>
+        
+        <p>宝玉急道：“我何尝不知？只是如今府里那些管事的，明里暗里结党营私，前儿我听见旺儿媳妇和赖大家的在那边说话，竟提到什么‘南边庄子上的出息，如今只送一半来’——这还了得！”一语未了，黛玉忽然一阵剧咳，直咳得弯下腰去，帕子掩口，半晌才止。宝玉忙上前替她抚背，只见那帕子上点点猩红，触目惊心，顿时脸都白了，道：“妹妹，你——”</p>
+        
+        <p>黛玉喘息稍定，将那帕子悄悄掖进袖中，强笑道：“不妨事，老毛病了。你方才说的那些，我何尝不晓得？只是如今咱们家，就如那秋后的海棠，外头看着还开得艳，内里根子早朽了。你纵有补天之手，也难回这天地元气。倒不如——”说着又咳了两声，声音渐低，“倒不如各人保重些罢。”</p>
+        
+        <p>紫鹃在旁熬药，听得这话，眼眶早红了，因上前道：“二爷，姑娘该吃药了。您且请回罢，待姑娘歇息歇息，明儿再来说话。”宝玉看着黛玉苍白的脸，又看着那药碗里黑沉沉的汁水，心中千言万语，竟一句也说不出，只将黛玉的手轻轻握了一握，方转身出去。走到门口，又回头望了一眼，只见黛玉已闭目倚枕，那泪珠儿却从长睫间滚落，正滴在那卷摊开的《楚辞》上，洇湿了“恐美人之迟暮”一句。</p>
+        
+      </div>
+    </article>
+
+    <nav class="chapter-footer" aria-label="回目翻页">
+      
+      <span class="turn-button footer-prev is-disabled">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        <span><span class="turn-label">上一回 · ←</span><span class="turn-title">已是第一回</span></span>
+      </span>
+      
+      
+      <span class="turn-button footer-next is-disabled">
+        <span><span class="turn-label">下一回 · →</span><span class="turn-title">已是末回</span></span>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </span>
+      
+    </nav>
+
+    <footer class="colophon"><p>stone-weaver · 自家版本（引擎重建）</p></footer>
+  </main>
+</div>
+
+<div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+
+<nav class="mobile-chapter-nav" aria-label="回目翻页">
+  
+  <span class="control-button mobile-prev is-disabled"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></span>
+  
+  <button class="chapter-jump mobile-current" id="mobile-current" type="button">第81回</button>
+  
+  <span class="control-button mobile-next is-disabled"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+  
+</nav>
+
+<script src="/static/reader.js"></script>
+</body>
+</html>

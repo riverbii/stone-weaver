@@ -1145,3 +1145,16 @@ a.portal-card:hover {
   vertical-align: middle;
   font-family: var(--font-ui);
 }
+
+/* 引擎重建徽标 */
+.engine-badge {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 2px 10px;
+  margin: 6px 0 0;
+  font-family: var(--font-ui);
+}
