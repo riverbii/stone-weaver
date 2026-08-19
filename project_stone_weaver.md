@@ -141,3 +141,9 @@
 - **Bug1**：RELATION/LOCATION/EVENT/BEAT/PLANNER 等 prompt 模板用 `{{ }}`（.format 转义符）但替换时未还原 → 模型看到 `{{"source"...}}` 返回空。修复：替换时 `.replace("{{","{").replace("}}","}")`。加了回归测试 test_prompts_have_no_double_braces。
 - **Bug2**：共享 `parse_json_list` 过滤 `d.get("name")`，把关系（source/target）事件（summary）全滤成空。修复：parse_json_list 不过滤字段，由调用方决定（人物提取处补 name 过滤）。
 - 关系提取验证通过（第3回 4 条：林如海-贾雨村 上下级等）。
+
+## [2026-08-19 阶段1完成] 世界模型全量 + 80→81 衔接点
+- **四表全量**（gongban_rb 草稿底本，DeepSeek 官方 API）：人物 876 / 关系 1128 / 地点 412 / 事件 1967。
+- **80→81 衔接点就绪**：`build_ch80_state.py` LLM 核查 51 条 ch80 状态快照（9 已故：秦可卿/贾瑞/金钏/尤二姐/尤三姐/晴雯/秦钟/林如海/贾敬；黛玉病重潇湘馆、凤姐病重荣国府、宝玉怡红院）。
+- 修复：initial_state_from_events 规则版太粗糙（关键词误伤/漏标）→ 改用 LLM 核查脚本（一次调用）；人物匹配支持别名。
+- **阶段2 输入齐备**：人工情节弧(arc id=1) + ch80 世界状态 + 文风锚点 + 引擎骨架。

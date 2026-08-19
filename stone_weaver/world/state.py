@@ -183,24 +183,28 @@ def initial_state_from_events(db: Session, chapter: int = 80) -> WorldState:
     等事件表有结构化数据后扩展。
     """
     ws = state_at(db, chapter)
-    from ..models import Character, Event
+    from ..models import Chapter, Character, Event
 
-    # 死亡关键词 → 事件 summary 命中即标记该事件参与者已故
-    death_hints = ("自缢", "病逝", "身亡", "被杀", "刺死", "赐死", "薨", "殁", "死", "亡故")
+    # 死亡关键词 → 仅当事件参与者唯一 且 summary 含死亡语义时标记
+    # （避免"X讲别人死了"把 X 误标；粗糙规则，阶段3 用 LLM 精修）
+    death_hints = ("自缢", "病逝", "身亡", "被杀", "刺死", "赐死", "薨逝", "亡故", "死了", "死去", "殁")
     story_ids = {
         c.id: c for c in db.query(Character).filter(Character.kind == "story")
     }
     evs = (
         db.query(Event)
         .join(Event.chapter)
-        .filter(Event.chapter.has(num <= chapter))
+        .filter(Chapter.num <= chapter)
         .all()
     )
     for ev in evs:
-        if any(h in ev.summary for h in death_hints):
-            for pid in ev.participants or []:
-                if pid in story_ids:
-                    ws.persons[pid].alive = False
-                    ws.persons[pid].status = "已故"
-                    ws.persons[pid].note = ev.summary[:80]
+        if not any(h in ev.summary for h in death_hints):
+            continue
+        pids = [p for p in (ev.participants or []) if p in story_ids]
+        # 参与者唯一且 summary 是"该人死了"类 → 标记
+        if len(pids) == 1 and any(h in ev.summary for h in ("自缢", "病逝", "身亡", "被杀", "刺死", "赐死", "薨逝", "亡故")):
+            pid = pids[0]
+            ws.persons[pid].alive = False
+            ws.persons[pid].status = "已故"
+            ws.persons[pid].note = ev.summary[:80]
     return ws
