@@ -4,126 +4,132 @@
    "num": 81,
    "title": "惜昵近公子做良媒　讳笞罚丫鬟结恶党",
    "chars": 11610,
-   "score": 0.42,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.58,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 12.0,
-    "modern_start_pct": 0.3,
+    "modern_only_per_1k": 0.1,
     "le_end_pct": 0.6,
     "four_char_ratio": 0.71
    },
    "reasons": [
     "文言虚词 12/千(0.75)",
     "四字结构 0.71(1.00)",
-    "现代句首 0%(罚0.02)",
-    "了字句尾 1%(罚0.02)"
+    "现代虚词 0.1/千(罚0.00)",
+    "了字句尾 1%(罚0.01)"
    ]
   },
   {
    "num": 82,
    "title": "王熙凤病求千翼方　林黛玉闷作十独吟",
    "chars": 10474,
-   "score": 0.56,
+   "score": 0.66,
    "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 15.1,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.2,
     "le_end_pct": 1.3,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 15/千(0.94)",
     "四字结构 0.70(1.00)",
-    "了字句尾 1%(罚0.04)"
+    "现代虚词 0.2/千(罚0.00)",
+    "了字句尾 1%(罚0.03)"
    ]
   },
   {
    "num": 83,
    "title": "暮年哀聊发白头吟　金萱悲情洒儿女泪",
    "chars": 9868,
-   "score": 0.51,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.58,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 11.1,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.1,
     "le_end_pct": 0.7,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 11/千(0.69)",
     "四字结构 0.70(1.00)",
-    "了字句尾 1%(罚0.02)"
+    "现代虚词 0.1/千(罚0.00)",
+    "了字句尾 1%(罚0.01)"
    ]
   },
   {
    "num": 84,
    "title": "薛宝钗弥望霭烟缘　史湘云喜得如意郎",
    "chars": 12856,
-   "score": 0.49,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.62,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 12.8,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.4,
     "le_end_pct": 1.5,
     "four_char_ratio": 0.71
    },
    "reasons": [
     "文言虚词 13/千(0.80)",
     "四字结构 0.71(1.00)",
-    "了字句尾 1%(罚0.05)"
+    "现代虚词 0.4/千(罚0.00)",
+    "了字句尾 1%(罚0.03)"
    ]
   },
   {
    "num": 85,
    "title": "痴王孙传信牵奇缘　惭妙尼避情乘游槎（chá）",
    "chars": 11267,
-   "score": 0.64,
+   "score": 0.69,
    "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 15.6,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.3,
     "le_end_pct": 1.6,
     "four_char_ratio": 0.71
    },
    "reasons": [
     "文言虚词 16/千(0.97)",
     "四字结构 0.71(1.00)",
-    "了字句尾 2%(罚0.05)"
+    "现代虚词 0.3/千(罚0.00)",
+    "了字句尾 2%(罚0.03)"
    ]
   },
   {
    "num": 86,
    "title": "挑正庶风月断佳偶　祭祖祠清明泣远嫁",
    "chars": 10148,
-   "score": 0.52,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.61,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 12.6,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.2,
     "le_end_pct": 1.2,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 13/千(0.78)",
     "四字结构 0.70(1.00)",
-    "了字句尾 1%(罚0.04)"
+    "现代虚词 0.2/千(罚0.00)",
+    "了字句尾 1%(罚0.02)"
    ]
   },
   {
    "num": 87,
    "title": "花柳质命断无情兽　绣户女自绝美韶华",
    "chars": 8658,
-   "score": 0.54,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.67,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 13.5,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.1,
     "le_end_pct": 0.3,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 13/千(0.84)",
     "四字结构 0.70(1.00)",
+    "现代虚词 0.1/千(罚0.00)",
     "了字句尾 0%(罚0.01)"
    ]
   },
@@ -131,53 +137,56 @@
    "num": 88,
    "title": "邢夫人执意寻舛（chuǎn）错　王熙凤聪明误此生",
    "chars": 9078,
-   "score": 0.54,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.63,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 13.2,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.2,
     "le_end_pct": 0.0,
     "four_char_ratio": 0.72
    },
    "reasons": [
     "文言虚词 13/千(0.83)",
-    "四字结构 0.72(1.00)"
+    "四字结构 0.72(1.00)",
+    "现代虚词 0.2/千(罚0.00)"
    ]
   },
   {
    "num": 89,
    "title": "有情人欣遇赏心事　不良妾专煞良辰景",
    "chars": 8697,
-   "score": 0.36,
-   "verdict": "⚠️ 白话流水账倾向",
+   "score": 0.54,
+   "verdict": "🟡 文骨尚可",
    "metrics": {
     "classical_per_1k": 12.3,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.5,
     "le_end_pct": 2.9,
     "four_char_ratio": 0.71
    },
    "reasons": [
     "文言虚词 12/千(0.77)",
     "四字结构 0.71(1.00)",
-    "了字句尾 3%(罚0.10)"
+    "现代虚词 0.5/千(罚0.00)",
+    "了字句尾 3%(罚0.06)"
    ]
   },
   {
    "num": 90,
    "title": "林黛玉嬉春待好音　贾元春托梦警天伦",
    "chars": 7895,
-   "score": 0.34,
-   "verdict": "⚠️ 白话流水账倾向",
+   "score": 0.47,
+   "verdict": "🟡 文骨尚可",
    "metrics": {
     "classical_per_1k": 9.7,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.3,
     "le_end_pct": 1.4,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 10/千(0.60)",
     "四字结构 0.70(1.00)",
-    "了字句尾 1%(罚0.05)"
+    "现代虚词 0.3/千(罚0.00)",
+    "了字句尾 1%(罚0.03)"
    ]
   },
   {
@@ -188,7 +197,7 @@
    "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 11.4,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.0,
     "le_end_pct": 0.4,
     "four_char_ratio": 0.7
    },
@@ -202,17 +211,18 @@
    "num": 92,
    "title": "家宅乱恶子通强梁　世道艰道人连流寇",
    "chars": 9629,
-   "score": 0.63,
+   "score": 0.73,
    "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 15.3,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.3,
     "le_end_pct": 0.3,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 15/千(0.96)",
     "四字结构 0.70(1.00)",
+    "现代虚词 0.3/千(罚0.00)",
     "了字句尾 0%(罚0.01)"
    ]
   },
@@ -220,35 +230,37 @@
    "num": 93,
    "title": "山雨近阊阖笼霭晦　风云喧末世漫尘烟",
    "chars": 8643,
-   "score": 0.48,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.63,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 13.0,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.2,
     "le_end_pct": 1.4,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 13/千(0.81)",
     "四字结构 0.70(1.00)",
-    "了字句尾 1%(罚0.05)"
+    "现代虚词 0.2/千(罚0.00)",
+    "了字句尾 1%(罚0.03)"
    ]
   },
   {
    "num": 94,
    "title": "骨肉泯良女落风尘　贵贱失恶奴劫浮财",
    "chars": 10285,
-   "score": 0.54,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.61,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 11.7,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.5,
     "le_end_pct": 0.4,
     "four_char_ratio": 0.71
    },
    "reasons": [
     "文言虚词 12/千(0.73)",
     "四字结构 0.71(1.00)",
+    "现代虚词 0.5/千(罚0.00)",
     "了字句尾 0%(罚0.01)"
    ]
   },
@@ -256,17 +268,18 @@
    "num": 95,
    "title": "水月庵龄官挞贾蔷　嶽神庙茜雪慰宝玉",
    "chars": 7882,
-   "score": 0.35,
-   "verdict": "⚠️ 白话流水账倾向",
+   "score": 0.51,
+   "verdict": "🟡 文骨尚可",
    "metrics": {
     "classical_per_1k": 8.9,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.1,
     "le_end_pct": 0.4,
     "four_char_ratio": 0.69
    },
    "reasons": [
     "文言虚词 9/千(0.56)",
     "四字结构 0.69(1.00)",
+    "现代虚词 0.1/千(罚0.00)",
     "了字句尾 0%(罚0.01)"
    ]
   },
@@ -274,105 +287,109 @@
    "num": 96,
    "title": "贾宝玉参无知无识　花袭人信有始有终",
    "chars": 9835,
-   "score": 0.43,
+   "score": 0.51,
    "verdict": "🟡 文骨尚可",
    "metrics": {
     "classical_per_1k": 9.5,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.0,
     "le_end_pct": 1.4,
     "four_char_ratio": 0.71
    },
    "reasons": [
     "文言虚词 9/千(0.59)",
     "四字结构 0.71(1.00)",
-    "了字句尾 1%(罚0.05)"
+    "了字句尾 1%(罚0.03)"
    ]
   },
   {
    "num": 97,
    "title": "鸳鸯女谮（zèn）语泄天机　绛珠仙泪尽抛全生",
    "chars": 9853,
-   "score": 0.34,
-   "verdict": "⚠️ 白话流水账倾向",
+   "score": 0.55,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 10.0,
-    "modern_start_pct": 0.3,
+    "modern_only_per_1k": 0.3,
     "le_end_pct": 0.6,
     "four_char_ratio": 0.71
    },
    "reasons": [
     "文言虚词 10/千(0.62)",
     "四字结构 0.71(1.00)",
-    "现代句首 0%(罚0.02)",
-    "了字句尾 1%(罚0.02)"
+    "现代虚词 0.3/千(罚0.00)",
+    "了字句尾 1%(罚0.01)"
    ]
   },
   {
    "num": 98,
    "title": "系新绦嗟慰失意人　拾旧帕悲悼寂寞骨",
    "chars": 10543,
-   "score": 0.66,
+   "score": 0.78,
    "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 19.5,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.1,
     "le_end_pct": 0.0,
     "four_char_ratio": 0.66
    },
    "reasons": [
     "文言虚词 20/千(1.00)",
-    "四字结构 0.66(1.00)"
+    "四字结构 0.66(1.00)",
+    "现代虚词 0.1/千(罚0.00)"
    ]
   },
   {
    "num": 99,
    "title": "林黛玉还魂证前缘　贾宝玉展裘触旧情",
    "chars": 7687,
-   "score": 0.44,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.59,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 11.9,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.4,
     "le_end_pct": 0.0,
     "four_char_ratio": 0.69
    },
    "reasons": [
     "文言虚词 12/千(0.74)",
-    "四字结构 0.69(1.00)"
+    "四字结构 0.69(1.00)",
+    "现代虚词 0.4/千(罚0.00)"
    ]
   },
   {
    "num": 100,
    "title": "邢岫烟魂断大庾岭　赵姨娘命丧平安州",
    "chars": 8301,
-   "score": 0.47,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.55,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 9.8,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.5,
     "le_end_pct": 0.0,
     "four_char_ratio": 0.71
    },
    "reasons": [
     "文言虚词 10/千(0.61)",
-    "四字结构 0.71(1.00)"
+    "四字结构 0.71(1.00)",
+    "现代虚词 0.5/千(罚0.00)"
    ]
   },
   {
    "num": 101,
    "title": "呆霸王惹祸牵旧案　悍妒妇作歹设新谋",
    "chars": 8200,
-   "score": 0.47,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.55,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 10.3,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.5,
     "le_end_pct": 0.4,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 10/千(0.64)",
     "四字结构 0.70(1.00)",
+    "现代虚词 0.5/千(罚0.00)",
     "了字句尾 0%(罚0.01)"
    ]
   },
@@ -380,17 +397,18 @@
    "num": 102,
    "title": "冷惜春甘伴青灯佛　洁妙玉泥陷瓜洲渡",
    "chars": 7891,
-   "score": 0.55,
+   "score": 0.63,
    "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 11.9,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.6,
     "le_end_pct": 0.4,
     "four_char_ratio": 0.71
    },
    "reasons": [
     "文言虚词 12/千(0.74)",
     "四字结构 0.71(1.00)",
+    "现代虚词 0.6/千(罚0.00)",
     "了字句尾 0%(罚0.01)"
    ]
   },
@@ -398,90 +416,93 @@
    "num": 103,
    "title": "刘姥姥三进荣国府　贾巧姐二哭大观园",
    "chars": 4315,
-   "score": 0.54,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.58,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 11.4,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.0,
     "le_end_pct": 1.3,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 11/千(0.71)",
     "四字结构 0.70(1.00)",
-    "了字句尾 1%(罚0.04)"
+    "了字句尾 1%(罚0.03)"
    ]
   },
   {
    "num": 104,
    "title": "毒中毒薛姨妈添病　计上计夏金桂焚身",
    "chars": 8086,
-   "score": 0.28,
-   "verdict": "⚠️ 白话流水账倾向",
+   "score": 0.44,
+   "verdict": "🟡 文骨尚可",
    "metrics": {
     "classical_per_1k": 7.6,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.2,
     "le_end_pct": 0.5,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 8/千(0.47)",
     "四字结构 0.70(1.00)",
-    "了字句尾 0%(罚0.02)"
+    "现代虚词 0.2/千(罚0.00)",
+    "了字句尾 0%(罚0.01)"
    ]
   },
   {
    "num": 105,
    "title": "薛宝钗藉词含讽谏　王熙凤知命強英雄",
    "chars": 7900,
-   "score": 0.5,
-   "verdict": "🟡 文骨尚可",
+   "score": 0.62,
+   "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 11.8,
-    "modern_start_pct": 0.5,
+    "modern_only_per_1k": 0.3,
     "le_end_pct": 0.9,
     "four_char_ratio": 0.7
    },
    "reasons": [
     "文言虚词 12/千(0.74)",
     "四字结构 0.70(1.00)",
-    "现代句首 0%(罚0.02)",
-    "了字句尾 1%(罚0.03)"
+    "现代虚词 0.3/千(罚0.00)",
+    "了字句尾 1%(罚0.02)"
    ]
   },
   {
    "num": 106,
    "title": "孤倔王孙悬崖撒手　凄惶红袖秋千传情",
    "chars": 8846,
-   "score": 0.61,
+   "score": 0.66,
    "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 13.6,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.7,
     "le_end_pct": 0.8,
     "four_char_ratio": 0.68
    },
    "reasons": [
     "文言虚词 14/千(0.85)",
     "四字结构 0.68(1.00)",
-    "了字句尾 1%(罚0.03)"
+    "现代虚词 0.7/千(罚0.00)",
+    "了字句尾 1%(罚0.02)"
    ]
   },
   {
    "num": 107,
    "title": "史湘云诉前尘旧梦　贾宝玉淡后事今生",
    "chars": 6967,
-   "score": 0.58,
+   "score": 0.73,
    "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 14.3,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.3,
     "le_end_pct": 0.4,
     "four_char_ratio": 0.69
    },
    "reasons": [
     "文言虚词 14/千(0.89)",
     "四字结构 0.69(1.00)",
+    "现代虚词 0.3/千(罚0.00)",
     "了字句尾 0%(罚0.01)"
    ]
   },
@@ -489,52 +510,53 @@
    "num": 108,
    "title": "情不情僧遭逢穷途　幻中幻境展演情榜",
    "chars": 8461,
-   "score": 0.73,
+   "score": 0.8,
    "verdict": "✅ 文骨接近曹雪芹",
    "metrics": {
     "classical_per_1k": 17.4,
-    "modern_start_pct": 0.0,
+    "modern_only_per_1k": 0.1,
     "le_end_pct": 0.0,
     "four_char_ratio": 0.69
    },
    "reasons": [
     "文言虚词 17/千(1.00)",
-    "四字结构 0.69(1.00)"
+    "四字结构 0.69(1.00)",
+    "现代虚词 0.1/千(罚0.00)"
    ]
   }
  ],
  "usable": [
+  81,
   82,
+  83,
+  84,
   85,
+  86,
+  87,
+  88,
   91,
   92,
+  93,
+  94,
+  97,
   98,
+  99,
+  100,
+  101,
   102,
+  103,
+  105,
   106,
   107,
   108
  ],
  "borderline": [
-  83,
-  84,
-  86,
-  87,
-  88,
-  93,
-  94,
-  100,
-  101,
-  103,
-  105
- ],
- "bad": [
-  81,
   89,
   90,
   95,
-  96,
-  97,
-  99,
+  96
+ ],
+ "bad": [
   104
  ]
 }
