@@ -1,14 +1,15 @@
-"""文风引擎 · 文骨检测器 v3（结构级，严格）。
+"""文风引擎 · 文骨检测器 v4（旁白优先）。
 
 方法论（数据驱动校准）：
   1. 先在前80回曹雪芹原文上校准——已知正确的数据必须高分
-  2. 用"文言结构"而非"单字虚词"（"X之Y"定语、"者…也"判断句尾、
-     "焉哉兮"收尾）——这些才体现真正的文言骨相
-  3. 实测区分度（曹雪芹 vs 癸酉本均值）：
+  2. **对话/旁白分开**（用户洞察）：对话是人设强相关（刘姥姥就该白话），
+     旁白才是作者文风稳定体现。检测器只对旁白段打分。
+  3. 用"文言结构"而非"单字虚词"（"X之Y"定语、"者…也"判断句尾）体现文骨
+  4. 实测区分度（曹雪芹 vs 癸酉本，仅旁白段）：
      - "X之Y"结构：4.74 vs 2.21（2.1x）
      - "者也矣焉兮"句尾：1.46 vs 0.17（8.6x）← 最强
-     - 文白比（文言虚词/白话语气词）：0.42 vs 0.21（2x）
-  4. 负向：只罚真正现代痕迹（曹雪芹原文实测 ≤0.04/千 的词 + "虽然…但是"成对）
+     - 文白比：0.42 vs 0.21（2x）
+  5. 负向：只罚真正现代痕迹（曹雪芹原文实测 ≤0.04/千 的词 + "虽然…但是"成对）
 """
 
 from __future__ import annotations
@@ -37,6 +38,9 @@ SUIRAN_DANSHI = re.compile(r"虽然[^。！？]{0,15}但是")
 # 批注清洗
 _ANNOT_RE = re.compile(r"〔批(?:[:：][^〕]*)?〕.*?〔/批〕", re.S)
 
+# 对话引号（中文“” 和 ASCII ""）
+QUOTE_RE = re.compile(r"[\u201c\"]([^\u201d\"]*)[\u201d\"]")
+
 
 def _clean(text: str) -> str:
     t = _ANNOT_RE.sub("", text)
@@ -45,12 +49,45 @@ def _clean(text: str) -> str:
     return t
 
 
-def assess(text: str) -> dict:
-    """文骨检测。0-1 分，越高越接近曹雪芹文言骨架。"""
+def split_dialogue(text: str) -> tuple[str, str]:
+    """把文本拆成 (对话段, 旁白段)。
+
+    对话 = 引号内内容 + "XX道/说/笑道："引导语；旁白 = 纯叙述。
+    原理：对话是人设强相关（刘姥姥白话正常），旁白才是作者文风体现。
+    """
+    dialogue_parts = []
+    narration_parts = []
+    pos = 0
+    for m in QUOTE_RE.finditer(text):
+        pre = text[pos : m.start()]
+        if pre.strip():
+            # 引导语（"XX道："等）并入对话段
+            lead = re.search(r"[^。！？]{0,20}[道说笑问答]：?$", pre)
+            if lead:
+                dialogue_parts.append(lead.group(0))
+                before = pre[: lead.start()]
+                if before.strip():
+                    narration_parts.append(before)
+            else:
+                narration_parts.append(pre)
+        dialogue_parts.append(m.group(1))
+        pos = m.end()
+    if pos < len(text):
+        narration_parts.append(text[pos:])
+    return "\n".join(dialogue_parts), "\n".join(narration_parts)
+
+
+def assess(text: str, *, use_narration_only: bool = True) -> dict:
+    """文骨检测。0-1 分，越高越接近曹雪芹文言骨架。
+
+    use_narration_only=True（默认）：只对旁白段打分（对话是人设强相关，不参与）。
+    """
     t = _clean(text)
+    if use_narration_only:
+        _, t = split_dialogue(t)
     n = len(t)
-    if n < 300:
-        return {"score": 0.0, "reasons": ["文本过短"]}
+    if n < 200:
+        return {"score": 0.0, "reasons": ["旁白过短（可能以对话为主）"]}
 
     sents = [s.strip() for s in re.split(r"[。！？\n]", t) if len(s.strip()) > 3]
     n_sents = max(len(sents), 1)
