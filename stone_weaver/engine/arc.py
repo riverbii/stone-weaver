@@ -118,14 +118,13 @@ class Arc:
         }
 
 
-def extract_beat(client: LLMClient, chapter: Chapter) -> Beat | None:
-    """单回压缩为 beat（容错：JSON 围栏/杂文；HTTP 异常上抛由调用方重试）。"""
-    text = chapter.content[:6000]
+def _extract_beat_chunk(client: LLMClient, text: str, chapter: int, chunk_tag: str = "") -> Beat | None:
+    """对一段文本提取 beat（含 points）。"""
     prompt = (
         BEAT_PROMPT.replace("{{", "{")
         .replace("}}", "}")
         .replace("{text}", text)
-        .replace("{chapter}", str(chapter.num))
+        .replace("{chapter}", f"{chapter}{chunk_tag}")
     )
     raw = client.chat([{"role": "system", "content": prompt}], temperature=0.1)  # 异常上抛
     import json
@@ -141,6 +140,59 @@ def extract_beat(client: LLMClient, chapter: Chapter) -> Beat | None:
     if not isinstance(data, dict) or not data.get("goal"):
         return None
     return Beat.from_dict(data)
+
+
+def extract_beat(client: LLMClient, chapter: Chapter, chunk_size: int = 5000) -> Beat | None:
+    """单回压缩为 beat（容错：JSON 围栏/杂文；HTTP 异常上抛由调用方重试）。
+
+    全文分段提取再合并：单回可达 1.3 万字（癸酉本），只取前 6000 字会丢失
+    后半段情节（如 81 回香菱段在 9235 位置）。每段提取 points 后拼接。
+    """
+    text = chapter.content
+    if len(text) <= chunk_size:
+        return _extract_beat_chunk(client, text, chapter.num)
+
+    # 分段：按段落边界切，每段约 chunk_size
+    chunks = []
+    cur = []
+    cur_len = 0
+    for p in text.split("\n"):
+        if cur and cur_len + len(p) > chunk_size:
+            chunks.append("\n".join(cur))
+            cur, cur_len = [], 0
+        cur.append(p)
+        cur_len += len(p)
+    if cur:
+        chunks.append("\n".join(cur))
+
+    beats = []
+    for i, c in enumerate(chunks, 1):
+        b = _extract_beat_chunk(client, c, chapter.num, f"（片段{i}/{len(chunks)}）")
+        if b:
+            beats.append(b)
+
+    if not beats:
+        return None
+    if len(beats) == 1:
+        return beats[0]
+
+    # 合并：goal 取第一段，points 全部拼接（去重同场景）
+    merged = beats[0]
+    seen_goals = {p.goal for p in merged.points}
+    for b in beats[1:]:
+        for p in b.points:
+            if p.goal not in seen_goals:
+                merged.points.append(p)
+                seen_goals.add(p.goal)
+    # 补充 characters/constraints
+    for b in beats[1:]:
+        for c in b.characters:
+            if c not in merged.characters:
+                merged.characters.append(c)
+        for c in b.constraints:
+            if c not in merged.constraints:
+                merged.constraints.append(c)
+    return merged
 
 
 def build_arc_from_chapters(
