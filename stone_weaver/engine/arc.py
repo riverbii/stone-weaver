@@ -87,8 +87,11 @@ class Arc:
 def extract_beat(client: LLMClient, chapter: Chapter) -> Beat | None:
     """单回压缩为 beat（容错：JSON 围栏/杂文；HTTP 异常上抛由调用方重试）。"""
     text = chapter.content[:6000]
-    prompt = BEAT_PROMPT.replace("{text}", text).replace(
-        "{chapter}", str(chapter.num)
+    prompt = (
+        BEAT_PROMPT.replace("{{", "{")
+        .replace("}}", "}")
+        .replace("{text}", text)
+        .replace("{chapter}", str(chapter.num))
     )
     raw = client.chat([{"role": "system", "content": prompt}], temperature=0.1)  # 异常上抛
     import json

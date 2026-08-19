@@ -136,3 +136,8 @@
 - **修复**：canonical 优先"带姓氏标准全名"（林黛玉>黛玉>潇湘妃子）；单向别名指向即可入组（比双向互认全面）；排除 ≤1 字别名（"玉"会串起所有含玉人物）、泛称（太太/老爷/二姑娘…）、硬分离名（甄宝玉≠宝玉，薛二姑娘≠迎春）、亲属称谓（X之母/X之妻）。
 - **教训**：归并类破坏性操作先跑模拟数据测试（tests/ 应有 test_merge_aliases.py）；先备份 DB（sqlite .backup）再 apply。
 - **当前**：DeepSeek 官方 API 快且稳（每回 25-40s，80 回约 40 分钟）——已替换耗尽的 opencode Zen。
+
+## [2026-08-18 提取管线双 bug 修复]
+- **Bug1**：RELATION/LOCATION/EVENT/BEAT/PLANNER 等 prompt 模板用 `{{ }}`（.format 转义符）但替换时未还原 → 模型看到 `{{"source"...}}` 返回空。修复：替换时 `.replace("{{","{").replace("}}","}")`。加了回归测试 test_prompts_have_no_double_braces。
+- **Bug2**：共享 `parse_json_list` 过滤 `d.get("name")`，把关系（source/target）事件（summary）全滤成空。修复：parse_json_list 不过滤字段，由调用方决定（人物提取处补 name 过滤）。
+- 关系提取验证通过（第3回 4 条：林如海-贾雨村 上下级等）。

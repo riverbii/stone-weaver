@@ -32,7 +32,7 @@ def extract_characters_from_text(client: LLMClient, text: str) -> list[dict]:
         {"role": "system", "content": EXTRACT_PROMPT.replace("{text}", text[:6000])}
     ]
     raw = client.chat(messages, temperature=0.1)  # 异常向上抛，由调用方重试
-    return parse_json_list(raw)
+    return [d for d in parse_json_list(raw) if d.get("name")]
 
 
 def parse_json_list(raw: str) -> list[dict]:
@@ -56,7 +56,9 @@ def parse_json_list(raw: str) -> list[dict]:
             return []
     if not isinstance(data, list):
         return []
-    return [d for d in data if isinstance(d, dict) and d.get("name")]
+    # 不过滤字段：人物提取用 name，关系用 source/target，事件用 summary——
+    # 由调用方决定用哪些字段，这里只保留 dict 元素
+    return [d for d in data if isinstance(d, dict)]
 
 
 def rule_based_mentions(text: str) -> list[tuple[str, int]]:
@@ -189,14 +191,14 @@ RELATION_PROMPT = """你是红楼梦研究助手。下面是第{chapter}回原�
 def extract_relationships_from_text(
     client: LLMClient, text: str, chapter: int
 ) -> list[dict]:
-    messages = [
-        {
-            "role": "system",
-            "content": RELATION_PROMPT.replace("{text}", text[:6000]).replace(
-                "{chapter}", str(chapter)
-            ),
-        }
-    ]
+    # 模板里 JSON 用了 {{ }}（.format 转义），先还原为 { }
+    prompt = (
+        RELATION_PROMPT.replace("{{", "{")
+        .replace("}}", "}")
+        .replace("{text}", text[:6000])
+        .replace("{chapter}", str(chapter))
+    )
+    messages = [{"role": "system", "content": prompt}]
     raw = client.chat(messages, temperature=0.1)  # 异常向上抛，由调用方重试
     return parse_json_list(raw)
 

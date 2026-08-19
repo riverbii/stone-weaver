@@ -41,7 +41,9 @@ def plan_beat(
     import json
 
     prompt = (
-        PLANNER_PROMPT.replace("{world_state}", state.describe())
+        PLANNER_PROMPT.replace("{{", "{")
+        .replace("}}", "}")
+        .replace("{world_state}", state.describe())
         .replace("{beat}", json.dumps(beat, ensure_ascii=False))
     )
     raw = client.chat([{"role": "system", "content": prompt}], temperature=0.3)  # 异常上抛
@@ -79,7 +81,11 @@ def extract_events_from_text(client: LLMClient, text: str) -> list[dict]:
     """从生成文本回提事件（含因果边信息）。JSON 解析失败返回 []，HTTP 异常上抛。"""
     import json
 
-    prompt = EXTRACT_EVENT_PROMPT.replace("{text}", text[:6000])
+    prompt = (
+        EXTRACT_EVENT_PROMPT.replace("{{", "{")
+        .replace("}}", "}")
+        .replace("{text}", text[:6000])
+    )
     raw = client.chat([{"role": "system", "content": prompt}], temperature=0.1)  # 异常上抛
     s = raw.strip()
     a, b = s.find("["), s.rfind("]")

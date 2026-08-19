@@ -66,3 +66,30 @@ def test_style_assess_distinguishes():
     assert a1["score"] > a2["score"]
     assert verdict(a1) in ("✅ 文风达标", "🟡 文风接近，需润色")
     assert verdict(a2) == "❌ 文风不符，需重写"
+
+
+def test_prompts_have_no_double_braces():
+    """所有 LLM prompt 模板不得残留 {{ }}（.format 转义符会破坏 JSON 指令）。"""
+    import stone_weaver.engine.arc as arc
+    import stone_weaver.engine.generate as gen
+    import stone_weaver.world.extract as ex
+    import scripts.extract_locations as loc
+    import scripts.extract_events as ev
+
+    def build(p: str, **kw) -> str:
+        out = p.replace("{{", "{").replace("}}", "}")
+        for k, v in kw.items():
+            out = out.replace("{" + k + "}", v)
+        return out
+
+    cases = [
+        build(ex.RELATION_PROMPT, text="原文", chapter="3"),
+        build(arc.BEAT_PROMPT, text="原文", chapter="81"),
+        build(gen.PLANNER_PROMPT, world_state="状态", beat="{}"),
+        build(gen.EXTRACT_EVENT_PROMPT, text="正文"),
+        build(loc.LOCATION_PROMPT, text="原文", chapter="1"),
+        build(ev.EVENT_PROMPT, text="原文", chapter="1"),
+    ]
+    for p in cases:
+        assert "{{" not in p, f"prompt 含 {{{{: {p[:60]}"
+        assert "}}" not in p, f"prompt 含 }}}}: {p[:60]}"

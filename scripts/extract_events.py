@@ -77,8 +77,11 @@ def chat_with_retry(client: LLMClient, text: str, chapter: int) -> list[dict]:
     last_err = ""
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            content = EVENT_PROMPT.replace("{text}", text[:6000]).replace(
-                "{chapter}", str(chapter)
+            content = (
+                EVENT_PROMPT.replace("{{", "{")
+                .replace("}}", "}")
+                .replace("{text}", text[:6000])
+                .replace("{chapter}", str(chapter))
             )
             raw = client.chat(
                 [{"role": "system", "content": content}], temperature=0.1
