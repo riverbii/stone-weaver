@@ -39,8 +39,10 @@ SCENE_PROMPT = """你是一位深谙《红楼梦》文风的续写专家。请�
 4. **对话符合人物**：宝玉痴语（"女儿是水做的骨肉"式）、黛玉机敏带刺、凤姐泼辣市井、婆子们粗鄙直白
 5. **白描**：动作直写（"起身""摔帘子""啐了一口"），不解释心理，情感藏于动作对话
 6. **禁止**：被字句（"被…照着/被…拉住"）、"仿佛/似乎/如同/不过…罢了/唯有/唯余"等现代抒情词、景物结尾
-7. 不要堆砌"话说/这日/只见"过渡词（每段最多 1 次）
-8. 字数 300-500 字，输出正文即可
+7. **"话说"最多用 1 次**（只在本场景开头起新线时用；正文中间严禁再用"话说/且说/却说"另起炉灶）。段落开头要多样自然：可用"只见""一进门""说笑之间""忽见""正说着""一时""谁知"等承接前文，不要每段都从人名重新起头
+8. **"X听了"句式严禁流水线**：全场景"听了"最多 2 次；"X听了"后不能总是接"道"——可以接转述（"宝玉听了这话，公然又是一个袭人"）、接内心判断（"王夫人听了这话内有因"）、接比喻（"如雷轰电掣一般"）、接动作去向（"晴雯听了，只得拿了帕子往潇湘馆来"）
+9. **句式变化**：不要连续三句用"X道："开头；对话引导词轮换（笑道/叹道/忙道/啐道/悄声道/正色道）；叙述句不要都从人名开始
+10. 字数 300-500 字，输出正文即可
 
 正文：
 """
@@ -50,10 +52,17 @@ def build_scene_prompt(
     goal: str,
     state: WorldState,
     anchors: list[StyleAnchor],
+    prev_tail: str = "",
 ) -> str:
-    return SCENE_PROMPT.replace("{style_anchors}", format_anchors(anchors)).replace(
+    prompt = SCENE_PROMPT.replace("{style_anchors}", format_anchors(anchors)).replace(
         "{world_state}", state.describe()
     ).replace("{goal}", goal)
+    if prev_tail:
+        prompt = prompt.replace(
+            "正文：",
+            f"【前文结尾（请自然衔接，不要用\"话说\"另起，直接从场景衔接处续写）】\n……{prev_tail}\n\n正文：",
+        )
+    return prompt
 
 
 def generate_scene(
@@ -61,9 +70,10 @@ def generate_scene(
     goal: str,
     state: WorldState,
     anchors: list[StyleAnchor],
+    prev_tail: str = "",
 ) -> str:
     """生成一个场景段落（带一次失败重试），清洗输出残留标记。"""
-    prompt = build_scene_prompt(goal, state, anchors)
+    prompt = build_scene_prompt(goal, state, anchors, prev_tail)
     for attempt in range(2):
         try:
             raw = client.chat(
