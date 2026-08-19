@@ -72,7 +72,7 @@ def extract_anchors(db: Session, chapters: list[int] | None = None, per_kind: in
     """
     if chapters is None:
         chapters = list(range(1, 81))
-    anchors: dict[str, list[str]] = {k: [] for k in ("dialogue_jiaoyu", "dialogue_daiyu", "dialogue_fengjie", "scene_landscape", "scene_emotion", "opening", "closing")}
+    anchors: dict[str, list[str]] = {k: [] for k in ("dialogue_jiaoyu", "dialogue_daiyu", "dialogue_fengjie", "action_scene", "scene_landscape", "scene_emotion", "opening", "closing")}
 
     for num in chapters:
         ch = (
@@ -91,6 +91,15 @@ def extract_anchors(db: Session, chapters: list[int] | None = None, per_kind: in
                     continue
                 if any(h in p for h in hints) and ("道" in p or "说" in p or "笑" in p or "？" in p):
                     anchors[kind].append(p)
+            # 动作交锋段：多动作词 + 有对话（正是"人物互动多"的示范）
+            action_verbs = ("起身", "上前", "拉住", "拦住", "扯", "夺", "推", "跪", "摔", "啐", "抢", "夺门", "拽", "一把", "登时", "忙", "便")
+            if (
+                len(anchors["action_scene"]) < per_kind * 2
+                and sum(1 for v in action_verbs if v in p) >= 2
+                and ("道" in p or "说" in p or "笑" in p)
+                and len(p) < 300
+            ):
+                anchors["action_scene"].append(p)
             # 场景描写：含"、"列举或方位词且无引号
             if (
                 len(anchors["scene_landscape"]) < per_kind * 2
@@ -100,7 +109,7 @@ def extract_anchors(db: Session, chapters: list[int] | None = None, per_kind: in
             ):
                 anchors["scene_landscape"].append(p)
             if (
-                len(anchors["scene_emotion"]) < per_kind * 2
+                len(anchors["scene_emotion"]) < per_kind
                 and any(k in p for k in ("不觉", "心下", "暗自", "越想", "悲", "叹", "痴"))
                 and len(p) < 200
             ):
@@ -128,6 +137,7 @@ def format_anchors(anchors: list[StyleAnchor]) -> str:
         "dialogue_jiaoyu": "宝玉的说话口吻（痴语、女儿至上）",
         "dialogue_daiyu": "黛玉的说话口吻（机敏、诗性、微带尖刻）",
         "dialogue_fengjie": "凤姐的说话口吻（泼辣爽利、市井机变）",
+        "action_scene": "动作+对话交锋（人物互动推进，白描，不抒情）",
         "scene_landscape": "大观园景物描写（工笔白描、四时意象）",
         "scene_emotion": "人物心理与情感段落（含蓄、以景衬情）",
         "opening": "章回开篇（常以诗句/议论起）",
