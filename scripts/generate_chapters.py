@@ -28,7 +28,7 @@ from stone_weaver.engine.arc import load_arc
 from stone_weaver.engine.simulate import simulate_one_beat
 from stone_weaver.ingest.text import make_session
 from stone_weaver.llm import LLMClient
-from stone_weaver.models import GeneratedChapter
+from stone_weaver.models import CharacterState, GeneratedChapter
 from stone_weaver.style.anchors import extract_anchors
 from stone_weaver.world.state import initial_state_from_events, state_at
 
@@ -57,8 +57,18 @@ def main() -> int:
     anchors = extract_anchors(db, chapters=list(range(1, 81)), per_kind=2)
     print(f"风格锚点 {len(anchors)} 条", flush=True)
 
-    # 80→81 世界状态（衔接点）
-    state = initial_state_from_events(db, chapter=80)
+    # 80→81 世界状态（衔接点）：优先用 character_states 快照（LLM 核查版），
+    # 无快照时退回规则推导
+    from stone_weaver.world.state import state_at
+
+    state = state_at(db, 80)
+    n_snap = (
+        db.query(CharacterState).filter(CharacterState.chapter == 80).count()
+    )
+    if n_snap == 0:
+        print("无 ch80 快照，用规则推导（建议先跑 scripts/build_ch80_state.py）", flush=True)
+        state = initial_state_from_events(db, chapter=80)
+    print(f"ch80 世界状态（{n_snap} 条快照）:", flush=True)
     print(state.describe(limit=10), flush=True)
 
     nums = [args.only] if args.only else list(range(args.start, args.end + 1))
