@@ -110,16 +110,27 @@ def generate_and_extract(
     state: WorldState,
     anchors: list[StyleAnchor],
 ) -> tuple[str, list[dict]]:
-    """完整一步：plan → generate → extract。返回 (正文, 事件列表)。"""
-    scenes = plan_beat(client, beat, state)
-    if not scenes:
-        return "", []
+    """完整一步：plan → generate → extract。返回 (正文, 事件列表)。
+
+    优先按 beat.points（细粒度情节点，从真实文本提取）逐个生成；
+    无 points 时回退 plan_beat 让 LLM 自行规划场景。
+    """
+    points = beat.get("points") or []
     chunks = []
-    for sc in scenes:
-        goal = f"场景{sc.get('order', '?')}：在{sc.get('where', '某处')}，{sc.get('what', '')}"
-        chunk = generate_scene(client, goal, state, anchors)
-        if chunk:
-            chunks.append(chunk)
+    if points:
+        for i, pt in enumerate(points, 1):
+            goal = f"情节{i}：在{pt.get('scene', '某处')}，{pt.get('goal', '')}"
+            chunk = generate_scene(client, goal, state, anchors)
+            if chunk:
+                chunks.append(chunk)
+    else:
+        scenes = plan_beat(client, beat, state)
+        if scenes:
+            for sc in scenes:
+                goal = f"场景{sc.get('order', '?')}：在{sc.get('where', '某处')}，{sc.get('what', '')}"
+                chunk = generate_scene(client, goal, state, anchors)
+                if chunk:
+                    chunks.append(chunk)
     text = "\n".join(chunks)
     if not text:
         return "", []

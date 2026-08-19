@@ -21,15 +21,16 @@ from ..llm import LLMClient
 from ..models import Arc as ArcRow
 from ..models import Chapter
 
-BEAT_PROMPT = """你是红楼梦叙事分析专家。下面是《癸酉本》第{chapter}回原文。请把本回情节压缩为一个"叙事节拍"（beat）。
+BEAT_PROMPT = """你是红楼梦叙事分析专家。下面是《癸酉本》第{chapter}回原文。请把本回情节拆解为**细粒度情节点序列**（4-8 个），每个情节点对应一个独立的场景单元。
 
 只输出一个 JSON 对象，不要其他文字：
-{{"scene": "场景地点", "goal": "本回核心目标（一句话，含人物动作与结果）", "characters": ["核心人物标准姓名"], "constraints": ["关键约束或前提（如时间/背景/必须承接的前事）"], "expected_out": "本回结束时的世界状态变化（谁死了/谁去了哪/关系如何变）"}}
+{{"scene": "本回总体场景", "goal": "本回核心目标（一句话）", "characters": ["核心人物"], "constraints": ["关键约束"], "expected_out": "本回结束时世界状态变化", "points": [{{"scene": "情节点场景地点", "goal": "该情节点发生的事（一句话，含人物动作与结果）", "characters": ["该情节点人物"], "expected_out": "该情节点结束后的状态"}}]}}
 
 规则：
+- **points 要细**：把本回拆成 4-8 个连续场景单元，每个都具体到"谁在哪儿做了什么、结果如何"
+  （如"王夫人裁月钱→宝玉求情→婆子结党"应拆成 2-3 个 points）
 - goal 只写"发生了什么"，不写"怎么写的"（文风由生成器负责）
-- characters 只放有实际戏份的人物
-- expected_out 要具体到可校验（如"林黛玉自缢于柳叶渚槐树"）
+- points 的 expected_out 要具体可校验
 
 原文：
 {text}
@@ -37,14 +38,45 @@ BEAT_PROMPT = """你是红楼梦叙事分析专家。下面是《癸酉本》第
 
 
 @dataclass
+class PlotPoint:
+    """细粒度情节点：一个场景单元（比 Beat 小一级）。
+
+    一回拆成多个 PlotPoint（4-8 个），生成器逐个生成后拼装成完整回目。
+    """
+
+    scene: str
+    goal: str
+    characters: list[str] = field(default_factory=list)
+    expected_out: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "scene": self.scene,
+            "goal": self.goal,
+            "characters": self.characters,
+            "expected_out": self.expected_out,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> "PlotPoint":
+        return cls(
+            scene=d.get("scene", ""),
+            goal=d.get("goal", ""),
+            characters=d.get("characters") or [],
+            expected_out=d.get("expected_out", ""),
+        )
+
+
+@dataclass
 class Beat:
-    """单节拍：一个场景目标。"""
+    """单回叙事节拍：本回核心目标 + 细粒度情节点序列。"""
 
     scene: str
     goal: str
     characters: list[str] = field(default_factory=list)
     constraints: list[str] = field(default_factory=list)
     expected_out: str = ""
+    points: list[PlotPoint] = field(default_factory=list)  # 细粒度情节点
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -53,6 +85,7 @@ class Beat:
             "characters": self.characters,
             "constraints": self.constraints,
             "expected_out": self.expected_out,
+            "points": [p.to_dict() for p in self.points],
         }
 
     @classmethod
@@ -63,6 +96,7 @@ class Beat:
             characters=d.get("characters") or [],
             constraints=d.get("constraints") or [],
             expected_out=d.get("expected_out", ""),
+            points=[PlotPoint.from_dict(p) for p in (d.get("points") or [])],
         )
 
 
