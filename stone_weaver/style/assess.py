@@ -1,45 +1,38 @@
-"""文风引擎 · 文风指纹评估器（题材无关）。
+"""文风引擎 · 文骨检测器 v3（结构级，严格）。
 
-架构定位（docs/architecture.md §6）：
-  只测"与内容无关的文体指纹"，不罚题材特征（奇幻回对话少是正常的）。
-
-核心思路（实测验证，见 project memory [2026-08-19 文风指纹]）：
-  - 正向（文言骨相）：文言虚词密度（之乎者也矣焉哉兮其若何乃遂因故则）、
-    四字骈俪结构比例、文言句首率（因/遂/乃/即/俄而/忽/方）
-  - 负向（白话流水账）：现代句首率（他/我/你/然后/因为/所以开头）、
-    了字句尾率（以"了/着呢"收尾）、白话因果链（然后/但是/因为/所以）、
-    口语堆叠（着了/的呢/的话）
-  - 不罚：对话密度、动作密度（题材决定）
+方法论（数据驱动校准）：
+  1. 先在前80回曹雪芹原文上校准——已知正确的数据必须高分
+  2. 用"文言结构"而非"单字虚词"（"X之Y"定语、"者…也"判断句尾、
+     "焉哉兮"收尾）——这些才体现真正的文言骨相
+  3. 实测区分度（曹雪芹 vs 癸酉本均值）：
+     - "X之Y"结构：4.74 vs 2.21（2.1x）
+     - "者也矣焉兮"句尾：1.46 vs 0.17（8.6x）← 最强
+     - 文白比（文言虚词/白话语气词）：0.42 vs 0.21（2x）
+  4. 负向：只罚真正现代痕迹（曹雪芹原文实测 ≤0.04/千 的词 + "虽然…但是"成对）
 """
 
 from __future__ import annotations
 
 import re
 
-# ---- 文言骨相（正向）----
-CLASSICAL_PARTICLES = (
-    "之", "乎", "者", "也", "矣", "焉", "哉", "兮", "其", "若何",
-    "乃", "遂", "因", "故", "则", "苟", "斯", "是以", "俄而", "既而", "须臾", "方",
-)
-WENYAN_START_RE = re.compile(r"^(因|遂|乃|即|俄而|既而|故|于是|忽|方|及|已而|须臾|自此|只因|原来)")
-FOUR_CHAR_RE = re.compile(r"[^\s，。！？；：、""''（）]{4}")
+# ---- 正向：文言结构骨相 ----
+# "X之Y"文言定语结构（"府中之物/园中之景"——之 作结构助词）
+ZHI_STRUCT_RE = re.compile(r"[^，。！？；：、]{1,6}之[^，。！？；：、]{1,6}")
+# "者…也"判断句尾 + "矣焉哉兮"文言收尾
+WENYAN_END_RE = re.compile(r"[^。！？]{1,12}[者也矣焉哉兮][。！？]")
+# 文言虚词（作词，非单字——"乃/遂/俄而/既而/因/故/须臾/斯"）
+WENYAN_WORDS = ("乃", "遂", "俄而", "既而", "因", "故", "须臾", "斯", "是以", "因而", "自此", "及至")
+# 白话语气词（文白比分母）
+BAIHUA_PARTICLES = ("了", "呢", "罢", "呀", "么", "的", "着", "吧")
 
-# ---- 白话流水账（负向）----
-# 只罚真正的现代独有词（经前80回实测：这些在曹雪芹原文 ≤0.04/千，可视为现代痕迹）：
-#   进行/对于/也许/或许/竟然/认为/其实/突然/同时/但是/应该/必须/反正/居然/真的/非常
-# 注意：所以/虽然/然后/而且 等曹雪芹原文也用（0.06-0.42/千），不算负向
+# ---- 负向：真现代痕迹（曹雪芹原文实测 ≤0.04/千）----
 MODERN_ONLY = (
     "其实", "真的", "觉得", "认为", "进行", "关于", "对于", "突然",
     "非常", "但是", "同时", "也许", "或许", "可能", "应该", "必须",
     "竟然", "居然", "反正",
 )
-# 成对关联词（真现代痕迹——实测曹雪芹"虽然…但是"0次；"因为…所以""不但…而且"古白话也有，不算）
-MODERN_PAIRS = [
-    (r"虽然[^。！？]{0,15}但是", 0.20),
-]
-# 口语堆叠（古白话少见）
-VERNACULAR_STACK = ("着呢", "的了", "了吗", "的呀", "走了过去", "走了进来")
-LE_END_RE = re.compile(r"(着呢|的了|了呢|过了|好了)$")
+# "虽然…但是"成对（曹雪芹原文 0 次）
+SUIRAN_DANSHI = re.compile(r"虽然[^。！？]{0,15}但是")
 
 # 批注清洗
 _ANNOT_RE = re.compile(r"〔批(?:[:：][^〕]*)?〕.*?〔/批〕", re.S)
@@ -47,79 +40,76 @@ _ANNOT_RE = re.compile(r"〔批(?:[:：][^〕]*)?〕.*?〔/批〕", re.S)
 
 def _clean(text: str) -> str:
     t = _ANNOT_RE.sub("", text)
-    # 去 verse/题曰 等残留标签
     t = re.sub(r"\bverse\b", "", t)
     t = re.sub(r"^\s*题曰\s*[：:]", "", t, flags=re.M)
     return t
 
 
 def assess(text: str) -> dict:
-    """题材无关的文风指纹评估。0-1 分，越高越接近曹雪芹文骨。"""
+    """文骨检测。0-1 分，越高越接近曹雪芹文言骨架。"""
     t = _clean(text)
     n = len(t)
-    if n < 200:
+    if n < 300:
         return {"score": 0.0, "reasons": ["文本过短"]}
 
     sents = [s.strip() for s in re.split(r"[。！？\n]", t) if len(s.strip()) > 3]
     n_sents = max(len(sents), 1)
 
-    # 正向：文言骨相（题材无关——对话/奇幻/日常都有）
-    classical = sum(t.count(w) for w in CLASSICAL_PARTICLES) / n * 1000
-    s_classical = min(1.0, classical / 16)  # 曹雪芹 14.8-41.7，16 即高分
+    # ---- 正向：文言骨相 ----
+    # 1) "X之Y"结构密度（曹 4.74 / 癸 2.21）
+    zhi = len(ZHI_STRUCT_RE.findall(t)) / n * 1000
+    s_zhi = min(1.0, zhi / 4.74)  # 曹雪芹均值满格
 
-    fours = sum(len(m.group()) for m in FOUR_CHAR_RE.finditer(t))
-    four_ratio = fours / n
-    s_four = min(1.0, four_ratio / 0.65)
+    # 2) "者也矣焉兮"句尾密度（曹 1.46 / 癸 0.17）← 最强指标
+    wenyan_end = len(WENYAN_END_RE.findall(t)) / n * 1000
+    s_wenyan_end = min(1.0, wenyan_end / 1.46)
 
-    # 负向：真正的现代痕迹
-    # 1) 现代独有虚词密度：曹雪芹前80回实测中位 0.19/千、p90 0.49、max 0.80
-    #    → 超过 0.8/千（曹雪芹上限）才开始罚，1.6/千 满罚
-    modern_only = sum(t.count(w) for w in MODERN_ONLY) / n * 1000
-    s_modern_pen = min(0.3, max(0.0, (modern_only - 0.8) / 0.8))
+    # 3) 文言词密度（乃/遂/俄而…）
+    wenyan_words = sum(t.count(w) for w in WENYAN_WORDS) / n * 1000
+    s_wenyan_words = min(1.0, wenyan_words / 2.0)
 
-    # 2) 成对关联词（虽然…但是 等——古白话不用成对）
-    pair_hits = sum(len(re.findall(p, t)) for p, _ in MODERN_PAIRS)
-    s_pair_pen = min(0.25, pair_hits * 0.1)
+    # 4) 文白比（文言虚词总量 / 白话语气词总量；曹 0.42 / 癸 0.21）
+    wenyan_total = sum(t.count(w) for w in ("之", "乎", "者", "也", "矣", "焉", "哉", "兮", "其")) / n * 1000
+    baihua_total = sum(t.count(w) for w in BAIHUA_PARTICLES) / n * 1000
+    wb_ratio = wenyan_total / max(baihua_total, 1)
+    s_ratio = min(1.0, wb_ratio / 0.42)
 
-    # 3) 了字句尾
-    le_end = sum(1 for s in sents if LE_END_RE.search(s)) / n_sents * 100
-    s_le_pen = min(0.1, le_end / 50)
-
-    # 4) 口语堆叠
-    vern = sum(t.count(w) for w in VERNACULAR_STACK) / n * 1000
-    s_vern_pen = min(0.1, vern / 6)
+    # ---- 负向：真现代痕迹 ----
+    modern = sum(t.count(w) for w in MODERN_ONLY) / n * 1000
+    s_modern_pen = min(0.3, max(0.0, (modern - 0.8) / 0.8))  # 超曹雪芹上限(0.8)才罚
+    suiran = len(SUIRAN_DANSHI.findall(t))
+    s_suiran_pen = min(0.25, suiran * 0.15)
 
     score = max(
         0.0,
         min(
             1.0,
-            0.55 * s_classical
-            + 0.25 * s_four
+            0.3 * s_zhi
+            + 0.35 * s_wenyan_end
+            + 0.15 * s_wenyan_words
+            + 0.2 * s_ratio
             - s_modern_pen
-            - s_pair_pen
-            - s_le_pen
-            - s_vern_pen,
+            - s_suiran_pen,
         ),
     )
     reasons = [
-        f"文言虚词 {classical:.0f}/千({s_classical:.2f})",
-        f"四字结构 {four_ratio:.2f}({s_four:.2f})",
+        f"之X结构 {zhi:.1f}/千({s_zhi:.2f})",
+        f"者也句尾 {wenyan_end:.2f}/千({s_wenyan_end:.2f})",
+        f"文白比 {wb_ratio:.2f}({s_ratio:.2f})",
     ]
-    if modern_only:
-        reasons.append(f"现代虚词 {modern_only:.1f}/千(罚{s_modern_pen:.2f})")
-    if pair_hits:
-        reasons.append(f"成对关联词 {pair_hits}(罚{s_pair_pen:.2f})")
-    if le_end:
-        reasons.append(f"了字句尾 {le_end:.0f}%(罚{s_le_pen:.2f})")
+    if modern > 0.8:
+        reasons.append(f"现代虚词 {modern:.1f}/千(罚{s_modern_pen:.2f})")
+    if suiran:
+        reasons.append(f"虽然但是×{suiran}(罚{s_suiran_pen:.2f})")
     return {
         "score": round(score, 2),
         "n_chars": n,
         "reasons": reasons,
         "metrics": {
-            "classical_per_1k": round(classical, 1),
-            "modern_only_per_1k": round(modern_only, 1),
-            "le_end_pct": round(le_end, 1),
-            "four_char_ratio": round(four_ratio, 2),
+            "zhi_struct_per_1k": round(zhi, 1),
+            "wenyan_end_per_1k": round(wenyan_end, 2),
+            "wb_ratio": round(wb_ratio, 2),
+            "modern_per_1k": round(modern, 1),
         },
     }
 
@@ -130,5 +120,5 @@ def verdict(a: dict) -> str:
     if a["score"] >= 0.4:
         return "🟡 文骨尚可"
     if a["score"] >= 0.28:
-        return "⚠️ 白话流水账倾向"
-    return "❌ 文风偏离"
+        return "⚠️ 白话化倾向"
+    return "❌ 文骨缺失"
