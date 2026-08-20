@@ -45,8 +45,13 @@ def simulate_one_beat(
     title: str = "",
     max_retries: int = 3,
     persist: bool = True,
+    cliche_gate: bool = False,
 ) -> dict:
-    """执行一个 beat 的完整循环。返回结果 dict（供调用方检查）。"""
+    """执行一个 beat 的完整循环。返回结果 dict（供调用方检查）。
+
+    cliche_gate=True 时套路词超量触发重生成（慢，仅质量攻坚用）；
+    False（默认）时只记录套路词问题不阻断（批量生成用）。
+    """
     result: dict = {
         "ok": False,
         "text": "",
@@ -74,11 +79,11 @@ def simulate_one_beat(
             result["violations"] = v_rule
             result["retries"] = attempt + 1
             continue
-        # 套路词检查（生成后自动把关：半晌/怔了/眼圈等 LLM 套路词超量则重生成）
+        # 套路词检查（生成后把关：半晌/怔了/眼圈等 LLM 套路词）
         from ..style.cliches import check_style
 
         cliche_problems = check_style(text)
-        if cliche_problems:
+        if cliche_problems and cliche_gate:
             active_beat = dict(active_beat)
             active_beat["_feedback"] = (
                 "【文风套路检查反馈——请重写并消除以下套路】\n" + "\n".join(f"- {p}" for p in cliche_problems)
@@ -87,6 +92,7 @@ def simulate_one_beat(
             result["retries"] = attempt + 1
             print(f"    套路词超量（{'；'.join(p[:22] for p in cliche_problems)}），重试 {attempt+1}/{max_retries}", flush=True)
             continue
+        result["cliches"] = cliche_problems  # 记录（无论是否 gate）
         # 规则通过 → 落库
         result["ok"] = True
         result["text"] = text

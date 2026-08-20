@@ -32,6 +32,9 @@ from stone_weaver.models import CharacterState, GeneratedChapter
 from stone_weaver.style.anchors import extract_anchors
 from stone_weaver.world.state import initial_state_from_events, state_at
 
+# arc 2 的情节弧起始回（beats[0]=ch81）
+ARC_START = 81
+
 
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -83,8 +86,8 @@ def main() -> int:
             if exists and exists.status != "draft":
                 print(f"[{num}] 已生成（{exists.status}），跳过（--force 重做）", flush=True)
                 continue
-        idx = num - args.start
-        if idx >= len(arc.beats):
+        idx = num - ARC_START
+        if idx < 0 or idx >= len(arc.beats):
             print(f"[{num}] ⚠️ 超出情节弧 beat 数，跳过", flush=True)
             continue
         beat = arc.beats[idx].to_dict()
@@ -95,6 +98,7 @@ def main() -> int:
             title=f"第{num}回（引擎重建）",
             max_retries=3,
             persist=not args.no_persist,
+            cliche_gate=False,  # 批量生成不因套路词阻断（记录即可）
         )
         if result["ok"]:
             print(f"✅ [{num}] 生成成功（{result['retries']} 次重试）耗时 {time.time()-t0:.0f}s", flush=True)
@@ -104,7 +108,10 @@ def main() -> int:
         else:
             print(f"❌ [{num}] 生成失败", flush=True)
             for v in result["violations"]:
-                print(f"    [{v.severity}] {v.message}", flush=True)
+                if isinstance(v, str):
+                    print(f"    [套路] {v}", flush=True)
+                else:
+                    print(f"    [{v.severity}] {v.message}", flush=True)
     print(f"\n完成，总耗时 {(time.time()-t_start)/60:.1f} 分钟", flush=True)
     return 0
 
