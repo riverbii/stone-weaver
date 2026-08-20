@@ -54,9 +54,10 @@ def simulate_one_beat(
         "violations": [],
         "retries": 0,
     }
+    active_beat = dict(beat)
     for attempt in range(max_retries):
         try:
-            text, evs = generate_and_extract(client, beat, state, anchors)
+            text, evs = generate_and_extract(client, active_beat, state, anchors)
         except Exception as e:  # noqa: BLE001
             result["retries"] = attempt + 1
             print(f"    生成异常（{type(e).__name__}），重试 {attempt+1}/{max_retries}", flush=True)
@@ -68,10 +69,23 @@ def simulate_one_beat(
         if v_rule:
             # 带反馈重生成
             fb = feedback_prompt(v_rule)
-            beat_w_fb = dict(beat)
-            beat_w_fb["_feedback"] = fb
+            active_beat = dict(active_beat)
+            active_beat["_feedback"] = fb
             result["violations"] = v_rule
             result["retries"] = attempt + 1
+            continue
+        # 套路词检查（生成后自动把关：半晌/怔了/眼圈等 LLM 套路词超量则重生成）
+        from ..style.cliches import check_style
+
+        cliche_problems = check_style(text)
+        if cliche_problems:
+            active_beat = dict(active_beat)
+            active_beat["_feedback"] = (
+                "【文风套路检查反馈——请重写并消除以下套路】\n" + "\n".join(f"- {p}" for p in cliche_problems)
+            )
+            result["violations"] = cliche_problems
+            result["retries"] = attempt + 1
+            print(f"    套路词超量（{'；'.join(p[:22] for p in cliche_problems)}），重试 {attempt+1}/{max_retries}", flush=True)
             continue
         # 规则通过 → 落库
         result["ok"] = True

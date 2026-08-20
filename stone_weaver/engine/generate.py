@@ -117,12 +117,13 @@ def generate_and_extract(
     连续生成：每段传入上一段结尾作衔接，避免每段都"话说"另起炉灶。
     """
     points = beat.get("points") or []
+    feedback = beat.get("_feedback") or ""
     chunks = []
     if points:
         prev_tail = ""
         for i, pt in enumerate(points, 1):
             goal = f"情节{i}：在{pt.get('scene', '某处')}，{pt.get('goal', '')}"
-            chunk = generate_scene(client, goal, state, anchors, prev_tail=prev_tail)
+            chunk = generate_scene(client, goal, state, anchors, prev_tail=prev_tail, feedback=feedback)
             if chunk:
                 chunks.append(chunk)
                 prev_tail = chunk[-80:]  # 上一段结尾作衔接
@@ -132,7 +133,7 @@ def generate_and_extract(
             prev_tail = ""
             for sc in scenes:
                 goal = f"场景{sc.get('order', '?')}：在{sc.get('where', '某处')}，{sc.get('what', '')}"
-                chunk = generate_scene(client, goal, state, anchors, prev_tail=prev_tail)
+                chunk = generate_scene(client, goal, state, anchors, prev_tail=prev_tail, feedback=feedback)
                 if chunk:
                     chunks.append(chunk)
                     prev_tail = chunk[-80:]
