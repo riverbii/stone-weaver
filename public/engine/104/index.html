@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="zhu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d8d2c2">
+<title>第104回　第104回（引擎重建） · 自家版本</title>
+<script>
+try {
+  const saved = JSON.parse(localStorage.getItem("stone-weaver-preferences") || "{}");
+  if (["zhu", "bamboo", "begonia", "night"].includes(saved.theme)) document.documentElement.dataset.theme = saved.theme;
+  if (Number.isFinite(saved.fontSize)) document.documentElement.style.setProperty("--reader-size", saved.fontSize + "px");
+} catch (_) {}
+</script>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body data-view="reader" data-current="104" data-total="28">
+
+<div class="reader-shell">
+
+  <aside class="toc-panel" aria-label="回目">
+    <header class="toc-head">
+      <span class="toc-word">回 目</span>
+      <button class="control-button toc-close" id="toc-close" type="button" aria-label="收起回目">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <ol class="toc-list">
+      
+      <li>
+        <a class="toc-link " href="/engine/81" >
+          <span class="toc-number">081</span>
+          <span class="toc-title">第81回（引擎重建·v5）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/82" >
+          <span class="toc-number">082</span>
+          <span class="toc-title">第82回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/83" >
+          <span class="toc-number">083</span>
+          <span class="toc-title">第83回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/84" >
+          <span class="toc-number">084</span>
+          <span class="toc-title">第84回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/85" >
+          <span class="toc-number">085</span>
+          <span class="toc-title">第85回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/86" >
+          <span class="toc-number">086</span>
+          <span class="toc-title">第86回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/87" >
+          <span class="toc-number">087</span>
+          <span class="toc-title">第87回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/88" >
+          <span class="toc-number">088</span>
+          <span class="toc-title">第88回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/89" >
+          <span class="toc-number">089</span>
+          <span class="toc-title">第89回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/90" >
+          <span class="toc-number">090</span>
+          <span class="toc-title">第90回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/91" >
+          <span class="toc-number">091</span>
+          <span class="toc-title">第91回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/92" >
+          <span class="toc-number">092</span>
+          <span class="toc-title">第92回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/93" >
+          <span class="toc-number">093</span>
+          <span class="toc-title">第93回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/94" >
+          <span class="toc-number">094</span>
+          <span class="toc-title">第94回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/95" >
+          <span class="toc-number">095</span>
+          <span class="toc-title">第95回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/96" >
+          <span class="toc-number">096</span>
+          <span class="toc-title">第96回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/97" >
+          <span class="toc-number">097</span>
+          <span class="toc-title">第97回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/98" >
+          <span class="toc-number">098</span>
+          <span class="toc-title">第98回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/99" >
+          <span class="toc-number">099</span>
+          <span class="toc-title">第99回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/100" >
+          <span class="toc-number">100</span>
+          <span class="toc-title">第100回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/101" >
+          <span class="toc-number">101</span>
+          <span class="toc-title">第101回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/102" >
+          <span class="toc-number">102</span>
+          <span class="toc-title">第102回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/103" >
+          <span class="toc-number">103</span>
+          <span class="toc-title">第103回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link is-active" href="/engine/104" aria-current="true">
+          <span class="toc-number">104</span>
+          <span class="toc-title">第104回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/105" >
+          <span class="toc-number">105</span>
+          <span class="toc-title">第105回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/106" >
+          <span class="toc-number">106</span>
+          <span class="toc-title">第106回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/107" >
+          <span class="toc-number">107</span>
+          <span class="toc-title">第107回（引擎重建）</span>
+        </a>
+      </li>
+      
+      <li>
+        <a class="toc-link " href="/engine/108" >
+          <span class="toc-number">108</span>
+          <span class="toc-title">第108回（引擎重建）</span>
+        </a>
+      </li>
+      
+    </ol>
+    <footer class="toc-foot">
+      
+      <a class="control-button toc-prev" href="/engine/103" aria-label="上一回">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </a>
+      
+      <span class="toc-current">第104回</span>
+      
+      <a class="control-button toc-next" href="/engine/105" aria-label="下一回">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </a>
+      
+    </footer>
+  </aside>
+
+  <main class="reader-main">
+    <header class="reader-toolbar" id="reader-toolbar">
+      <div class="reading-progress"><span id="progress-bar"></span></div>
+      <div class="reader-toolbar-inner">
+        <div class="toolbar-left">
+          <button class="control-button" id="toc-toggle" type="button" aria-label="回目">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          </button>
+          <a class="control-button" href="/" aria-label="封面">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V4l12-2v18M4 20l12-2M4 4l12-2M16 18V2"/></svg>
+          </a>
+        </div>
+        <button class="chapter-jump" id="chapter-jump" type="button" title="打开回目">
+          <span class="cj-num">第104回</span>
+          <span class="cj-title">第104回（引擎重建）</span>
+        </button>
+        <div class="toolbar-right">
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <button class="control-button font-smaller" id="font-smaller" type="button" aria-label="减小字号">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20l6-16M11 20l6-16M8 12h6M3 20h4M17 20h4"/></svg>
+          </button>
+          <span class="font-value" id="font-size-value" aria-live="polite">21</span>
+          <button class="control-button font-larger" id="font-larger" type="button" aria-label="增大字号">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l6-16M10 20l6-16M7 12h6"/></svg>
+          </button>
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <button class="control-button theme-toggle" id="theme-toggle" type="button" aria-label="主题" aria-expanded="false">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18 7 7 0 0 1 0-14 3 3 0 0 0 0-4z"/></svg>
+          </button>
+          <div class="theme-popover" id="theme-popover" role="radiogroup" aria-label="主题选择">
+            <button class="theme-option" type="button" role="radio" data-theme-value="zhu" aria-checked="true"><span class="theme-swatch swatch-zhu"></span><span>朱砂笺</span></button>
+            <button class="theme-option" type="button" role="radio" data-theme-value="bamboo" aria-checked="false"><span class="theme-swatch swatch-bamboo"></span><span>潇湘竹</span></button>
+            <button class="theme-option" type="button" role="radio" data-theme-value="begonia" aria-checked="false"><span class="theme-swatch swatch-begonia"></span><span>海棠春</span></button>
+            <button class="theme-option" type="button" role="radio" data-theme-value="night" aria-checked="false"><span class="theme-swatch swatch-night"></span><span>松烟夜</span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <article class="article-stage">
+      <header class="chapter-header">
+        <h2 class="chapter-title">第104回</h2>
+        <p class="chapter-subtitle">第104回（引擎重建）</p>
+        <p class="engine-badge">引擎重建 · draft</p>
+        <div class="chapter-rule" aria-hidden="true"><span></span></div>
+      </header>
+      <div class="prose">
+        
+        <p>话说那日宝玉因宝钗提起黛玉旧事，心中正自怅然。一时踱至蘅芜苑来，只见宝钗独坐窗前，手内执着一卷旧纸，默默出神。宝玉笑道：“姐姐看什么，这等仔细？”宝钗抬头见是他来，忙起身让坐，道：“你来得正好。前儿收拾箱子，翻出林妹妹从前在我这儿抄的诗稿，竟是她的笔迹。”说着，将那卷纸递过来。</p>
+        
+        <p>宝玉接在手中，展开一看，只见上头写着《十独吟》三字，字迹纤弱，墨色已淡。他一行行看下去，看到“孤灯照壁影伶仃”一句，手便微微颤起来。又看至“独卧空床听雨声”，忽地将纸一摔，伏在案上，放声大哭。宝钗忙上前拉他，道：“你这是做什么！好端端的，又招出病来。”宝玉也不答话，只将头埋在臂弯里，肩膀耸动不止。</p>
+        
+        <p>正闹着，只听门外脚步响，薛姨妈的声音传进来：“宝丫头，你哥哥捎了东西来，你瞧瞧——”话未说完，人已掀帘进来。见宝玉如此模样，薛姨妈吃了一惊，忙问：“这是怎么了？”宝钗一面递眼色，一面笑道：“没什么，他方才看诗看迷了，一时感触罢了。”薛姨妈瞅见桌上那卷纸，便叹道：“原是林丫头的字。可怜见的，人去了，倒留下这些墨迹。”说着，将纸轻轻收起，道：“宝玉，你且回去歇歇罢。这些旧物，看了只添伤心。”</p>
+        
+        <p>宝玉这才慢慢抬起头来，泪痕满面，也不言语，只向薛姨妈母女点了点头，转身便走。走到门槛处，又回头望了一眼那卷纸，方掩面去了。薛姨妈目送他去远，回头对宝钗道：“你何苦拿这个给他看？他那个性子，你还不知道么？”宝钗低头无言，只将纸卷细细叠好，收进匣中。</p>
+        
+        <p>薛姨妈正说着，只听院门外一阵脚步响，接着便有人高声笑道：“亲家太太在家么？我特来瞧我们姑娘来了！”薛姨妈听了，忙起身往外看时，只见宝蟾掀帘子进来，笑道：“太太，亲家太太来了，说是要瞧瞧姑娘的病呢。”</p>
+        
+        <p>薛姨妈一面理衣裳，一面叹道：“这早晚才来，也难为她惦记着。”说着便往外走。宝钗在里间听见，忙道：“妈，你老人家慢些走，外头风大。”薛姨妈回头道：“你只管坐着，我去去就来。”</p>
+        
+        <p>一出门，早见金桂的母亲站在当院里，穿着半旧青绸褂子，手里拄着根竹杖，脸上笑吟吟的。一见薛姨妈，便赶上来道：“亲家太太，一向好哇！我听说我们姑娘病得重了，心里急得什么似的，今儿特特赶来瞧瞧。”薛姨妈忙让道：“亲家太太屋里坐罢，外头凉。”</p>
+        
+        <p>金桂母亲却站住脚，四下里张望了一回，道：“怎么不见我们姑娘？倒是我那不成器的女婿，又出门做买卖去了？”薛姨妈道：“蟠儿前日才动身，说是往南边贩货去。桂姐在屋里躺着呢，亲家太太请进罢。”说着，亲自打帘子让客。</p>
+        
+        <p>金桂母亲这才挪步进屋，嘴里絮絮叨叨道：“我这女儿自小娇养惯了，脾气不好，亲家太太多担待罢。”宝钗在内间听见，也不出来，只低头拨弄着手里的茶盅盖子。</p>
+        
+        <p>金桂见他母亲进了屋，回身将门帘子“啪”地一摔，也不让座，先自歪在炕上，拿帕子捂着脸，呜呜咽咽哭将起来。他母亲忙凑到炕沿边坐下，伸手去拉他胳膊，道：“这是怎么说？好端端的，又闹什么？”</p>
+        
+        <p>金桂把头一扭，甩开手道：“我闹？我闹什么！这屋里还有我闹的份儿？那薛蟠三天两头不在家，丢下我守着个病秧子香菱，倒像是我的不是了！宝钗姑娘整日里冷着脸，连正眼也不瞧我，我在这家里，活像个贼防着！”说着又哭。</p>
+        
+        <p>他母亲叹道：“我的儿，你既嫁了来，好歹忍耐些。那香菱原是个妾，你正头奶奶的名分在那里，怕他怎的？”</p>
+        
+        <p>金桂猛地坐起身，压低声道：“妈，你不知道——那香菱的病，怕是好不了了。我前儿听大夫说，不过熬着罢了。可这家里，银子财物，尽在宝钗手里攥着，我连根针也摸不着！他哥哥又不着家，我守着这空屋子，将来怎么过？”</p>
+        
+        <p>他母亲听了，眼珠一转，凑得更近些，悄声道：“既如此，你手头可攒下些什么没有？”</p>
+        
+        <p>金桂啐了一口，道：“攒什么！每月月钱不过那几两，还不够打点下人的。我倒瞧着，那箱笼里有几件金器，是薛蟠从前给我的，如今锁在柜里，钥匙却在我这儿。”说着，从腰间解下一串钥匙，晃了晃。</p>
+        
+        <p>他母亲一把按住他的手，四下一瞧，方低声道：“既这样，不如寻个空儿，把值钱的都收拾了，咱们娘儿俩，往南边你舅舅家去，离了这鬼地方，岂不干净？”</p>
+        
+        <p>金桂听了，倒不哭了，咬着嘴唇沉吟半晌，方道：“可那宝钗精似鬼，若被她察觉……”</p>
+        
+        <p>他母亲道：“怕什么！只说回娘家住几日，她还能拦着不成？你舅舅那边，房子都现成的。等薛蟠回来，黄花菜都凉了！”</p>
+        
+        <p>金桂把钥匙攥在手心，牙一咬，道：“好，就依妈的主意。后日一早，妈来帮我收拾，咱们只带细软，笨重的一概不要。”说着，又向窗外努了努嘴，“那香菱病着，正好没人碍眼。”</p>
+        
+        <p>他母亲连连点头，笑道：“这才是我的好闺女！你放心，妈回去就给你舅舅捎信儿去。”说着，起身理了理衣裳，扬声向外头道：“亲家太太，我家里还烧着水呢，先回去了，改日再来瞧姑娘。”</p>
+        
+        <p>宝钗在内间听见，只把茶盅盖子轻轻一合，也不言语。</p>
+        
+        <p>金桂母听了这话，倒不好就走，回身笑道：“姑奶奶既忙着，我住两日再家去。”薛姨妈便道：“亲家太太多住几日，也陪陪姑娘。”说着，便命人收拾东厢房。金桂忙拦道：“东厢房冷清，不如就在我屋里套间里，娘晚间也好说话。”薛姨妈看了她一眼，也不言语。</p>
+        
+        <p>当夜母女两个在灯下说了半夜话。金桂母见女儿脸上黄瘦，腮边泪痕犹在，便叹道：“你也是忒性急。那香菱已是将死的人了，你只消耐着性子等几日，何苦闹得鸡飞狗跳？”金桂咬着牙道：“娘不知，那东西一日在宝钗手里，我一日不安生。她如今把个病秧子当宝贝似的，若香菱有个好歹，那锦盒岂不更要落到她手里？”说着，起身从箱底取出个乌木匣子，沉甸甸的，打开来，里面裹着个锦缎包袱。</p>
+        
+        <p>金桂母凑近一看，只见那锦盒不过巴掌大小，周遭缠着细金丝，锁扣上挂着一枚小小铜钥匙。金桂将钥匙解下来，递与母亲，悄声道：“娘把这盒子带回去，千万收好。钥匙我另藏一处。若那边有人来问，娘只推不知。”金桂母接了，掂了掂，皱眉道：“这里头沉得很，是什么？”金桂不答，只道：“娘别问。只记着，若我这边有事，娘便把盒子交给南边来的一个姓冷的客人，他自会料理。”</p>
+        
+        <p>金桂母还要再问，忽听外头有人咳嗽一声，却是宝蟾的声音：“奶奶睡下了不曾？太太打发人来问，说亲家太太屋里可要添床被子。”金桂忙把锦盒往母亲怀里一塞，扬声道：“睡下了，被子够了，劳烦回太太，说我们娘儿两个已歇了。”宝蟾在外应了一声，脚步去了。</p>
+        
+        <p>金桂母把锦盒揣进怀里，又坐了片刻，方各自睡下。次日一早，金桂母便说家里有事，辞了薛姨妈，果然去了。薛姨妈也不留，只命人送了两盒子点心，打发上车。金桂立在门首，直看着马车转过街角，方转身进来，脸上倒比昨日松快了些。</p>
+        
+        <p>金桂进得宝钗屋内，见宝钗正倚在炕上翻一本药书，便笑道：“妹妹今日气色倒好，我特特熬了一碗参汤来，趁热喝了罢。”说着，从丫鬟手里接过一盏青花盅子，热气腾腾的，双手捧到炕沿边。</p>
+        
+        <p>宝钗刚要伸手去接，宝蟾从外头进来，眼尖，一把按住那盅子，笑道：“奶奶倒有闲心，这会子熬参汤，可巧我方才在廊下见着个野猫子，叼了块生肉过去，怕不干净。”说着，端起盅子凑到鼻尖一闻，脸色忽地变了，也不言语，转身走到窗前，把汤泼在阶下青苔上，那汤落地，竟滋滋地冒了一缕白烟。</p>
+        
+        <p>金桂脸色一僵，强笑道：“好个伶俐丫头，我熬的汤也敢泼？”</p>
+        
+        <p>宝蟾也不答话，只拿眼瞟着地上那滩水，半晌方道：“奶奶这参汤，怕是掺了别的什么罢？那味儿，倒像是砒霜拌过似的。”金桂登时涨红了脸，张口要骂，宝蟾却抢先一步，凑到金桂耳边，声音压得极低：“奶奶要除眼中钉，何苦用这拙法子？若叫人拿住把柄，反为不美。依我说，不如……”说着，眼珠一转，往门外努了努嘴。</p>
+        
+        <p>金桂怔了怔，目光闪烁，竟慢慢缓下脸色来，也悄声道：“你说怎么着？”</p>
+        
+        <p>宝蟾冷笑一声：“她不是病着么？病里头吃药，药里添点子东西，谁又瞧得出来？那才叫神不知鬼不觉呢。”</p>
+        
+        <p>金桂听了，沉吟不语，半晌，却把眼往宝钗脸上瞟了一瞟。宝钗自始至终只低头看书，仿佛那参汤、那白烟、那几句悄语，一概不曾入耳入目。只是翻书的手指，微微顿了一顿，又缓缓翻过一页。</p>
+        
+        <p>金桂见宝蟾端汤进来，头也不抬，只拿扇子拨弄着炉灰，道：“放下罢。”宝蟾将汤盅搁在案上，手却不曾离，指尖微微发颤。金桂眼角一溜，笑道：“今儿倒勤谨，敢是太阳打西头出来了？”宝蟾勉强笑道：“奶奶说哪里话。”金桂起身，端起汤盅，凑近鼻尖嗅了一嗅，忽把脸一沉：“这汤味儿不对。”宝蟾脸色登时白了，退后半步。金桂冷笑一声，将汤盅往案上一顿，溅出几滴汤水：“好个糊涂东西，我倒要瞧瞧，这是哪个黑心烂肝的调唆你，敢往我嘴里送这个！”宝蟾扑通跪下，只管磕头，嘴里却说不出整话。金桂也不理她，眼珠一转，端了汤盅往外就走。宝蟾慌了，爬起来拦道：“奶奶往哪里去？”金桂啐道：“我送去给太太尝尝！既是好东西，焉有独享之理？”说着已掀帘子出了门。宝蟾追了两步，又不敢拉扯，只跺脚干急。金桂径往薛姨妈上房来，进门便满脸堆笑：“姨妈，我新学了个汤方，特送来孝敬您老人家。”薛姨妈正歪在榻上，闻言坐起身，笑道：“你倒有孝心。”金桂双手捧上汤盅。薛姨妈接过来，才呷一口，忽觉喉中一阵辛辣，呛得咳嗽起来，汤盅“咣当”落地，碎瓷四溅。金桂退后一步，脸上笑容未收，只见薛姨妈面色青白，捂着喉咙，手指金桂，颤声道：“你……你……”话未说完，身子一歪，已滚下榻来。外头丫头们听见声响，乱作一团，早有人飞跑去请大夫。金桂立在当地，低头看着地上的碎瓷与汤渍，一言不发。</p>
+        
+        <p>宝蟾忙上前扶住金桂，低声劝道：“奶奶且回房去，这里乱糟糟的，没得沾了晦气。”金桂却一甩手，冷笑道：“晦气？我偏要瞧瞧，这屋里头谁先晦气。”说着，竟踱到薛姨妈榻前，伸手在那药碗残渣上拨了一拨。宝钗正扶着薛姨妈呕吐，吐得满身是汗，见金桂这般，也不言语，只拿帕子替母亲揩了嘴角。薛姨妈吐了半晌，方喘过一口气来，摇头道：“这药……怕是吃坏了。”话未说完，眼睛一翻，竟没了声息。宝钗一探鼻息，登时脸色煞白，连唤两声“妈”，不见应声，便扑在榻上，哭得气噎喉堵。薛蟠不在家，屋里只有几个丫头，早吓得哭作一团。金桂却立在当地，嘴角微微抽动，半晌方道：“老太太没了，还不快报丧去？都杵着做什么！”宝蟾见势头不好，忙拉了金桂出来，悄声道：“奶奶，这药是您亲手熬的，若有人问起……”金桂啐了一口：“怕什么？我熬的药，她吃了几日了，偏今儿死了？谁瞧见是我毒死的？”话虽硬，声音却有些发虚。宝蟾低声道：“奶奶虽不怕，可那宝钗是个精细人，若闹将起来，只怕不好收场。”金桂咬牙道：“她一个病秧子，能翻出什么浪来？你且去盯着，看那药渣子还在不在。”宝蟾会意，转身回屋，只见宝钗已哭得昏厥过去，几个丫头正围着掐人中，那药碗碎在地上，渣子早被踩得稀烂。宝蟾暗自松了口气，正要退出，忽听宝钗在昏沉中喃喃道：“蟾儿……你过来……”宝蟾心头一跳，只得走近前，俯身道：“姑娘有什么吩咐？”宝钗睁开眼，目光如冰，直直望着她，半晌方道：“那药……是你熬的？”宝蟾一时语塞，只觉脊背发凉，竟不敢回话。</p>
+        
+        <p>宝蟾见问，扑通跪下，泪珠滚落，道：“姑娘明鉴，那药是金桂奶奶亲手配的，我只管熬，哪里敢动什么手脚？”宝钗冷笑一声，也不言语，只把药碗轻轻一推。那碗沿磕在桌角，叮当一声，药汁溅出几点。宝蟾吓得一哆嗦，又不敢哭出声，只伏在地上，肩膀微微耸动。</p>
+        
+        <p>正说着，忽听院门外一阵乱嚷。只见金桂的娘家人——一个五旬上下的婆子，满头银发，拄着拐杖，哭天抢地闯了进来，后头跟着两个小厮。那婆子一眼瞧见灵堂上供着金桂的牌位，登时嚎啕大哭，扑倒在地，拍着地哭道：“我的儿啊！你死得好苦！你撇下娘孤零零的，叫娘怎么活哟！”哭得声嘶力竭，泪如雨下。</p>
+        
+        <p>宝钗见是金桂之母，忙起身让座，命人奉茶。那婆子哭了一阵，方才收泪，抬眼打量宝钗，又瞧见一旁跪着的宝蟾，眉头一拧，道：“这丫头不是跟在我儿身边的么？怎么倒在这里？”宝蟾低头不语。宝钗便将金桂病中之事略述一遍，只隐去下药一节不提。那婆子听了，又哭了一场，直哭得两眼红肿，方才起身，道：“既是我儿命薄，也怨不得旁人。只是我这一把老骨头，往后可依靠谁去？”说着，又滴下泪来。</p>
+        
+        <p>宝钗命人取了几两银子，又包了两件衣裳，送与那婆子。婆子千恩万谢，拄着拐杖去了。宝蟾跪在地上，见婆子走远，方才悄悄抬头，只见宝钗正冷冷望着她，心中又是一寒。</p>
+        
+        <p>正厅里那盏羊角灯被风吹得摇摇晃晃，夏家太太一头撞进来，身后跟着两个粗壮妇人，口里嚷道：“好个薛家！把香菱那丫头藏到哪儿去了？我儿子活活烧死，你们倒把尸首一埋，就罢了不成？”</p>
+        
+        <p>宝钗正坐在堂上，听了这话，慢慢起身，也不看那夏太太，只向丫鬟道：“给夏太太看座。”</p>
+        
+        <p>夏太太哪里肯坐，拍着桌子道：“少跟我弄这些虚文！我今日来，只要那丫头的命！”</p>
+        
+        <p>宝钗这才转过脸来，道：“夏太太，令郎的事，我也听说了。只是香菱那丫头，前日已被那恶霸抢去，当夜一场大火，连尸首都化了灰。我薛家还垫了二十两银子，替她收殓。太太若不信，可问张掌柜。”</p>
+        
+        <p>说着，向门外一招手。只见张德辉带着四个伙计，大步进来，往厅中一站，拱手道：“太太，小的张德辉，在薛家铺子里管了二十年事。那日火起，小的亲眼瞧见，香菱姑娘被那恶霸拖进屋里，再没出来。太太要人，该往那恶霸家去要，怎么反到这儿来？”</p>
+        
+        <p>夏太太被这一堵，噎了一噎，又见那四个伙计个个膀大腰圆，把门堵得严严实实，气焰先矮了三分，却仍嘴硬道：“你们薛家素来会算计，谁知是不是你们把人藏了，编出这套谎来？”</p>
+        
+        <p>宝钗也不恼，端起茶盅，呷了一口，道：“太太这话差了。香菱是我薛家的人，若真活着，我何必说她死了？她死了，于我有什么好处？太太若还不信，只管去衙门里告，我薛家奉陪到底。”</p>
+        
+        <p>张德辉又上前一步，道：“太太，小的劝您一句，那恶霸是外省流民，烧了房子早跑了。太太如今闹到这儿来，倒叫人笑话。不如回去，把令郎的后事料理了，要紧。”</p>
+        
+        <p>夏太太听了，脸上一阵红一阵白，回头看看那两个妇人，那两个也低了头。半晌，夏太太跺了跺脚，道：“好！好！你们薛家势大，我惹不起！我走！”说着，带着人摔帘子出去了。</p>
+        
+        <p>宝钗放下茶盅，向张德辉点了点头，道：“张掌柜辛苦了。”张德辉笑道：“奶奶放心，这种人，唬一唬就散了。”</p>
+        
+        <p>只见宝蟾引着敖小白转过一道竹篱，进了山庄客房。房中已备下热水巾栉，宝蟾笑道：“二爷且净了面，我去取件干净衣裳来。”说着，掀帘自去。</p>
+        
+        <p>敖小白方解了外衫，就着铜盆洗了脸，忽听门外脚步杂沓。门帘“哗”地一掀，闯进三四个壮夫，当先一个黑脸大汉，手里攥着一根麻绳。敖小白吃了一惊，退后半步道：“你们做什么？”</p>
+        
+        <p>那黑脸大汉也不答话，一使眼色，两个壮夫抢上前来，一左一右扭住敖小白胳膊。敖小白挣扎叫道：“光天化日，你们要——”话未说完，一条麻绳已勒上脖颈。那大汉绕到身后，双手绞紧，敖小白喉间咯咯作响，两脚乱蹬，挣了不过片刻，身子便软了下去。</p>
+        
+        <p>宝蟾捧着衣裳走到廊下，听见里头声响不对，掀帘一看，正见敖小白歪在地上，那大汉正探手试他鼻息。宝蟾“啊呀”一声，衣裳落地，转身要跑，早被一个壮夫扯住发髻拖了回来。</p>
+        
+        <p>忽听院门外一阵喧嚷，却是金桂的娘赶来，指着宝蟾骂道：“好个小妇，拐了我外孙往哪儿藏？”一语未了，只见两个婆子赶上来，一边一个架住她胳膊，拖了便走。金桂娘一路骂不绝口：“你们薛家仗势欺人！我女儿若有个三长两短，我拼了老命——”声音渐远，终不可闻。</p>
+        
+        <p>宝蟾被按在墙角，浑身乱颤，面如土色。那黑脸大汉将麻绳收了，向众人道：“抬出去，照奶奶吩咐的办。”众人抬起敖小白尸身，鱼贯而出。</p>
+        
+        <p>一时宝钗带着几个家人到了，见客房中已收拾干净，只余地上一滩水渍。宝钗向宝蟾道：“今日之事，你只当没看见。夏家那边，自有人去料理。”宝蟾跪在地上，磕头如捣蒜，道：“奶奶放心，奴婢一个字也不敢提。”</p>
+        
+        <p>宝钗又命人取了两吊钱，赏了那黑脸大汉，道：“送夏家太太出城去，看着她上了车再回来。”大汉应了一声，自去了。宝钗立在窗前，看着院中竹叶萧萧，半晌，方转身道：“把门锁了，再不许人进这屋子。”</p>
+        
+        <p>一进门，见宝玉歪在榻上，手里拈着一卷《南华经》，正读到“巧者劳而智者忧”一句，见宝钗进来，也不起身，只笑道：“宝姐姐来得正好，且听我解一解这‘无能者无所求’的妙处。”宝钗不答，先走到案前，见砚台里墨已干透，书页上画了满满一幅墨竹，竹叶倒垂，似有风意。宝钗伸手将那书卷抽了去，道：“这是你的功课？我瞧瞧。”宝玉忙跳下榻来抢，宝钗早退了一步，把书卷往身后一藏，道：“昨儿老太太问你《孟子》‘尽其心者’一章，你背到‘知其性也’便卡住了，今儿倒有闲工夫画竹？”宝玉笑道：“那‘知性’二字，原比画竹难得多。姐姐若肯教我，我明儿就背。”宝钗啐了一口：“你倒会讨价。”说着，转身从针线笸箩里取出一块白绢，又拿剪子“咔嚓”一声，剪成两截，道：“你瞧这绢，剪断了再接，可还成得整幅？”宝玉道：“自然不成。”宝钗道：“读书便如织绢，一日一梭，十日一寸。你今儿荒半寸，明儿荒一尺，到后来，连个帕子也织不成，只好做抹布了。”宝玉笑道：“抹布也罢，原是给人擦灰用的，倒比那供在案上的锦缎实惠些。”宝钗把剪子往桌上一拍：“你既爱实惠，明儿跟老烟学赶车去，倒省了灯油钱。”宝玉见宝钗动了气，忙敛了笑，走近两步，低声道：“姐姐莫恼，我背就是了。”宝钗瞧他额角还沾着墨渍，叹了口气，把手里的半截绢子递过去：“你既肯背，这半幅绢便赏你擦笔。”宝玉接了，笑道：“姐姐这绢剪得巧，倒像替我裁的。”宝钗又气又笑，伸手在他额上一戳：“贫嘴！快背去。”宝玉果然回身坐到案前，翻开书来，朗声念道：“尽其心者，知其性也——”一时声音朗朗，直传到窗外。</p>
+        
+        <p>谁知这日雨村在金陵街市上闲走，头戴破巾，身穿旧袍，混在人群里看那往来热闹。忽听得前面一阵喧嚷，几个泼皮围着一人厮打，口里乱骂：“好个不长进的爷们！偷了东西还跑？”那人被按倒在地，衣裳扯得稀烂，却一声不吭。雨村近前一看，见那少年眉清目秀，虽狼狈不堪，面上却无惧色，倒有几分痴气。</p>
+        
+        <p>正看时，一个年长仆从挤进来，慌忙扶起那少年，顿足道：“我的爷！你怎的又跑到这街上来？上回被认作那贾府的宝二爷，白挨了一顿打，今儿又——”话未说完，那少年啐了一口：“他们认错了人，干我甚事？我偏要出来走走，看谁再敢动手！”仆从急得跺脚：“我的爷，你瞧瞧你这模样，再叫人认错了，可怎么好？”</p>
+        
+        <p>雨村听了，心中一动，上前拱手道：“这位小哥，可是甄府的？”那少年抬头打量雨村，也不答话，只把眼一横。忽听得马蹄声近，一乘轿子停在街心，轿帘掀开，一个锦衣内监探出头来，笑道：“这位可就是贾府的宝玉？王爷听说你学问好，特命我来请你去伴读呢。”那少年听了，仰头哈哈大笑：“我姓甄，不姓贾。你找错人了！”说着，拉了仆从，转身便走，头也不回。</p>
+        
+        <p>内监怔在当地，雨村却暗暗点头，心道：“此子倒有几分骨气。”</p>
+        
+        <p>却说雨村回到下处，唤心腹小厮暗请张如圭来。二人掩了门，雨村将方才之事略述一遍，道：“如今北静王正得圣眷，若得他一句言语，胜过十年苦熬。”张如圭搓着手道：“只是王府门深似海，等闲如何进得？”雨村笑道：“水溶王爷素爱风雅，更兼好色——前日我见一幅仇十洲的《汉宫春晓》，若配着个活色生香的美人儿送去，怕他不笑纳？”张如圭拊掌道：“妙极！只是这美人——”雨村压低声：“金陵城西有个甄家，抄没时有个丫头名唤娇杏的，原是我旧识，如今流落在烟花巷里。我出银赎了她，再添上那画，双美并呈，何愁大事不成？”</p>
+        
+        <p>张如圭沉吟道：“娇杏虽好，毕竟残花败柳。北静王何等眼界？”雨村捋须笑道：“你不知，这丫头眉眼间有三分像林府小姐的标致，更兼性情温顺。王爷见惯了浓妆艳抹的，偏爱这等清素人物。”说着便唤人备轿，自往烟花巷去了。</p>
+        
+        <p>过午时分，雨村果然携一女子回来。张如圭看时，见那女子约莫二十许年纪，荆钗布裙，眉目间却有一段天然风韵。雨村又取出一个锦匣，内里层层包裹着一轴古画。二人计议停当，次日清晨便往北静王府投帖。</p>
+        
+        <p>北静王水溶正在书房赏玩古鼎，听门官禀报说贾雨村求见，因知他是贾府门生，便传进来。雨村与张如圭叩拜已毕，献上锦匣。水溶展开画轴，细看半晌，笑道：“仇英真迹，果然神品。”雨村忙道：“下官偶得此画，自忖俗物不堪污王爷清目，特来敬献。又闻王爷案牍劳形，特觅得一婢，粗通文墨，可替王爷抄录诗稿。”说着将娇杏唤上前来。</p>
+        
+        <p>那娇杏低眉垂首，行了个万福。水溶抬眼打量，见她虽不施脂粉，却有一段天然袅娜之态，比那浓妆艳饰的又别是一种风致。因笑道：“贾知府费心了。”说着便命人收了画，又看娇杏，点头道：“留下吧。既是贾知府美意，本王也不好却。”雨村与张如圭对视一眼，心中暗喜。</p>
+        
+        <p>水溶又闲话几句，忽道：“前日吏部报上来，金陵知府一缺尚虚悬着。贾知府政声颇好，本王倒可保举。”雨村忙跪下谢恩。水溶摆手道：“不必多礼。张如圭——”张如圭连忙躬身。水溶道：“本王记得你是贾府旧人，如今做什么官？”张如圭道：“卑职现为江宁府通判。”水溶点头：“通判虽小，倒也清闲。既来了，本王一并替你周旋周旋。”</p>
+        
+        <p>二人千恩万谢退出府来。张如圭拭着额上汗，笑道：“雨村兄这着棋，走得妙极！”雨村亦笑道：“若非贤弟提醒，我如何想得这‘美人计’来？只是——”说着回头望了王府大门一眼，压声道：“这娇杏原是甄家丫鬟，若有人认出，倒有些不便。”张如圭道：“怕什么？甄家已抄没了，谁还认得她来？况王爷既收了，便是王府的人，谁敢多口？”雨村点头，二人相视一笑，各自上轿去了。</p>
+        
+      </div>
+    </article>
+
+    <nav class="chapter-footer" aria-label="回目翻页">
+      
+      <a class="turn-button footer-prev" href="/engine/103" aria-keyshortcuts="ArrowLeft">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        <span><span class="turn-label">上一回 · ←</span><span class="turn-title">第103回　第103回（引擎重建）</span></span>
+      </a>
+      
+      
+      <a class="turn-button footer-next" href="/engine/105" aria-keyshortcuts="ArrowRight">
+        <span><span class="turn-label">下一回 · →</span><span class="turn-title">第105回　第105回（引擎重建）</span></span>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </a>
+      
+    </nav>
+
+    <footer class="colophon"><p>stone-weaver · 自家版本（引擎重建）</p></footer>
+  </main>
+</div>
+
+<div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+
+<nav class="mobile-chapter-nav" aria-label="回目翻页">
+  
+  <a class="control-button mobile-prev" href="/engine/103" aria-label="上一回">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+  </a>
+  
+  <button class="chapter-jump mobile-current" id="mobile-current" type="button">第104回</button>
+  
+  <a class="control-button mobile-next" href="/engine/105" aria-label="下一回">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+  </a>
+  
+</nav>
+
+<script src="/static/reader.js"></script>
+</body>
+</html>
