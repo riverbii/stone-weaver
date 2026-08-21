@@ -7,3 +7,8 @@ data/processed/
 *.db
 .DS_Store
 .opencode/
+
+# 大文件不入库（PDF/扫描件）
+data/红楼梦/
+*.pdf
+*.doc
