@@ -527,12 +527,14 @@ def self_chapter(request: Request, num: int):
         elif n == num + 1:
             next_ = (n, t)
     paragraphs = [p for p in ch.content.split("\n") if p.strip()]
+    annotated = [render_annotated(p) for p in paragraphs]
     return templates.TemplateResponse(
         request=request,
         name="engine_chapter.html",
         context={
             "chapter": ch,
             "paragraphs": paragraphs,
+            "annotated": annotated,
             "all_chapters": all_chs,
             "prev": prev,
             "next": next_,

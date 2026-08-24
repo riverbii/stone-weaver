@@ -101,9 +101,21 @@ try {
         <div class="chapter-rule" aria-hidden="true"><span></span></div>
       </header>
       <div class="prose">
+        {% if annotated %}
+        {% for nodes in annotated %}
+        <p>
+          {% for n in nodes %}
+            {% if n.type == 'text' %}{{ n.text }}
+            {% elif n.type == 'annot' %}<span class="ann-inline ann-{{ n.source }}" title="{{ n.source_label }}">{{ n.text }}</span>
+            {% endif %}
+          {% endfor %}
+        </p>
+        {% endfor %}
+        {% else %}
         {% for p in paragraphs %}
         <p>{{ p }}</p>
         {% endfor %}
+        {% endif %}
       </div>
     </article>
 
