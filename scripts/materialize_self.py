@@ -53,7 +53,13 @@ def main() -> int:
         if src is None:
             print(f"⚠️ ch{num} 无内容（{source_label}），跳过", flush=True)
             continue
-        title = f"{src.title}　〔{source_label}〕" if source_label == "引擎重建" else src.title
+        # 标题一律用原回目名（guihui_v3），不附加来源标记
+        orig = (
+            db.query(Chapter)
+            .filter(Chapter.version == "guihui_v3", Chapter.num == num)
+            .first()
+        )
+        title = orig.title if orig else src.title
         rows.append(
             {
                 "num": num,

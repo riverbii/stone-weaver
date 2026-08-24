@@ -484,9 +484,11 @@ def world_character(request: Request, cid: int, version: str = "gongban_rb"):
 def self_chapter(request: Request, num: int):
     """自家版本阅读页：直接读物化成品（version=self，scripts/materialize_self.py 生成）。
 
-    选稿决策（原文 or 引擎）在内容准备阶段已固化，路由不做判断。
-    来源从标题后缀 〔引擎重建〕 解析。
+    选稿决策（原文 or 引擎）在内容准备阶段已固化（data/self_decision.json），
+    路由只读成品；来源徽标从决策文件读，标题保持原回目名。
     """
+    import json
+
     db = get_db()
     try:
         from ..models import Chapter
@@ -511,11 +513,13 @@ def self_chapter(request: Request, num: int):
             context={"num": num},
             status_code=404,
         )
-    source_label = (
-        "癸酉本原文 · 文笔达标"
-        if "〔引擎重建〕" not in ch.title
-        else "引擎重建"
-    )
+    # 来源徽标：从固化决策读
+    decision_path = ROOT / "data" / "self_decision.json"
+    source_label = "引擎重建"
+    if decision_path.exists():
+        decision = json.loads(decision_path.read_text(encoding="utf-8"))
+        if decision.get(str(num)) == "original":
+            source_label = "癸酉本原文 · 文笔达标"
     prev = next_ = None
     for n, t in all_chs:
         if n == num - 1:
