@@ -28,7 +28,7 @@ try {
     <ol class="toc-list">
       {% for c in all_chapters %}
       <li>
-        <a class="toc-link {% if c.num == chapter.num %}is-active{% endif %}" href="/engine/{{ c.num }}" {% if c.num == chapter.num %}aria-current="true"{% endif %}>
+        <a class="toc-link {% if c.num == chapter.num %}is-active{% endif %}" href="{{ base_path if base_path else "/engine" }}/{{ c.num }}" {% if c.num == chapter.num %}aria-current="true"{% endif %}>
           <span class="toc-number">{{ "%03d" | format(c.num) }}</span>
           <span class="toc-title">{{ c.title }}</span>
         </a>
@@ -37,7 +37,7 @@ try {
     </ol>
     <footer class="toc-foot">
       {% if prev %}
-      <a class="control-button toc-prev" href="/engine/{{ prev[0] }}" aria-label="上一回">
+      <a class="control-button toc-prev" href="{{ base_path if base_path else "/engine" }}/{{ prev[0] }}" aria-label="上一回">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
       </a>
       {% else %}
@@ -45,7 +45,7 @@ try {
       {% endif %}
       <span class="toc-current">第{{ chapter.num }}回</span>
       {% if next %}
-      <a class="control-button toc-next" href="/engine/{{ next[0] }}" aria-label="下一回">
+      <a class="control-button toc-next" href="{{ base_path if base_path else "/engine" }}/{{ next[0] }}" aria-label="下一回">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
       </a>
       {% else %}
@@ -109,7 +109,7 @@ try {
 
     <nav class="chapter-footer" aria-label="回目翻页">
       {% if prev %}
-      <a class="turn-button footer-prev" href="/engine/{{ prev[0] }}" aria-keyshortcuts="ArrowLeft">
+      <a class="turn-button footer-prev" href="{{ base_path if base_path else "/engine" }}/{{ prev[0] }}" aria-keyshortcuts="ArrowLeft">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
         <span><span class="turn-label">上一回 · ←</span><span class="turn-title">第{{ prev[0] }}回　{{ prev[1] }}</span></span>
       </a>
@@ -120,7 +120,7 @@ try {
       </span>
       {% endif %}
       {% if next %}
-      <a class="turn-button footer-next" href="/engine/{{ next[0] }}" aria-keyshortcuts="ArrowRight">
+      <a class="turn-button footer-next" href="{{ base_path if base_path else "/engine" }}/{{ next[0] }}" aria-keyshortcuts="ArrowRight">
         <span><span class="turn-label">下一回 · →</span><span class="turn-title">第{{ next[0] }}回　{{ next[1] }}</span></span>
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
       </a>
@@ -132,7 +132,7 @@ try {
       {% endif %}
     </nav>
 
-    <footer class="colophon"><p>stone-weaver · 自家版本（引擎重建）</p></footer>
+    <footer class="colophon"><p>stone-weaver · 自家版本{% if source_label %}（{{ source_label }}）{% endif %}</p></footer>
   </main>
 </div>
 
@@ -140,7 +140,7 @@ try {
 
 <nav class="mobile-chapter-nav" aria-label="回目翻页">
   {% if prev %}
-  <a class="control-button mobile-prev" href="/engine/{{ prev[0] }}" aria-label="上一回">
+  <a class="control-button mobile-prev" href="{{ base_path if base_path else "/engine" }}/{{ prev[0] }}" aria-label="上一回">
     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
   </a>
   {% else %}
@@ -148,7 +148,7 @@ try {
   {% endif %}
   <button class="chapter-jump mobile-current" id="mobile-current" type="button">第{{ chapter.num }}回</button>
   {% if next %}
-  <a class="control-button mobile-next" href="/engine/{{ next[0] }}" aria-label="下一回">
+  <a class="control-button mobile-next" href="{{ base_path if base_path else "/engine" }}/{{ next[0] }}" aria-label="下一回">
     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
   </a>
   {% else %}

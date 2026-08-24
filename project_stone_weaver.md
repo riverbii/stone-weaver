@@ -265,3 +265,10 @@
 - **自家版本 /self/81-108 完整上线**：文笔≥6的10回用原文 + 其余18回引擎版。
 - **部署基建**：Cloudflare API token 已配置 ~/.wrangler/config/default.toml（永久免OAuth授权）。
 - 线上验证：engine/82/103/108 200，self/82引擎版/self/81原文/self/108引擎版 正常。
+
+## [2026-08-24 自家版本物化] 选稿决策前移（架构改进）
+- **用户关键指正**："核心不应该是路由，用原文还是引擎不应该是部署阶段的选择"——选稿是内容编辑决策，应在内容准备阶段定稿。
+- **物化** `scripts/materialize_self.py`：把 81-108 选稿固化为 chapters 表 version=self（原文10回 + 引擎18回），选稿决策存 data/self_decision.json。
+- **路由简化**：/self/{num} 直接读 version=self 成品，零判断（来源从标题〔引擎重建〕后缀解析）；不再每次读 JSON。
+- **导航修复**：模板链接 base_path（self→/self，engine→/engine），翻页保持来源。
+- 线上验证：10回"癸酉本原文 · 文笔达标" + 18回"引擎重建 · draft"，翻页保持 /self/。

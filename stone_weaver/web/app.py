@@ -482,45 +482,23 @@ def world_character(request: Request, cid: int, version: str = "gongban_rb"):
 
 @app.get("/self/{num}", response_class=HTMLResponse)
 def self_chapter(request: Request, num: int):
-    """自家版本阅读页：文笔≥6 的回用癸酉本原文，其余用引擎重建。
+    """自家版本阅读页：直接读物化成品（version=self，scripts/materialize_self.py 生成）。
 
-    判定依据：data/guihui_judge_report.json（LLM 纯文笔裁判 ≥6 = 直接用原文）。
+    选稿决策（原文 or 引擎）在内容准备阶段已固化，路由不做判断。
+    来源从标题后缀 〔引擎重建〕 解析。
     """
-    import json
-
     db = get_db()
     try:
-        from ..models import Chapter, GeneratedChapter
+        from ..models import Chapter
 
-        # 文笔≥6 名单
-        report_path = ROOT / "data" / "guihui_judge_report.json"
-        use_original = set()
-        if report_path.exists():
-            report = json.loads(report_path.read_text(encoding="utf-8"))
-            use_original = {
-                int(k) for k, v in report.items()
-                if isinstance(v, dict) and v.get("score") is not None and v["score"] >= 6
-            }
-
-        if num in use_original:
-            # 用癸酉本原文
-            ch = (
-                db.query(Chapter)
-                .filter(Chapter.version == "guihui_clean", Chapter.num == num)
-                .first()
-            )
-            source_label = "癸酉本原文 · 文笔达标"
-        else:
-            # 用引擎重建（若无则 404）
-            ch = (
-                db.query(GeneratedChapter)
-                .filter(GeneratedChapter.num == num)
-                .first()
-            )
-            source_label = "引擎重建"
+        ch = (
+            db.query(Chapter)
+            .filter(Chapter.version == "self", Chapter.num == num)
+            .first()
+        )
         all_chs = (
             db.query(Chapter.num, Chapter.title)
-            .filter(Chapter.version == "guihui_clean", Chapter.num.between(81, 108))
+            .filter(Chapter.version == "self")
             .order_by(Chapter.num)
             .all()
         )
@@ -533,6 +511,11 @@ def self_chapter(request: Request, num: int):
             context={"num": num},
             status_code=404,
         )
+    source_label = (
+        "癸酉本原文 · 文笔达标"
+        if "〔引擎重建〕" not in ch.title
+        else "引擎重建"
+    )
     prev = next_ = None
     for n, t in all_chs:
         if n == num - 1:
@@ -551,6 +534,7 @@ def self_chapter(request: Request, num: int):
             "next": next_,
             "total": len(all_chs),
             "source_label": source_label,
+            "base_path": "/self",
         },
     )
 
@@ -599,6 +583,7 @@ def engine_chapter(request: Request, num: int):
             "next": next_,
             "total": len(all_chs),
             "source_label": "引擎重建",
+            "base_path": "/engine",
         },
     )
 
