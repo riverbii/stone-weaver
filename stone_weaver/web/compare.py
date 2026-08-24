@@ -435,7 +435,10 @@ def _parse_guihui(text: str) -> list[dict]:
     if pos < len(text):
         nodes.append({"type": "text", "text": text[pos:]})
     out: list[dict] = []
+    # 残留批注标记清理：嵌套/错位导致的孤立 〔批:red〕 / 〔/批〕 不裸显示
     for n in nodes:
+        if n["type"] == "text":
+            n["text"] = re.sub(r"〔批(?:[:：][^〕]*)?〕|〔/批〕", "", n["text"])
         if n["type"] == "text" and out and out[-1]["type"] == "text":
             out[-1]["text"] += n["text"]
         else:
