@@ -142,3 +142,44 @@ def generate_and_extract(
         return "", []
     evs = extract_events_from_text(client, text)
     return text, evs
+
+
+TIYU_PROMPT = """你是红楼梦续书的开篇诗作者。请为本章写一首"题曰"开篇诗（仿癸酉本风格）。
+
+癸酉本各回"题曰"示例（开篇诗，置于正文"话说"之前，概括本章情节）：
+- 「天降良缘贵似金，春风暖样醉好音。」（写喜事）
+- 「萧萧落叶皆陈迹，错认红尘堪痛惜。」（写衰败）
+- 「傲骨冰清不染尘，孤魂无泪对旧人。」（写黛玉还魂）
+
+【本章情节要点】
+{points}
+
+【本章回目】
+{title}
+
+要求：
+1. 七言两句（一联）为主，可扩展为四句，需押韵、对仗工整
+2. 内容**必须贴合本章情节**：从要点中提炼意象与情绪（喜事/丧事/抄家/离别/还魂等）
+3. 含蓄用典，不直白（如写抄家用"诏令如山镇微臣"，写离别用"王孙情重思秦晋"）
+4. 不是打油诗，用词要有古意
+5. 只输出诗句本身（可含"题曰："前缀），不要解释
+
+输出：
+"""
+
+
+def generate_tiyu(client: LLMClient, beat: dict, title: str = "") -> str:
+    """为本章生成"题曰"开篇诗。失败返回空字符串。"""
+    points = beat.get("points") or []
+    point_lines = "\n".join(
+        f"- {p.get('scene', '')}: {p.get('goal', '')[:40]}" for p in points[:6]
+    ) or beat.get("goal", "")
+    prompt = (
+        TIYU_PROMPT.replace("{points}", point_lines[:800])
+        .replace("{title}", title)
+    )
+    try:
+        raw = client.chat([{"role": "system", "content": prompt}], temperature=0.7)
+        return raw.strip()
+    except Exception:
+        return ""

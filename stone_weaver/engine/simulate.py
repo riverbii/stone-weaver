@@ -93,6 +93,17 @@ def simulate_one_beat(
             print(f"    套路词超量（{'；'.join(p[:22] for p in cliche_problems)}），重试 {attempt+1}/{max_retries}", flush=True)
             continue
         result["cliches"] = cliche_problems  # 记录（无论是否 gate）
+        # 生成"题曰"开篇诗（结合本章情节），前置到正文
+        from .generate import generate_tiyu
+
+        tiyu = generate_tiyu(client, beat, title)
+        if tiyu:
+            # 诗可能已含"题曰："前缀，避免重复
+            if tiyu.strip().startswith("题曰"):
+                text = f"{tiyu}\n\n{text}"
+            else:
+                text = f"题曰：\n{tiyu}\n\n{text}"
+        result["tiyu"] = tiyu
         # 规则通过 → 落库
         result["ok"] = True
         result["text"] = text
