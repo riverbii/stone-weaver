@@ -46,11 +46,13 @@ def simulate_one_beat(
     max_retries: int = 3,
     persist: bool = True,
     cliche_gate: bool = False,
+    reviewer_gate: bool = False,
 ) -> dict:
     """执行一个 beat 的完整循环。返回结果 dict（供调用方检查）。
 
     cliche_gate=True 时套路词超量触发重生成（慢，仅质量攻坚用）；
-    False（默认）时只记录套路词问题不阻断（批量生成用）。
+    reviewer_gate=True 时审查智能体把关（多智能体：生成→审查→重写）；
+    False（默认）时只记录不阻断（批量生成用）。
     """
     result: dict = {
         "ok": False,
@@ -104,6 +106,21 @@ def simulate_one_beat(
             else:
                 text = f"题曰：\n{tiyu}\n\n{text}"
         result["tiyu"] = tiyu
+        # 审查智能体把关（多智能体：生成→审查→重写）。默认记录不阻断，可配置 gate。
+        if reviewer_gate:
+            from ..style.reviewer import StyleReviewer
+
+            reviewer = StyleReviewer(client, db)
+            review = reviewer.review(text, beat=beat, title=title)
+            result["review"] = review
+            if review.has_errors() and attempt < max_retries - 1:
+                text = reviewer.rewrite_with_feedback(text, review)
+                active_beat = dict(active_beat)
+                active_beat["_feedback"] = review.issues_text()
+                result["violations"] = [v.message for v in review.dims if not v.ok][:5]
+                result["retries"] = attempt + 1
+                print(f"    审查未过（{review.verdict}），带反馈重写 {attempt+2}/{max_retries}", flush=True)
+                continue
         # 规则通过 → 落库
         result["ok"] = True
         result["text"] = text
