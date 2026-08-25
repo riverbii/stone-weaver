@@ -168,18 +168,78 @@ TIYU_PROMPT = """你是红楼梦续书的开篇诗作者。请为本章写一首
 """
 
 
-def generate_tiyu(client: LLMClient, beat: dict, title: str = "") -> str:
-    """为本章生成"题曰"开篇诗。失败返回空字符串。"""
+def generate_tiyu(client: LLMClient, beat: dict, title: str = "", *, check_geilv: bool = True) -> str:
+    """为本章生成"题曰"开篇诗。失败返回空字符串。
+
+    check_geilv=True 时生成后校验格律（平仄/押韵/对仗），不合格带反馈
+    重写一次；最多 2 次（初版 + 1 次修正），避免格律循环卡死。
+    """
     points = beat.get("points") or []
     point_lines = "\n".join(
         f"- {p.get('scene', '')}: {p.get('goal', '')[:40]}" for p in points[:6]
     ) or beat.get("goal", "")
-    prompt = (
+    base_prompt = (
         TIYU_PROMPT.replace("{points}", point_lines[:800])
         .replace("{title}", title)
     )
+
+    feedback = ""
+    last_poem = ""
+    for attempt in range(2):
+        prompt = base_prompt + (f"\n\n【上次格律问题——请修正后重写】\n{feedback}" if feedback else "")
+        try:
+            raw = client.chat(
+                [{"role": "system", "content": prompt}], temperature=0.7
+            )
+        except Exception:
+            return last_poem or ""
+        poem = raw.strip()
+        if not poem:
+            return last_poem or ""
+        last_poem = poem
+        if not check_geilv:
+            return poem
+        issues = check_poem_geilv(client, poem)
+        if not issues:
+            return poem
+        feedback = "\n".join(issues)
+    return last_poem  # 重试耗尽，返回最后版本（不阻塞）
+
+# 格律校验 prompt（近体诗规则）
+GEILV_CHECK_PROMPT = """你是近体诗格律专家。请校验下面这首诗的格律。
+
+诗作：
+{poem}
+
+只输出 JSON：
+{{"ok": true/false, "issues": ["问题1（具体到哪句哪个字）"]}}
+
+判断标准（近体诗）：
+- 平仄：七言句平仄相间（如 平平仄仄平平仄），句内忌三平尾、孤平
+- 押韵：押平声韵，一韵到底（首句可借韵）
+- 对仗：律诗颔联颈联须对仗（两句绝句体对仗不强制，但押韵平仄须合规）
+
+只评格律，不评内容。ok=true 时 issues 为空数组。
+"""
+
+
+def check_poem_geilv(client: LLMClient, poem: str) -> list[str]:
+    """校验诗作格律，返回问题列表（空=合规）。"""
+    import json
+
+    prompt = GEILV_CHECK_PROMPT.replace("{poem}", poem[:200])
     try:
-        raw = client.chat([{"role": "system", "content": prompt}], temperature=0.7)
-        return raw.strip()
+        raw = client.chat([{"role": "system", "content": prompt}], temperature=0.1)
     except Exception:
-        return ""
+        return ["格律校验调用失败"]
+    s = raw.strip()
+    a, b = s.find("{"), s.rfind("}")
+    if a == -1 or b <= a:
+        return ["格律校验响应解析失败"]
+    try:
+        data = json.loads(s[a : b + 1])
+    except Exception:
+        return ["格律校验 JSON 解析失败"]
+    if data.get("ok"):
+        return []
+    return data.get("issues") or ["格律不合规（未给出具体问题）"]
